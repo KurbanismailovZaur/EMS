@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 
-namespace Application.Control
+namespace Control.Behaviour
 {
 	public class StateMachine : MonoBehaviour 
 	{

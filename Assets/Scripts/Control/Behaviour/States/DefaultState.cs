@@ -6,7 +6,7 @@ using static UnityEngine.Debug;
 using UI;
 using UnityEngine.UI;
 
-namespace Application.Control.States
+namespace Control.Behaviour.States
 {
     public class DefaultState : State
     {
