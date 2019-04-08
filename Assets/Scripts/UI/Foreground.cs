@@ -18,17 +18,17 @@ namespace UI
 
         private bool _isBusy;
 
-        public Tween Show() => SwitchForegroundTo(1f);
+        public Tween Show() => SwitchForegroundTo(1f, true);
 
-        public Tween Hide() => SwitchForegroundTo(0f);
+        public Tween Hide() => SwitchForegroundTo(0f, false);
 
-        public Tween SwitchForegroundTo(float visibility)
+        public Tween SwitchForegroundTo(float visibility, bool blockRaycast)
         {
             if (_isBusy) throw new Exception("Tweening is busy");
 
             _isBusy = true;
 
-            return _group.DoAlpha(visibility, _duration).OnComplete(() => { _isBusy = false; }).Play();
+            return _group.DoAlpha(visibility, _duration).OnComplete(() => { _isBusy = false; _group.blocksRaycasts = blockRaycast; }).Play();
         }
     }
 }
