@@ -5,12 +5,19 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UI.Main.Contexts;
 using General;
+using UnityEngine.Events;
 
 namespace Managing
 {
 	public class ProjectManager : MonoBehaviour 
 	{
-        private Project _project;
+        private Project? _project;
+
+        #region Events
+        public UnityEvent Created;
+
+        public UnityEvent Closed;
+        #endregion
 
         private void RunAction(ProjectContext.Action action)
         {
@@ -36,9 +43,11 @@ namespace Managing
 
         private void New()
         {
-            CheckChangingAndShowDialog();
+            Close();
 
             _project = new Project();
+
+            Created.Invoke();
         }
 
         private void Load()
@@ -53,10 +62,13 @@ namespace Managing
 
         private void Close()
         {
+            if (_project == null) return;
+            
             CheckChangingAndShowDialog();
-
-            _project.Close();
+            
             _project = null;
+            
+            Closed.Invoke();
         }
 
         private void Quit()
@@ -68,7 +80,7 @@ namespace Managing
         {
             if (_project == null) return;
             
-            //TODO: modal dialog to save current project
+            //TODO: modal dialog to save current project if it was changed
         }
 
         #region Event handlers

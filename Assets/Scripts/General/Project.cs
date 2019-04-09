@@ -6,29 +6,12 @@ using static UnityEngine.Debug;
 
 namespace General
 {
-	public class Project 
+	public struct Project 
 	{
         private string _path;
 
         private string _name;
 
         private bool _wasChanged;
-
-        #region Static methods
-        public static Project Load(string path)
-        {
-            return null;
-        }
-        #endregion
-
-        public void Save()
-        {
-
-        }
-
-        public void Close()
-        {
-
-        }
 	}
 }
