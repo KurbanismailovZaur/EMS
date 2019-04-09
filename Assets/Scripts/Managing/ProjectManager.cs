@@ -36,7 +36,9 @@ namespace Managing
 
         private void New()
         {
-            Log("New");
+            CheckChangingAndShowDialog();
+
+            _project = new Project();
         }
 
         private void Load()
@@ -51,12 +53,22 @@ namespace Managing
 
         private void Close()
         {
-            Log("Close");
+            CheckChangingAndShowDialog();
+
+            _project.Close();
+            _project = null;
         }
 
         private void Quit()
         {
             Application.Quit();
+        }
+
+        private void CheckChangingAndShowDialog()
+        {
+            if (_project == null) return;
+            
+            //TODO: modal dialog to save current project
         }
 
         #region Event handlers

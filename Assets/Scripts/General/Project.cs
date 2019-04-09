@@ -14,8 +14,6 @@ namespace General
 
         private bool _wasChanged;
 
-
-
         #region Static methods
         public static Project Load(string path)
         {
@@ -24,6 +22,11 @@ namespace General
         #endregion
 
         public void Save()
+        {
+
+        }
+
+        public void Close()
         {
 
         }
