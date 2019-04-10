@@ -10,10 +10,10 @@ namespace Environment
     public class Axes : MonoBehaviour
     {
         [SerializeField]
-        private Transform _main;
+        private Transform _axes;
 
         [SerializeField]
-        private Transform _lines;
+        private Transform _grid;
 
         [SerializeField]
         private Camera _camera;
@@ -59,8 +59,14 @@ namespace Environment
 
         public bool AxesVisibility
         {
-            get => _main.gameObject.activeSelf;
-            set => _main.gameObject.SetActive(value);
+            get => _axes.gameObject.activeSelf;
+            set => _axes.gameObject.SetActive(value);
+        }
+
+        public bool GridVisibility
+        {
+            get => _grid.gameObject.activeSelf;
+            set => _grid.gameObject.SetActive(value);
         }
 
         private void Start()
@@ -127,7 +133,7 @@ namespace Environment
         {
             var line = VectorLine.SetLine3D(color, Vector3.zero, Vector3.zero, vector);
             line.name = name;
-            line.rectTransform.SetParent(_main);
+            line.rectTransform.SetParent(_axes);
             line.smoothColor = true;
             line.SetColors(new List<Color32>() { color, new Color(color.r, color.g, color.b, 0f) });
             line.lineWidth = _linesWidth;
@@ -138,7 +144,8 @@ namespace Environment
         private VectorLine CreateLine(Color color, Vector3 pointA, Vector3 pointB)
         {
             var line = VectorLine.SetLine3D(color, pointA, pointB);
-            line.rectTransform.SetParent(_lines);
+            line.lineWidth = _linesWidth;
+            line.rectTransform.SetParent(_grid);
 
             return line;
         }

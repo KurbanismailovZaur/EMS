@@ -19,7 +19,7 @@ namespace Managing
         public UnityEvent Closed;
         #endregion
 
-        private void RunAction(ProjectContext.Action action)
+        public void RunAction(ProjectContext.Action action)
         {
             switch (action)
             {
@@ -82,9 +82,5 @@ namespace Managing
             
             //TODO: modal dialog to save current project if it was changed
         }
-
-        #region Event handlers
-        public void ProjectContext_Selected(ProjectContext.Action action) => RunAction(action);
-        #endregion
     }
 }

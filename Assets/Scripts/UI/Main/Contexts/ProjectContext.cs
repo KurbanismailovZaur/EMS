@@ -45,16 +45,9 @@ namespace UI.Main.Contexts
         
         public void Quit() => Selected.Invoke(Action.Quit);
 
-        #region Event handlers
-        public void ProjectManager_Created()
+        public void SetButtonsInteractable(bool state)
         {
-            _saveButton.interactable = _closeButton.interactable = true;
+            _saveButton.interactable = _closeButton.interactable = state;
         }
-
-        public void ProjectManager_Closed()
-        {
-            _saveButton.interactable = _closeButton.interactable = false;
-        }
-        #endregion
     }
 }

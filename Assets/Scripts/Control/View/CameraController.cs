@@ -53,6 +53,9 @@ namespace Control.View
 
         private bool _isMouseInViewport;
 
+        [SerializeField]
+        private bool _isActive;
+
         #region Editor
 #if UNITY_EDITOR
         [Header("Debug")]
@@ -61,24 +64,21 @@ namespace Control.View
 #endif
         #endregion
 
+        public Camera Camera { get => _camera; }
+
         private float Size
         {
             get { return _size; }
             set { _size = Mathf.Clamp(value, 1f, _maxSize); }
         }
 
+        public bool IsActive { get => _isActive; set => _isActive = value; }
+
         private void Awake()
         {
             _camera = GetComponent<Camera>();
-            _size = _camera.orthographicSize;
 
-            _targetVector = transform.position - _origin;
-
-            _targetVector.Normalize();
-            _targetUpVector = transform.up;
-
-            _currentVector = _targetVector;
-            _currentUpVector = _targetUpVector;
+            SetTargetsToCurrentState();
         }
 
         private void Update()
@@ -97,6 +97,8 @@ namespace Control.View
 
         private void CalculateTargetTransform()
         {
+            if (!_isActive) return;
+
             Vector2 mouseDeltas = Input.GetKey(_key) ? new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) : Vector2.zero;
             mouseDeltas *= _mouseDeltaMultiplier;
 
@@ -111,8 +113,8 @@ namespace Control.View
 
         private void CalculateTargetSize()
         {
-            if (!_isMouseInViewport) return;
-            
+            if (!_isMouseInViewport || !_isActive) return;
+
             Size += -Input.GetAxis("Mouse ScrollWheel") * _mouseScrollMultiplier;
         }
 
@@ -128,6 +130,19 @@ namespace Control.View
         private void SetSizeToTarget()
         {
             _camera.orthographicSize = Mathf.Lerp(_camera.orthographicSize, Size, _sizeInterpolation * Time.deltaTime);
+        }
+
+        public void SetTargetsToCurrentState()
+        {
+            _size = _camera.orthographicSize;
+
+            _targetVector = transform.position - _origin;
+
+            _targetVector.Normalize();
+            _targetUpVector = transform.up;
+
+            _currentVector = _targetVector;
+            _currentUpVector = _targetUpVector;
         }
 
         #region Editor
