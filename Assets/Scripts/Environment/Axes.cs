@@ -7,8 +7,14 @@ using Vectrosity;
 
 namespace Environment
 {
-	public class Axes : MonoBehaviour 
-	{
+    public class Axes : MonoBehaviour
+    {
+        [SerializeField]
+        private Transform _main;
+
+        [SerializeField]
+        private Transform _lines;
+
         [SerializeField]
         private Camera _camera;
 
@@ -22,6 +28,12 @@ namespace Environment
         private Color _zColor;
 
         [SerializeField]
+        private Color _lineColor;
+
+        [SerializeField]
+        private Color _majorLineColor;
+
+        [SerializeField]
         [Range(1f, 8f)]
         private float _axesMagnitudeMultiplier = 1f;
 
@@ -29,34 +41,98 @@ namespace Environment
         [Range(1f, 4f)]
         private float _linesWidth = 1f;
 
-        private IEnumerator Start()
+        [SerializeField]
+        [Range(4, 384)]
+        private int _LinesCountPerAxis = 4;
+
+        [SerializeField]
+        [Range(8f, 256f)]
+        private float _lineMagnitude = 8f;
+
+        [SerializeField]
+        [Range(8f, 32f)]
+        private float _invisibleAngle = 8f;
+
+        [SerializeField]
+        [Range(8f, 40f)]
+        private float _visibleAngleOffset = 8f;
+
+        private void Start()
         {
-            var xLine = CreateExis("xAxis", _xColor, Vector3.right);
-            var yLine =  CreateExis("yAxis", _yColor, Vector3.up);
-            var zLine = CreateExis("zAxis", _zColor, Vector3.forward);
+            var xLine = CreateAxis("xAxis", _xColor, Vector3.right);
+            var yLine = CreateAxis("yAxis", _yColor, Vector3.up);
+            var zLine = CreateAxis("zAxis", _zColor, Vector3.forward);
 
-            var lines = new List<VectorLine>() { xLine, yLine, zLine };
+            var axes = new List<VectorLine>() { xLine, yLine, zLine };
+            var lines = new List<VectorLine>();
+            var majorLines = new List<VectorLine>();
 
+            for (int i = -_LinesCountPerAxis / 2; i < _LinesCountPerAxis / 2; i++)
+            {
+                if ((i + 1) % 10 != 0)
+                {
+                    lines.Add(CreateLine(_lineColor, new Vector3(i + 1f, 0f, -_lineMagnitude / 2f), new Vector3(i + 1f, 0f, _lineMagnitude / 2f)));
+                    lines.Add(CreateLine(_lineColor, new Vector3(-_lineMagnitude / 2f, 0f, i + 1f), new Vector3(_lineMagnitude / 2f, 0f, i + 1f)));
+                }
+                else
+                {
+                    majorLines.Add(CreateLine(_majorLineColor, new Vector3(i + 1f, 0f, -_lineMagnitude / 2f), new Vector3(i + 1f, 0f, _lineMagnitude / 2f)));
+                    majorLines.Add(CreateLine(_majorLineColor, new Vector3(-_lineMagnitude / 2f, 0f, i + 1f), new Vector3(_lineMagnitude / 2f, 0f, i + 1f)));
+                }
+            }
+
+            StartCoroutine(UpdateAxes(axes));
+            StartCoroutine(UpdateLines(lines, majorLines));
+        }
+
+        private IEnumerator UpdateAxes(List<VectorLine> axes)
+        {
             while (true)
             {
-                foreach (var line in lines)
+                foreach (var axis in axes)
                 {
-                    line.points3[2] = line.points3[2].normalized * _camera.orthographicSize * _axesMagnitudeMultiplier;
-                    line.Draw3D();
+                    axis.points3[2] = axis.points3[2].normalized * _camera.orthographicSize * _axesMagnitudeMultiplier;
+                    axis.Draw3D();
                 }
 
                 yield return null;
             }
         }
 
-        private VectorLine CreateExis(string name, Color color, Vector3 vector)
+        private IEnumerator UpdateLines(List<VectorLine> lines, List<VectorLine> majorLines)
+        {
+            while (true)
+            {
+                var angle = Vector3.Angle(_camera.transform.position, new Vector3(_camera.transform.position.x, 0f, _camera.transform.position.z));
+
+                float alpha = Mathf.Min(Mathf.Max(angle - _invisibleAngle, 0f) / _visibleAngleOffset, 1f);
+
+                for (int i = 0; i < lines.Count; i++)
+                    lines[i].color = new Color(_lineColor.r, _lineColor.g, _lineColor.b, _lineColor.a * alpha);
+
+                for (int i = 0; i < majorLines.Count; i++)
+                    majorLines[i].color = new Color(_majorLineColor.r, _majorLineColor.g, _majorLineColor.b, _majorLineColor.a * alpha);
+
+                yield return null;
+            }
+        }
+
+        private VectorLine CreateAxis(string name, Color color, Vector3 vector)
         {
             var line = VectorLine.SetLine3D(color, Vector3.zero, Vector3.zero, vector);
             line.name = name;
-            line.rectTransform.SetParent(transform);
+            line.rectTransform.SetParent(_main);
             line.smoothColor = true;
             line.SetColors(new List<Color32>() { color, new Color(color.r, color.g, color.b, 0f) });
             line.lineWidth = _linesWidth;
+
+            return line;
+        }
+
+        private VectorLine CreateLine(Color color, Vector3 pointA, Vector3 pointB)
+        {
+            var line = VectorLine.SetLine3D(color, pointA, pointB);
+            line.rectTransform.SetParent(_lines);
 
             return line;
         }

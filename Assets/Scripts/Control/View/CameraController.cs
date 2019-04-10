@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using static UnityEngine.Debug;
 
 namespace Control.Transformation
 {
@@ -111,10 +112,10 @@ namespace Control.Transformation
 #if UNITY_EDITOR
         private void DrawDebugLines()
         {
-            Debug.DrawLine(_origin, _origin + _targetVector, Color.red);
-            Debug.DrawLine(_origin, _origin + _targetUpVector, Color.green);
-            Debug.DrawLine(_origin, _origin + _currentVector, Color.yellow);
-            Debug.DrawLine(_origin, _origin + _currentUpVector, Color.white);
+            DrawLine(_origin, _origin + _targetVector, Color.red);
+            DrawLine(_origin, _origin + _targetUpVector, Color.green);
+            DrawLine(_origin, _origin + _currentVector, Color.yellow);
+            DrawLine(_origin, _origin + _currentUpVector, Color.white);
         }
 #endif
     }
