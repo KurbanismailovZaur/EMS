@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using static UnityEngine.Debug;
 
-namespace Control.Transformation
+namespace Control.View
 {
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour
@@ -29,8 +29,8 @@ namespace Control.Transformation
 
         [SerializeField]
         [Range(1f, 32f)]
-        private float _interpolation = 1f;
-        
+        private float _transformInterpolation = 1f;
+
         [SerializeField]
         [Range(1f, 8f)]
         private float _mouseDeltaMultiplier = 1f;
@@ -47,11 +47,19 @@ namespace Control.Transformation
         [Range(1f, 64f)]
         private float _maxSize = 1f;
 
+        [SerializeField]
+        [Range(1f, 32f)]
+        private float _sizeInterpolation = 1f;
+
+        private bool _isMouseInViewport;
+
+        #region Editor
 #if UNITY_EDITOR
         [Header("Debug")]
         [SerializeField]
         private bool _drawDebugLines;
 #endif
+        #endregion
 
         private float Size
         {
@@ -75,18 +83,20 @@ namespace Control.Transformation
 
         private void Update()
         {
-            CalculateTargetRotation();
-            SetTransformToTargets();
+            CalculateTargetSize();
 
+            SetTransformToTargets();
+            SetSizeToTarget();
+
+            #region Editor
 #if UNITY_EDITOR
             if (_drawDebugLines) DrawDebugLines();
 #endif
+            #endregion
         }
 
-        private void CalculateTargetRotation()
+        private void CalculateTargetTransform()
         {
-            Size += -Input.GetAxis("Mouse ScrollWheel") * _mouseScrollMultiplier;
-
             Vector2 mouseDeltas = Input.GetKey(_key) ? new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) : Vector2.zero;
             mouseDeltas *= _mouseDeltaMultiplier;
 
@@ -99,16 +109,28 @@ namespace Control.Transformation
             _targetUpVector = yRotation * Vector3.up;
         }
 
+        private void CalculateTargetSize()
+        {
+            if (!_isMouseInViewport) return;
+            
+            Size += -Input.GetAxis("Mouse ScrollWheel") * _mouseScrollMultiplier;
+        }
+
         private void SetTransformToTargets()
         {
-            _currentVector = Quaternion.Lerp(Quaternion.LookRotation(_currentVector, _targetUpVector), Quaternion.LookRotation(_targetVector, _targetUpVector), _interpolation * Time.deltaTime) * Vector3.forward;
-            _currentUpVector = Quaternion.Lerp(Quaternion.LookRotation(_currentUpVector, _currentVector), Quaternion.LookRotation(_targetUpVector, _targetVector), _interpolation * Time.deltaTime) * Vector3.forward;
+            _currentVector = Quaternion.Lerp(Quaternion.LookRotation(_currentVector, _targetUpVector), Quaternion.LookRotation(_targetVector, _targetUpVector), _transformInterpolation * Time.deltaTime) * Vector3.forward;
+            _currentUpVector = Quaternion.Lerp(Quaternion.LookRotation(_currentUpVector, _currentVector), Quaternion.LookRotation(_targetUpVector, _targetVector), _transformInterpolation * Time.deltaTime) * Vector3.forward;
 
             transform.position = _origin + (_currentVector * _offset);
             transform.LookAt(_origin, _currentUpVector);
-            _camera.orthographicSize = Size;
         }
 
+        private void SetSizeToTarget()
+        {
+            _camera.orthographicSize = Mathf.Lerp(_camera.orthographicSize, Size, _sizeInterpolation * Time.deltaTime);
+        }
+
+        #region Editor
 #if UNITY_EDITOR
         private void DrawDebugLines()
         {
@@ -118,5 +140,14 @@ namespace Control.Transformation
             DrawLine(_origin, _origin + _currentUpVector, Color.white);
         }
 #endif
+        #endregion
+
+        #region Event handlers
+        public void EventTrigger_PointerEnter(BaseEventData eventData) => _isMouseInViewport = true;
+
+        public void EventTrigger_PointerExit(BaseEventData eventData) => _isMouseInViewport = false;
+
+        public void EventTrigger_Drag(BaseEventData eventData) => CalculateTargetTransform();
+        #endregion
     }
 }

@@ -57,6 +57,12 @@ namespace Environment
         [Range(8f, 40f)]
         private float _visibleAngleOffset = 8f;
 
+        public bool AxesVisibility
+        {
+            get => _main.gameObject.activeSelf;
+            set => _main.gameObject.SetActive(value);
+        }
+
         private void Start()
         {
             var xLine = CreateAxis("xAxis", _xColor, Vector3.right);
