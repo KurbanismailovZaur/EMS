@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using Vectrosity;
+using System.IO;
+using Dummiesman;
 
 namespace Namespace
 {
@@ -13,7 +15,8 @@ namespace Namespace
 
         void Start()
         {
-            VectorLine.SetLine3D(Color.white, Vector3.zero, Vector3.one).name = "Line";
+            new OBJLoader().Load(@"C:\Users\Zaur Magomedovich\Desktop\model.obj");
+            //ObjImporter.Import(File.ReadAllText(@"C:\Users\Zaur Magomedovich\Desktop\IronMan.obj"));
         }
     }
 }

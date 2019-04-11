@@ -17,7 +17,13 @@ namespace Control.Facades
         private ProjectContext _projectContext;
 
         [SerializeField]
+        private ModelContext _modelContext;
+
+        [SerializeField]
         private ProjectManager _projectManager;
+
+        [SerializeField]
+        private ModelManager _modelManager;
 
         [SerializeField]
         private Axes _axes;
@@ -43,6 +49,7 @@ namespace Control.Facades
         public void ProjectManager_Created()
         {
             _projectContext.SetButtonsInteractable(true);
+            _modelContext.ImportInteractable = true;
 
             _axes.AxesVisibility = _axes.GridVisibility = true;
 
@@ -52,12 +59,18 @@ namespace Control.Facades
         public void ProjectManager_Closed()
         {
             _projectContext.SetButtonsInteractable(false);
+            _modelContext.ImportInteractable = false;
 
             _axes.AxesVisibility = _axes.GridVisibility = false;
 
             SetCameraToDefaultState();
 
             _cameraController.IsActive = false;
+        }
+
+        public void ModelContext_Selected(ModelContext.Action action)
+        {
+            //_modelManager.RunAction(action);
         }
         #endregion
     }
