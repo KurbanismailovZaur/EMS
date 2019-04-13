@@ -6,17 +6,18 @@ using static UnityEngine.Debug;
 using Vectrosity;
 using System.IO;
 using Dummiesman;
+using Browsing.FileSystem;
 
 namespace Namespace
 {
     public class Test : MonoBehaviour
     {
-        public Material material;
+        [SerializeField]
+        private FileExplorer _explorer;
 
         void Start()
         {
-            new OBJLoader().Load(@"C:\Users\Zaur Magomedovich\Desktop\model.obj");
-            //ObjImporter.Import(File.ReadAllText(@"C:\Users\Zaur Magomedovich\Desktop\IronMan.obj"));
+            _explorer.OpenFile("Импорт Модели", "\\");
         }
     }
 }

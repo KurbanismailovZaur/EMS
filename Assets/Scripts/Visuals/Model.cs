@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
-using Visuals;
 
-namespace Managing
+namespace Visuals
 {
-	public class ModelManager : MonoBehaviour 
+	public class Model : MonoBehaviour 
 	{
-        private Model _model;
 	}
 }

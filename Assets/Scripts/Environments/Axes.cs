@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using Vectrosity;
 
-namespace Environment
+namespace Environments
 {
     public class Axes : MonoBehaviour
     {
