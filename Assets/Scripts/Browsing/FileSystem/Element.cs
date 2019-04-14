@@ -13,6 +13,13 @@ namespace Browsing.FileSystem
     public class Element : MonoBehaviour, IPointerDownHandler
     {
         #region Classes
+        public enum Type
+        {
+            Drive,
+            Directory,
+            File
+        }
+
         public static class Factory
         {
             public static Element Create(Element prefab, Transform container, string path, string name)
@@ -40,6 +47,13 @@ namespace Browsing.FileSystem
 
         private string _name;
 
+        private string _extension;
+
+        [SerializeField]
+        private Type _elementType;
+
+        public Type ElementType { get => _elementType; }
+
         public ClickedEvent Clicked;
 
         public DoubleClickedEvent DoubleClicked;
@@ -52,9 +66,17 @@ namespace Browsing.FileSystem
             private set
             {
                 _name = value;
+
+                _extension = System.IO.Path.GetExtension(_name);
+
+                if (_extension != string.Empty)
+                    _extension = _extension.Substring(1);
+
                 _text.text = _name;
             }
         }
+
+        public string Extension { get => _extension; }
 
         public Color Color
         {

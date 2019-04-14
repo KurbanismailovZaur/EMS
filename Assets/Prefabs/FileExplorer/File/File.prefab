@@ -244,6 +244,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 5953173476668094244}
   _image: {fileID: 8729737140808753747}
+  _elementType: 2
   Clicked:
     m_PersistentCalls:
       m_Calls: []

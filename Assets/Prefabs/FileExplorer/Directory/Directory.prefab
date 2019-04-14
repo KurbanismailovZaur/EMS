@@ -170,6 +170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 3614717506216055702}
   _image: {fileID: 562181408756472693}
+  _elementType: 1
   Clicked:
     m_PersistentCalls:
       m_Calls: []
