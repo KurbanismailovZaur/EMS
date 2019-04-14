@@ -15,8 +15,10 @@ namespace Browsing.FileSystem
 {
     public class FileExplorer : MonoBehaviour
     {
+        #region Class-events
         [Serializable]
         public class SubmitedEvent : UnityEvent<string[]> { }
+        #endregion
 
         [Header("File Explorer")]
         [SerializeField]
@@ -35,6 +37,9 @@ namespace Browsing.FileSystem
         private Button _parentButton;
 
         [SerializeField]
+        private Button _refreshButton;
+
+        [SerializeField]
         private InputField _addressInput;
 
         [SerializeField]
@@ -44,10 +49,19 @@ namespace Browsing.FileSystem
         private InputField _nameInput;
 
         [SerializeField]
+        private Transform _bookmarks;
+
+        [SerializeField]
         private Dropdown _filterDropdown;
 
         [SerializeField]
         private Button _submitButton;
+
+        [SerializeField]
+        private Button _cancelButton;
+
+        [SerializeField]
+        private Button _exceptionCloseButton;
 
         private bool _isBusy;
 
@@ -92,12 +106,12 @@ namespace Browsing.FileSystem
         public UnityEvent Canceled;
         #endregion
 
-        public string CurrentPath { get => _pathsHistory[_currentPathHistoryIndex]; }
+        private string CurrentPath { get => _pathsHistory[_currentPathHistoryIndex]; }
 
-        public string[] Filters
+        private string[] Filters
         {
             get => _filters;
-            private set
+            set
             {
                 _filters = value;
 
@@ -112,30 +126,56 @@ namespace Browsing.FileSystem
             }
         }
 
-        public string CurrentFilter { get => Filters[_filterDropdown.value]; }
+        private string CurrentFilter { get => Filters[_filterDropdown.value]; }
+
+        private void Awake() => SubscribeOnInnerEvents();
+
+        private void SubscribeOnInnerEvents()
+        {
+            _previousButton.onClick.AddListener(ShowPreviousContent);
+            _nextButton.onClick.AddListener(ShowNextContent);
+            _parentButton.onClick.AddListener(ShowParentContent);
+            _refreshButton.onClick.AddListener(RefreshContent);
+
+            foreach (var bookmark in _bookmarks.GetComponentsInChildren<Bookmark>())
+                bookmark.Clicked.AddListener(Bookmark_Clicked);
+
+            _filterDropdown.onValueChanged.AddListener(FilterDropdown_OnValueChanged);
+
+            _submitButton.onClick.AddListener(Submit);
+            _cancelButton.onClick.AddListener(Cancel);
+
+            _exceptionCloseButton.onClick.AddListener(HideException);
+        }
 
         public void OpenFile(string title = null, string path = null, string filters = null)
         {
             if (_isBusy) throw new BusyException("File explorer already opened.");
-
-            _isBusy = true;
-
+            
             ResetData();
 
             _titleText.text = title ?? "Открыть файл";
 
-            if (path != null)
-                CheckPath(path);
-            else
-                path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            if (path == null) path = string.Empty;
+            CheckPath(path);
 
-            if (filters != null)
-                CheckAndSaveFilters(filters);
-            else
-                Filters = new string[] { "*" };
+            if (filters == null) filters = "*";
+            Filters = CheckAndCorrectFilters(filters);
 
-            ShowExplorer();
+            StartExploring();
             ShowContent(path);
+        }
+
+        private void StartExploring()
+        {
+            _isBusy = true;
+            SetCanvasGroupParameters(1f, true);
+        }
+
+        private void StopExploring()
+        {
+            _isBusy = false;
+            SetCanvasGroupParameters(0f, false);
         }
 
         private void SetCanvasGroupParameters(float alpha, bool state)
@@ -144,16 +184,12 @@ namespace Browsing.FileSystem
             _canvasGroup.blocksRaycasts = _canvasGroup.interactable = state;
         }
 
-        private void ShowExplorer() => SetCanvasGroupParameters(1f, true);
-
-        private void HideExplorer() => SetCanvasGroupParameters(0f, false);
-
         private void CheckPath(string path)
         {
-            if (!Directory.Exists(path)) throw new IOException("Directory not exist.");
+            if (path != string.Empty && !Directory.Exists(path)) throw new IOException("Directory not exist.");
         }
 
-        private void CheckAndSaveFilters(string filters)
+        private string[] CheckAndCorrectFilters(string filters)
         {
             var splittedFilters = filters.Split('|');
 
@@ -170,16 +206,16 @@ namespace Browsing.FileSystem
                     throw new FormatException("Filter can not contain * and any extension together.");
             }
 
-            Filters = splittedFilters;
+            return splittedFilters;
         }
 
-        public void ShowContent(string path, bool updateHistory = true)
+        private void ShowContent(string path, bool updateHistory = true)
         {
             ClearContent();
 
             try
             {
-                if (path == "\\")
+                if (path == string.Empty)
                     ShowLogicalDrives();
                 else
                     ShowDirectoryContent(path);
@@ -189,7 +225,7 @@ namespace Browsing.FileSystem
 
                 _previousButton.interactable = _currentPathHistoryIndex != 0;
                 _nextButton.interactable = _currentPathHistoryIndex != _pathsHistory.Count - 1;
-                _parentButton.interactable = CurrentPath != "\\";
+                _parentButton.interactable = CurrentPath != string.Empty;
 
                 _addressInput.text = path;
             }
@@ -200,15 +236,9 @@ namespace Browsing.FileSystem
             }
         }
 
-        public void RedrawContent() => ShowContent(CurrentPath, false);
+        private void RefreshContent() => ShowContent(CurrentPath, false);
 
-        public void ShowThisComputerContent() => ShowContentWithoutRedraw("\\");
-
-        public void ShowDesktopContent() => ShowContentWithoutRedraw(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
-
-        public void ShowMyDocumentsContent() => ShowContentWithoutRedraw(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-
-        public void ShowContentWithoutRedraw(string path)
+        private void ShowContentWithoutRedraw(string path)
         {
             if (CurrentPath != path) ShowContent(path);
         }
@@ -299,7 +329,7 @@ namespace Browsing.FileSystem
             _pathsHistory.Clear();
         }
 
-        public void ShowPreviousContent()
+        private void ShowPreviousContent()
         {
             if (_currentPathHistoryIndex == 0) return;
 
@@ -308,7 +338,7 @@ namespace Browsing.FileSystem
             ShowContent(CurrentPath, false);
         }
 
-        public void ShowNextContent()
+        private void ShowNextContent()
         {
             if (_currentPathHistoryIndex == _pathsHistory.Count - 1) return;
 
@@ -317,11 +347,11 @@ namespace Browsing.FileSystem
             ShowContent(CurrentPath, false);
         }
 
-        public void ShowParentContent()
+        private void ShowParentContent()
         {
-            if (CurrentPath == "\\") return;
+            if (CurrentPath == string.Empty) return;
 
-            ShowContent(Path.GetDirectoryName(CurrentPath) ?? "\\");
+            ShowContent(Path.GetDirectoryName(CurrentPath) ?? string.Empty);
         }
 
         private void ShowException(string message)
@@ -330,27 +360,28 @@ namespace Browsing.FileSystem
             _exceptionMessageText.text = message;
         }
 
-        public void HideException() => _exception.SetActive(false);
+        private void HideException() => _exception.SetActive(false);
 
-        public void Submit()
+        private void Submit()
         {
-            _isBusy = false;
-
-            HideExplorer();
-
+            StopExploring();
             Submited.Invoke(new string[] { _currentElement.Path });
         }
 
-        public void Cancel()
+        private void Cancel()
         {
-            _isBusy = false;
-
-            HideExplorer();
-
+            StopExploring();
             Canceled.Invoke();
         }
 
         #region Event handlers
+        private void FilterDropdown_OnValueChanged(int value) => RefreshContent();
+
+        private void Bookmark_Clicked(Bookmark bookmark)
+        {
+            ShowContentWithoutRedraw(Environment.GetFolderPath(bookmark.SpecialFolder));
+        }
+
         private void DriveElement_Clicked(Element drive) => SelectElement(drive);
 
         private void DriveElement_DoubleClicked(Element drive) => ShowContent(drive.Path);
@@ -362,10 +393,6 @@ namespace Browsing.FileSystem
         private void FileElement_Clicked(Element directory) => SelectElement(directory);
 
         private void FileElement_DoubleClicked(Element directory) => Submit();
-
-        public void SubmitButton_OnClick() => Submit();
-
-        public void CancelButton_OnClick() => Cancel();
         #endregion
     }
 }
