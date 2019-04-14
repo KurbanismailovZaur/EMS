@@ -16,7 +16,7 @@ namespace Browsing.FileSystem
     public class FileExplorer : MonoBehaviour
     {
         [Serializable]
-        public class SubmitedEvent : UnityEvent<string> { }
+        public class SubmitedEvent : UnityEvent<string[]> { }
 
         [Header("File Explorer")]
         [SerializeField]
@@ -24,10 +24,6 @@ namespace Browsing.FileSystem
 
         [SerializeField]
         private Text _titleText;
-
-        private bool _isBusy;
-
-        private string[] _filters;
 
         [SerializeField]
         private Button _previousButton;
@@ -43,6 +39,19 @@ namespace Browsing.FileSystem
 
         [SerializeField]
         private Transform _content;
+
+        [SerializeField]
+        private InputField _nameInput;
+
+        [SerializeField]
+        private Dropdown _filterDropdown;
+
+        [SerializeField]
+        private Button _submitButton;
+
+        private bool _isBusy;
+
+        private string[] _filters;
 
         private Element _currentElement;
 
@@ -85,6 +94,26 @@ namespace Browsing.FileSystem
 
         public string CurrentPath { get => _pathsHistory[_currentPathHistoryIndex]; }
 
+        public string[] Filters
+        {
+            get => _filters;
+            private set
+            {
+                _filters = value;
+
+                var dropdownFilters = new List<string>(_filters);
+
+                _filterDropdown.ClearOptions();
+
+                for (int i = 0; i < dropdownFilters.Count; i++)
+                    dropdownFilters[i] = dropdownFilters[i].Replace(" ", ", ");
+
+                _filterDropdown.AddOptions(dropdownFilters);
+            }
+        }
+
+        public string CurrentFilter { get => Filters[_filterDropdown.value]; }
+
         public void OpenFile(string title = null, string path = null, string filters = null)
         {
             if (_isBusy) throw new BusyException("File explorer already opened.");
@@ -95,8 +124,6 @@ namespace Browsing.FileSystem
 
             _titleText.text = title ?? "Открыть файл";
 
-            ShowExplorer();
-
             if (path != null)
                 CheckPath(path);
             else
@@ -105,8 +132,9 @@ namespace Browsing.FileSystem
             if (filters != null)
                 CheckAndSaveFilters(filters);
             else
-                _filters = new string[] { "*" };
+                Filters = new string[] { "*" };
 
+            ShowExplorer();
             ShowContent(path);
         }
 
@@ -142,7 +170,7 @@ namespace Browsing.FileSystem
                     throw new FormatException("Filter can not contain * and any extension together.");
             }
 
-            _filters = splittedFilters;
+            Filters = splittedFilters;
         }
 
         public void ShowContent(string path, bool updateHistory = true)
@@ -171,6 +199,8 @@ namespace Browsing.FileSystem
                 ShowException(ex.Message);
             }
         }
+
+        public void RedrawContent() => ShowContent(CurrentPath, false);
 
         public void ShowThisComputerContent() => ShowContentWithoutRedraw("\\");
 
@@ -217,6 +247,11 @@ namespace Browsing.FileSystem
 
                 file.Clicked.AddListener(FileElement_Clicked);
                 file.DoubleClicked.AddListener(FileElement_DoubleClicked);
+
+                var fileExtensions = Path.GetExtension(file.Name).Substring(1);
+                if (CurrentFilter == "*" || CurrentFilter.Split(' ').Any(ex => fileExtensions == ex)) continue;
+
+                file.gameObject.SetActive(false);
             }
         }
 
@@ -231,16 +266,32 @@ namespace Browsing.FileSystem
 
         private void ClearContent()
         {
+            DeselectCurrentElement();
+
             foreach (Transform child in _content)
                 Destroy(child.gameObject);
         }
 
         private void SelectElement(Element element)
         {
-            if (_currentElement) _currentElement.Color = _defaultColor;
+            if (_currentElement) DeselectCurrentElement();
 
             _currentElement = element;
             _currentElement.Color = _selectedColor;
+
+            _nameInput.text = element.Name;
+            _submitButton.interactable = true;
+        }
+
+        public void DeselectCurrentElement()
+        {
+            if (!_currentElement) return;
+
+            _currentElement.Color = _defaultColor;
+            _currentElement = null;
+
+            _nameInput.text = string.Empty;
+            _submitButton.interactable = false;
         }
 
         private void ResetData()
@@ -269,7 +320,7 @@ namespace Browsing.FileSystem
         public void ShowParentContent()
         {
             if (CurrentPath == "\\") return;
-            
+
             ShowContent(Path.GetDirectoryName(CurrentPath) ?? "\\");
         }
 
@@ -280,6 +331,24 @@ namespace Browsing.FileSystem
         }
 
         public void HideException() => _exception.SetActive(false);
+
+        public void Submit()
+        {
+            _isBusy = false;
+
+            HideExplorer();
+
+            Submited.Invoke(new string[] { _currentElement.Path });
+        }
+
+        public void Cancel()
+        {
+            _isBusy = false;
+
+            HideExplorer();
+
+            Canceled.Invoke();
+        }
 
         #region Event handlers
         private void DriveElement_Clicked(Element drive) => SelectElement(drive);
@@ -292,10 +361,11 @@ namespace Browsing.FileSystem
 
         private void FileElement_Clicked(Element directory) => SelectElement(directory);
 
-        private void FileElement_DoubleClicked(Element directory)
-        {
+        private void FileElement_DoubleClicked(Element directory) => Submit();
 
-        }
+        public void SubmitButton_OnClick() => Submit();
+
+        public void CancelButton_OnClick() => Cancel();
         #endregion
     }
 }

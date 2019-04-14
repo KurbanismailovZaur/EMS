@@ -19,7 +19,7 @@ namespace Browsing.FileSystem
             {
                 Element file = Instantiate(prefab, container);
                 file.Path = path;
-                file._text.text = name;
+                file.Name = name;
 
                 return file;
             }
@@ -31,20 +31,36 @@ namespace Browsing.FileSystem
         [Serializable]
         public class DoubleClickedEvent : UnityEvent<Element> { }
         #endregion
-        
+
         [SerializeField]
         private Text _text;
 
         [SerializeField]
         private Image _image;
 
+        private string _name;
+
         public ClickedEvent Clicked;
 
         public DoubleClickedEvent DoubleClicked;
 
-        public string Path{ get; private set; }
+        public string Path { get; private set; }
 
-        public Color Color { get => _image.color; set => _image.color = value; }
+        public string Name
+        {
+            get => _name;
+            private set
+            {
+                _name = value;
+                _text.text = _name;
+            }
+        }
+
+        public Color Color
+        {
+            get => _image.color;
+            set => _image.color = value;
+        }
 
         private Coroutine _clickDetectRoutine;
 

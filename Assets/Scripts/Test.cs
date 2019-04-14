@@ -17,7 +17,8 @@ namespace Namespace
 
         void Start()
         {
-            _explorer.OpenFile("Импорт Модели", "\\");
+            _explorer.Submited.AddListener(x => { Log(x[0]); });
+            _explorer.OpenFile("Импорт Модели", filters: "* | obj fbx blend | png jpg tga");
         }
     }
 }
