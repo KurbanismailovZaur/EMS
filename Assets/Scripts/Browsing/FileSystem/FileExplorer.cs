@@ -30,7 +30,16 @@ namespace Browsing.FileSystem
         private string[] _filters;
 
         [SerializeField]
-        private InputField _address;
+        private Button _previousButton;
+
+        [SerializeField]
+        private Button _nextButton;
+
+        [SerializeField]
+        private Button _parentButton;
+
+        [SerializeField]
+        private InputField _addressInput;
 
         [SerializeField]
         private Transform _content;
@@ -73,6 +82,8 @@ namespace Browsing.FileSystem
 
         public UnityEvent Canceled;
         #endregion
+
+        public string CurrentPath { get => _pathsHistory[_currentPathHistoryIndex]; }
 
         public void OpenFile(string title = null, string path = null, string filters = null)
         {
@@ -134,7 +145,7 @@ namespace Browsing.FileSystem
             _filters = splittedFilters;
         }
 
-        private void ShowContent(string path, bool updateHistory = true)
+        public void ShowContent(string path, bool updateHistory = true)
         {
             ClearContent();
 
@@ -147,12 +158,29 @@ namespace Browsing.FileSystem
 
                 if (updateHistory)
                     AddPathToHistory(path);
+
+                _previousButton.interactable = _currentPathHistoryIndex != 0;
+                _nextButton.interactable = _currentPathHistoryIndex != _pathsHistory.Count - 1;
+                _parentButton.interactable = CurrentPath != "\\";
+
+                _addressInput.text = path;
             }
             catch (Exception ex)
             {
-                ShowContent(_pathsHistory[_currentPathHistoryIndex], false);
+                ShowContent(CurrentPath, false);
                 ShowException(ex.Message);
             }
+        }
+
+        public void ShowThisComputerContent() => ShowContentWithoutRedraw("\\");
+
+        public void ShowDesktopContent() => ShowContentWithoutRedraw(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+
+        public void ShowMyDocumentsContent() => ShowContentWithoutRedraw(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+
+        public void ShowContentWithoutRedraw(string path)
+        {
+            if (CurrentPath != path) ShowContent(path);
         }
 
         private void ShowLogicalDrives()
@@ -226,7 +254,23 @@ namespace Browsing.FileSystem
 
             _currentPathHistoryIndex -= 1;
 
-            ShowContent(_pathsHistory[_currentPathHistoryIndex], false);
+            ShowContent(CurrentPath, false);
+        }
+
+        public void ShowNextContent()
+        {
+            if (_currentPathHistoryIndex == _pathsHistory.Count - 1) return;
+
+            _currentPathHistoryIndex += 1;
+
+            ShowContent(CurrentPath, false);
+        }
+
+        public void ShowParentContent()
+        {
+            if (CurrentPath == "\\") return;
+            
+            ShowContent(Path.GetDirectoryName(CurrentPath) ?? "\\");
         }
 
         private void ShowException(string message)
