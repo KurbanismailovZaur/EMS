@@ -18,6 +18,7 @@ namespace Browsing.FileSystem
         [Serializable]
         public class SubmitedEvent : UnityEvent<string> { }
 
+        [Header("File Explorer")]
         [SerializeField]
         private CanvasGroup _canvasGroup;
 
@@ -36,15 +37,23 @@ namespace Browsing.FileSystem
 
         private Element _currentElement;
 
+        private List<string> _pathsHistory = new List<string>();
+
+        private int _currentPathHistoryIndex = -1;
+
+        [Header("Exception")]
+        [SerializeField]
+        private GameObject _exception;
+
+        [SerializeField]
+        private Text _exceptionMessageText;
+
+        [Header("Element")]
         [SerializeField]
         private Color _defaultColor = Color.white;
 
         [SerializeField]
         private Color _selectedColor = Color.blue;
-
-        private List<string> _pathsHistory = new List<string>();
-
-        private int _currentPathHistoryIndex = -1;
 
         #region Prefabs
         [Header("Prefabs")]
@@ -127,13 +136,23 @@ namespace Browsing.FileSystem
 
         private void ShowContent(string path, bool updateHistory = true)
         {
-            if (path == "\\")
-                ShowLogicalDrives();
-            else
-                ShowDirectoryContent(path);
+            ClearContent();
 
-            if (updateHistory)
-                AddPathToHistory(path);
+            try
+            {
+                if (path == "\\")
+                    ShowLogicalDrives();
+                else
+                    ShowDirectoryContent(path);
+
+                if (updateHistory)
+                    AddPathToHistory(path);
+            }
+            catch (Exception ex)
+            {
+                ShowContent(_pathsHistory[_currentPathHistoryIndex], false);
+                ShowException(ex.Message);
+            }
         }
 
         private void ShowLogicalDrives()
@@ -152,8 +171,6 @@ namespace Browsing.FileSystem
         private void ShowDirectoryContent(string path)
         {
             if (!Directory.Exists(path)) throw new IOException("Directory not exist.");
-
-            ClearContent();
 
             var directories = Directory.GetDirectories(path);
             var files = Directory.GetFiles(path);
@@ -211,6 +228,14 @@ namespace Browsing.FileSystem
 
             ShowContent(_pathsHistory[_currentPathHistoryIndex], false);
         }
+
+        private void ShowException(string message)
+        {
+            _exception.SetActive(true);
+            _exceptionMessageText.text = message;
+        }
+
+        public void HideException() => _exception.SetActive(false);
 
         #region Event handlers
         private void DriveElement_Clicked(Element drive) => SelectElement(drive);
