@@ -10,6 +10,7 @@ using Exceptions;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace Browsing.FileSystem
 {
@@ -17,7 +18,7 @@ namespace Browsing.FileSystem
     {
         #region Classes
         [Serializable]
-        public class SubmitedEvent : UnityEvent<string[]> { }
+        public class SubmitedEvent : UnityEvent<ReadOnlyCollection<string>> { }
 
         private abstract class State
         {
@@ -38,6 +39,12 @@ namespace Browsing.FileSystem
             public abstract void SetFooterState(string filename);
 
             public abstract void Submit();
+
+            protected virtual void SetResultsAndSubmit(string[] results)
+            {
+                _explorer._results = results;
+                _explorer.Submited.Invoke(new ReadOnlyCollection<string>(_explorer._results));
+            }
 
             #region Event handlers
             public abstract void FilenameInput_OnEndEdit(string name);
@@ -63,7 +70,7 @@ namespace Browsing.FileSystem
 
             public override void Submit()
             {
-                _explorer.Submited.Invoke(new string[] { _explorer._currentElement.Path });
+                SetResultsAndSubmit(new string[] { _explorer._currentElement.Path });
             }
 
             #region Event handlers
@@ -99,7 +106,7 @@ namespace Browsing.FileSystem
 
             public override void Submit()
             {
-                _explorer.Submited.Invoke(new string[] { Path.Combine(_explorer._addressInput.text, _explorer._nameInput.text) });
+                SetResultsAndSubmit(new string[] { Path.Combine(_explorer._addressInput.text, _explorer._nameInput.text) });
             }
 
             #region Event handlers
@@ -195,6 +202,8 @@ namespace Browsing.FileSystem
 
         private Coroutine _routine;
 
+        private string[] _results;
+
         [Header("Submit")]
         [SerializeField]
         private string _openFileSubmitText;
@@ -240,6 +249,8 @@ namespace Browsing.FileSystem
         private string CurrentFilter { get => Filters[_filterDropdown.value]; }
 
         private string[] CurrentFlterExtensions { get; set; }
+
+        public ReadOnlyCollection<string> LastResults { get => new ReadOnlyCollection<string>(_results); }
         #endregion
 
         #region Methods
@@ -623,6 +634,9 @@ namespace Browsing.FileSystem
         private void Cancel()
         {
             StopExploring();
+
+            _results = new string[0];
+
             Canceled.Invoke();
         }
         #endregion

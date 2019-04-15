@@ -49,7 +49,11 @@ namespace Control.Facades
         private IEnumerator ImportModelRoutine()
         {
             yield return _explorer.OpenFile("Импорт Модели", null, "obj");
-            Log("Waited");
+
+            foreach (var path in _explorer.LastResults)
+            {
+                Log(path);
+            }
         }
 
         #region Event handlers
