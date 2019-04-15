@@ -19,29 +19,7 @@ namespace Managing
         public UnityEvent Closed;
         #endregion
 
-        public void RunAction(ProjectContext.Action action)
-        {
-            switch (action)
-            {
-                case ProjectContext.Action.New:
-                    New();
-                    break;
-                case ProjectContext.Action.Load:
-                    Load();
-                    break;
-                case ProjectContext.Action.Save:
-                    Save();
-                    break;
-                case ProjectContext.Action.Close:
-                    Close();
-                    break;
-                case ProjectContext.Action.Quit:
-                    Quit();
-                    break;
-            }
-        }
-
-        private void New()
+        public void New()
         {
             Close();
 
@@ -50,17 +28,17 @@ namespace Managing
             Created.Invoke();
         }
 
-        private void Load()
+        public void Load()
         {
             Log("Load");
         }
 
-        private void Save()
+        public void Save()
         {
             Log("Save");
         }
 
-        private void Close()
+        public void Close()
         {
             if (_project == null) return;
             
@@ -71,7 +49,7 @@ namespace Managing
             Closed.Invoke();
         }
 
-        private void Quit()
+        public void Quit()
         {
             Application.Quit();
         }

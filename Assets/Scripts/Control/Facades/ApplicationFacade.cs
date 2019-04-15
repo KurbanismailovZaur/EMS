@@ -44,10 +44,35 @@ namespace Control.Facades
             _cameraController.SetTargetsToCurrentState();
         }
 
+        private void ImportModel() => StartCoroutine(ImportModelRoutine());
+
+        private IEnumerator ImportModelRoutine()
+        {
+            yield return _explorer.OpenFile("Импорт Модели", null, "obj");
+            Log("Waited");
+        }
+
         #region Event handlers
         public void ProjectContext_Selected(ProjectContext.Action action)
         {
-            _projectManager.RunAction(action);
+            switch (action)
+            {
+                case ProjectContext.Action.New:
+                    _projectManager.New();
+                    break;
+                case ProjectContext.Action.Load:
+                    _projectManager.Load();
+                    break;
+                case ProjectContext.Action.Save:
+                    _projectManager.Save();
+                    break;
+                case ProjectContext.Action.Close:
+                    _projectManager.Close();
+                    break;
+                case ProjectContext.Action.Quit:
+                    _projectManager.Quit();
+                    break;
+            }
         }
 
         public void ProjectManager_Created()
@@ -74,9 +99,18 @@ namespace Control.Facades
 
         public void ModelContext_Selected(ModelContext.Action action)
         {
-            _explorer.OpenFile("Импорт Модели", null, "obj");
-
-            //_modelManager.RunAction(action);
+            switch (action)
+            {
+                case ModelContext.Action.Import:
+                    ImportModel();
+                    break;
+                case ModelContext.Action.Visibility:
+                    break;
+                case ModelContext.Action.Transparency:
+                    break;
+                case ModelContext.Action.Remove:
+                    break;
+            }
         }
         #endregion
     }

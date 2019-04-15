@@ -558,6 +558,7 @@ namespace Browsing.FileSystem
         private void ClearHistory()
         {
             _pathsHistory.Clear();
+            _currentPathHistoryIndex = -1;
         }
         #endregion
 

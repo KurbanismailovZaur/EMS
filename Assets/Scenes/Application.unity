@@ -5788,7 +5788,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d83ec60834b3824ab2b95525094e3f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _explorer: {fileID: 0}
+  _explorer: {fileID: 1729094162147894945}
   _projectContext: {fileID: 628710560}
   _modelContext: {fileID: 2053896602}
   _projectManager: {fileID: 1216190983}
@@ -7487,6 +7487,18 @@ MonoBehaviour:
   m_Script: {fileID: 1392445389, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1729094162147894945 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1729094162147894945, guid: ee4959d4b320a6246acf14c1fb737da7,
+    type: 3}
+  m_PrefabInstance: {fileID: 3433302201327990253}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e2f4e1e1c254cc43a7093fd89a98094, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3433302201327990253
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7667,7 +7679,7 @@ PrefabInstance:
     - target: {fileID: 3433302200286231601, guid: ee4959d4b320a6246acf14c1fb737da7,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 37
       objectReference: {fileID: 0}
     - target: {fileID: 3433302200286231601, guid: ee4959d4b320a6246acf14c1fb737da7,
         type: 3}
