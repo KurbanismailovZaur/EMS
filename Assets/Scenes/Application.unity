@@ -2209,6 +2209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d5d9727083dc5f4e842e166f160988c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _allowedMaxSize: 20
 --- !u!114 &460280753 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4701945208916148062, guid: f3685b93a3e0688448419992f830a756,
@@ -7679,7 +7680,7 @@ PrefabInstance:
     - target: {fileID: 3433302200286231601, guid: ee4959d4b320a6246acf14c1fb737da7,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 37
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3433302200286231601, guid: ee4959d4b320a6246acf14c1fb737da7,
         type: 3}
