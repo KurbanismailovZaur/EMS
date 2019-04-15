@@ -45,5 +45,7 @@ namespace UI.Main.Contexts
             get => _importButton.interactable;
             set => _importButton.interactable = value;
         }
+
+        public void Import() => Selected.Invoke(Action.Import);
     }
 }

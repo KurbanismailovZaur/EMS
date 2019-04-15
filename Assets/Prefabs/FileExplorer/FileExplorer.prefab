@@ -1616,8 +1616,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -3.9999437, y: 0.00000333786}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -24, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &9077599257552323288
 MonoBehaviour:
@@ -3959,9 +3959,9 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3433302201655512152}
   m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!114 &1729094162147894945
 MonoBehaviour:
@@ -3982,6 +3982,7 @@ MonoBehaviour:
   _parentButton: {fileID: 9014068676496958571}
   _refreshButton: {fileID: 5854015291540868219}
   _addressInput: {fileID: 3433302201002202393}
+  _scrollRect: {fileID: 7540430141688743265}
   _content: {fileID: 6045928688014599327}
   _bookmarks: {fileID: 3433302201466728395}
   _nameInput: {fileID: 3433302200578925655}
@@ -4407,18 +4408,7 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
   Clicked:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1729094162147894945}
-        m_MethodName: DeselectCurrentElement
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!1 &5065134357050526296
@@ -5146,7 +5136,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 4, y: -4}
+  m_AnchoredPosition: {x: 8, y: -4}
   m_SizeDelta: {x: -32, y: -8}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &7129569161413359546
@@ -5352,26 +5342,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 3433302201655512152}
     - target: {fileID: 7066344335171433628, guid: 818062419a8b4424888e67a2e9447c51,
         type: 3}
       propertyPath: m_Text
@@ -5502,26 +5472,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 3433302201655512152}
     - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
         type: 3}
       propertyPath: _specialFolder
@@ -5672,26 +5622,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
-        type: 3}
-      propertyPath: Clicked.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 3433302201655512152}
     - target: {fileID: 5230017630434193217, guid: 818062419a8b4424888e67a2e9447c51,
         type: 3}
       propertyPath: _specialFolder

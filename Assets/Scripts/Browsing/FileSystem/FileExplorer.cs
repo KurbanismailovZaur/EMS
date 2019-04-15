@@ -15,11 +15,11 @@ namespace Browsing.FileSystem
 {
     public class FileExplorer : MonoBehaviour
     {
-        #region Class-events
+        #region Classes
         [Serializable]
         public class SubmitedEvent : UnityEvent<string[]> { }
 
-        private abstract class Strategy
+        private abstract class State
         {
             public enum Type
             {
@@ -27,23 +27,89 @@ namespace Browsing.FileSystem
                 SaveFile
             }
 
-            public abstract void Process();
+            protected FileExplorer _explorer;
+
+            protected State(FileExplorer explorer) => _explorer = explorer;
+
+            public virtual void ShowContent(string path, bool updateHistory = true) => _explorer.ShowContent(path, updateHistory);
+
+            public virtual void DeselectCurrentElement() => _explorer.DeselectCurrentElement();
+
+            public abstract void SetFooterState(string filename);
+
+            public abstract void Submit();
+
+            #region Event handlers
+            public abstract void FilenameInput_OnEndEdit(string name);
+            #endregion
         }
 
-        private class OpenFileStrategy : Strategy
+        private class OpenFileState : State
         {
-            public override void Process()
-            {
+            public OpenFileState(FileExplorer explorer) : base(explorer) { }
 
+            public override void DeselectCurrentElement()
+            {
+                base.DeselectCurrentElement();
+
+                _explorer._submitButton.interactable = false;
+                _explorer._nameInput.text = string.Empty;
             }
+
+            public override void SetFooterState(string filename)
+            {
+                _explorer.SetSubmitState(_explorer._openFileSubmitText, false);
+            }
+
+            public override void Submit()
+            {
+                _explorer.Submited.Invoke(new string[] { _explorer._currentElement.Path });
+            }
+
+            #region Event handlers
+            public override void FilenameInput_OnEndEdit(string name)
+            {
+                _explorer.SelectElementByName(name);
+            }
+            #endregion
         }
 
-        private class SaveFileStrategy : Strategy
+        private class SaveFileState : State
         {
-            public override void Process()
-            {
+            public SaveFileState(FileExplorer explorer) : base(explorer) { }
 
+            private bool CalculateSubmitState()
+            {
+                return _explorer._addressInput.text != string.Empty && _explorer._nameInput.text != string.Empty;
             }
+
+            public override void ShowContent(string path, bool updateHistory = true)
+            {
+                base.ShowContent(path, updateHistory);
+
+                _explorer._submitButton.interactable = CalculateSubmitState();
+            }
+
+            public override void SetFooterState(string filename)
+            {
+                _explorer._nameInput.text = filename;
+
+                _explorer.SetSubmitState(_explorer._saveFileSubmitText, CalculateSubmitState());
+            }
+
+            public override void Submit()
+            {
+                _explorer.Submited.Invoke(new string[] { Path.Combine(_explorer._addressInput.text, _explorer._nameInput.text) });
+            }
+
+            #region Event handlers
+            public override void FilenameInput_OnEndEdit(string name)
+            {
+                _explorer.SelectElementByName(name);
+
+                _explorer._submitButton.interactable = name != string.Empty;
+            }
+            #endregion
         }
         #endregion
 
@@ -69,6 +135,9 @@ namespace Browsing.FileSystem
 
         [SerializeField]
         private InputField _addressInput;
+
+        [SerializeField]
+        private ScrollRect _scrollRect;
 
         [SerializeField]
         private Transform _content;
@@ -120,9 +189,11 @@ namespace Browsing.FileSystem
 
         private int _currentPathHistoryIndex = -1;
 
-        private Dictionary<Strategy.Type, Strategy> _strategies = new Dictionary<Strategy.Type, Strategy>();
+        private Dictionary<State.Type, State> _states = new Dictionary<State.Type, State>();
 
-        private Strategy _currentStrategy;
+        private State _currentState;
+
+        private Coroutine _routine;
 
         [Header("Submit")]
         [SerializeField]
@@ -176,7 +247,7 @@ namespace Browsing.FileSystem
         private void Awake()
         {
             SubscribeOnInnerEvents();
-            CreateStrategiesPool();
+            CreateStatesPool();
         }
 
         private void SubscribeOnInnerEvents()
@@ -191,6 +262,8 @@ namespace Browsing.FileSystem
             foreach (var bookmark in _bookmarks.GetComponentsInChildren<Bookmark>())
                 bookmark.Clicked.AddListener(Bookmark_Clicked);
 
+            _scrollRect.Clicked.AddListener(ScrollRect_Clicked);
+
             _filterDropdown.onValueChanged.AddListener(FilterDropdown_OnValueChanged);
 
             _nameInput.onEndEdit.AddListener(FilenameInput_OnEndEdit);
@@ -202,49 +275,57 @@ namespace Browsing.FileSystem
         }
         #endregion
 
-        #region Strategy
-        private void CreateStrategiesPool()
+        #region State
+        private void CreateStatesPool()
         {
-            _strategies.Add(Strategy.Type.OpenFile, new OpenFileStrategy());
-            _strategies.Add(Strategy.Type.SaveFile, new OpenFileStrategy());
+            _states.Add(State.Type.OpenFile, new OpenFileState(this));
+            _states.Add(State.Type.SaveFile, new SaveFileState(this));
         }
 
-        private void SetCurrentStrategy(Strategy.Type type) => _currentStrategy = _strategies[type];
+        private void SetCurrentState(State.Type type) => _currentState = _states[type];
         #endregion
 
-        public void OpenFile(string title = null, string path = null, string filters = null)
+        public Coroutine OpenFile(string title = null, string path = null, string filters = null)
         {
             CheckAndCorrectAll(ref path, ref filters);
-            SetCurrentStrategy(Strategy.Type.OpenFile);
 
-            ClearHistory();
+            ShowExplorer(State.Type.OpenFile, title, path, null);
 
-            StartExploring(title);
-            ShowContent(path);
-
-            SetSubmitState(_openFileSubmitText, false);
+            return _routine;
         }
 
-        public void SaveFile(string title = null, string path = null, string filters = null, string filename = "noname")
+        public Coroutine SaveFile(string title = null, string path = null, string filters = null, string filename = null)
         {
-            CheckAndCorrectAll(ref path, ref filters);
-            SetCurrentStrategy(Strategy.Type.SaveFile);
+            CheckAndCorrectAll(ref path, ref filters, ref filename);
 
-            ClearHistory();
+            ShowExplorer(State.Type.SaveFile, title, path, filename);
 
-            StartExploring(title);
-            ShowContent(path);
+            return _routine;
+        }
 
-            SetSubmitState(_saveFileSubmitText, true);
+        private IEnumerator Routine()
+        {
+            while (IsBusy) yield return null;
+
+            _routine = null;
         }
 
         #region Exploring
-        private void StartExploring(string title)
+        private void ShowExplorer(State.Type type, string title, string path, string filename)
         {
+            SetCurrentState(type);
+
+            ClearHistory();
+
             IsBusy = true;
             SetCanvasGroupParameters(1f, true);
 
             _titleText.text = title;
+
+            _currentState.ShowContent(path);
+            _currentState.SetFooterState(filename);
+
+            _routine = StartCoroutine(Routine());
         }
 
         private void StopExploring()
@@ -257,6 +338,12 @@ namespace Browsing.FileSystem
         {
             _canvasGroup.alpha = alpha;
             _canvasGroup.blocksRaycasts = _canvasGroup.interactable = state;
+        }
+
+        private void SetSubmitState(string name, bool state)
+        {
+            _submitText.text = name;
+            _submitButton.interactable = state;
         }
         #endregion
 
@@ -315,13 +402,16 @@ namespace Browsing.FileSystem
             CalculateCurrentFilterExtensions();
         }
 
-        // TODO: rework it
-        private void CheckAndCorrectAll(ref string path, ref string filters, string filename)
+        private void CheckAndCorrectAll(ref string path, ref string filters, ref string filename)
         {
-            CheckBusy();
-            CheckAndCorrectPath(ref path);
-            Filters = CheckAndCorrectFilters(ref filters);
-            CalculateCurrentFilterExtensions();
+            CheckAndCorrectAll(ref path, ref filters);
+
+            if (filename == null) filename = "Untitled";
+
+            var invalidChars = Path.GetInvalidFileNameChars();
+
+            if (filename.Any(c => invalidChars.Contains(c)))
+                throw new FormatException("Filename contains invalid symbol");
         }
         #endregion
 
@@ -348,14 +438,14 @@ namespace Browsing.FileSystem
             }
             catch (Exception ex)
             {
-                ShowContent(CurrentPath, false);
+                _currentState.ShowContent(CurrentPath, false);
                 ShowException(ex.Message);
             }
         }
 
         private void ShowContentIfNotCurrent(string path)
         {
-            if (CurrentPath != path) ShowContent(path);
+            if (CurrentPath != path) _currentState.ShowContent(path);
         }
 
         private void ShowLogicalDrivesContent()
@@ -403,7 +493,7 @@ namespace Browsing.FileSystem
 
             _currentPathHistoryIndex -= 1;
 
-            ShowContent(CurrentPath, false);
+            _currentState.ShowContent(CurrentPath, false);
         }
 
         private void ShowNextContent()
@@ -412,17 +502,17 @@ namespace Browsing.FileSystem
 
             _currentPathHistoryIndex += 1;
 
-            ShowContent(CurrentPath, false);
+            _currentState.ShowContent(CurrentPath, false);
         }
 
         private void ShowParentContent()
         {
             if (CurrentPath == string.Empty) return;
 
-            ShowContent(Path.GetDirectoryName(CurrentPath) ?? string.Empty);
+            _currentState.ShowContent(Path.GetDirectoryName(CurrentPath) ?? string.Empty);
         }
 
-        private void RefreshContent() => ShowContent(CurrentPath, false);
+        private void RefreshContent() => _currentState.ShowContent(CurrentPath, false);
 
         private void FilterFiles()
         {
@@ -448,7 +538,7 @@ namespace Browsing.FileSystem
 
         private void ClearContent()
         {
-            DeselectCurrentElement();
+            _currentState.DeselectCurrentElement();
 
             foreach (Transform child in _content)
                 Destroy(child.gameObject);
@@ -474,8 +564,6 @@ namespace Browsing.FileSystem
         #region Selecting
         private void SelectElement(Element element)
         {
-            if (_currentElement) DeselectCurrentElement();
-
             _currentElement = element;
             _currentElement.Color = _selectedColor;
 
@@ -486,29 +574,30 @@ namespace Browsing.FileSystem
             }
         }
 
-        private void SelectElementByName(string name)
+        private void SelectOnlyThisElement(Element element)
         {
-            var element = _content.GetComponentsInChildren<Element>()
-                .ToList()
-                .Find(el => el.ElementType == Element.Type.File && el.Name == name);
-
-            if (element)
-                SelectElement(element);
-            else
-                DeselectCurrentElement();
+            _currentState.DeselectCurrentElement();
+            SelectElement(element);
         }
 
-        public void DeselectCurrentElement()
+        private void SelectElementByName(string name)
         {
-            _nameInput.text = string.Empty;
+            _currentState.DeselectCurrentElement();
 
+            var element = _content.GetComponentsInChildren<Element>()
+                .ToList()
+                .Find(el => el.ElementType == Element.Type.File && el.Name.ToLower() == name.ToLower());
+
+
+            if (element) SelectElement(element);
+        }
+
+        private void DeselectCurrentElement()
+        {
             if (!_currentElement) return;
 
             _currentElement.Color = _defaultColor;
             _currentElement = null;
-
-            _nameInput.text = string.Empty;
-            _submitButton.interactable = false;
         }
         #endregion
 
@@ -523,16 +612,11 @@ namespace Browsing.FileSystem
         #endregion
 
         #region Decision
-        private void SetSubmitState(string name, bool state)
-        {
-            _submitText.text = name;
-            _submitButton.interactable = state;
-        }
-
         private void Submit()
         {
             StopExploring();
-            Submited.Invoke(new string[] { _currentElement.Path });
+
+            _currentState.Submit();
         }
 
         private void Cancel()
@@ -543,19 +627,23 @@ namespace Browsing.FileSystem
         #endregion
 
         #region Event handlers
-        private void AddressInput_OnEndEdit(string path) => ShowContent(path);
+        private void AddressInput_OnEndEdit(string path) => _currentState.ShowContent(path);
 
-        private void DriveElement_Clicked(Element drive) => SelectElement(drive);
+        private void ScrollRect_Clicked() => _currentState.DeselectCurrentElement();
 
-        private void DriveElement_DoubleClicked(Element drive) => ShowContent(drive.Path);
+        #region Elements
+        private void DriveElement_Clicked(Element drive) => SelectOnlyThisElement(drive);
 
-        private void DirectoryElement_Clicked(Element directory) => SelectElement(directory);
+        private void DriveElement_DoubleClicked(Element drive) => _currentState.ShowContent(drive.Path);
 
-        private void DirectoryElement_DoubleClicked(Element directory) => ShowContent(directory.Path);
+        private void DirectoryElement_Clicked(Element directory) => SelectOnlyThisElement(directory);
 
-        private void FileElement_Clicked(Element directory) => SelectElement(directory);
+        private void DirectoryElement_DoubleClicked(Element directory) => _currentState.ShowContent(directory.Path);
+
+        private void FileElement_Clicked(Element directory) => SelectOnlyThisElement(directory);
 
         private void FileElement_DoubleClicked(Element directory) => Submit();
+        #endregion
 
         private void Bookmark_Clicked(Bookmark bookmark)
         {
@@ -567,12 +655,12 @@ namespace Browsing.FileSystem
             CalculateCurrentFilterExtensions();
 
             if (_currentElement && !IsAllowedExtension(_currentElement))
-                DeselectCurrentElement();
+                _currentState.DeselectCurrentElement();
 
             FilterFiles();
         }
 
-        private void FilenameInput_OnEndEdit(string name) => SelectElementByName(name);
+        private void FilenameInput_OnEndEdit(string name) => _currentState.FilenameInput_OnEndEdit(name);
         #endregion
         #endregion
     }

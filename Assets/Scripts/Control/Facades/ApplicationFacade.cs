@@ -8,11 +8,15 @@ using Managing;
 using Environments;
 using Control.View;
 using General;
+using Browsing.FileSystem;
 
 namespace Control.Facades
 {
 	public class ApplicationFacade : MonoBehaviour 
 	{
+        [SerializeField]
+        private FileExplorer _explorer;
+
         [SerializeField]
         private ProjectContext _projectContext;
 
@@ -70,6 +74,8 @@ namespace Control.Facades
 
         public void ModelContext_Selected(ModelContext.Action action)
         {
+            _explorer.OpenFile("Импорт Модели", null, "obj");
+
             //_modelManager.RunAction(action);
         }
         #endregion
