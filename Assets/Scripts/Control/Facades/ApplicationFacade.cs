@@ -50,10 +50,9 @@ namespace Control.Facades
         {
             yield return _explorer.OpenFile("Импорт Модели", null, "obj");
 
-            foreach (var path in _explorer.LastResults)
-            {
-                Log(path);
-            }
+            if (_explorer.LastResults.Count == 0) yield break;
+
+            _modelManager.Import(_explorer.LastResults[0]);
         }
 
         #region Event handlers
