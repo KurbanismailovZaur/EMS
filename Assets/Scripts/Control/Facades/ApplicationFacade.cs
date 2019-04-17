@@ -111,10 +111,6 @@ namespace Control.Facades
                 case ModelContext.Action.Import:
                     ImportModel();
                     break;
-                case ModelContext.Action.Visibility:
-                    break;
-                case ModelContext.Action.Transparency:
-                    break;
                 case ModelContext.Action.Remove:
                     RemoveModel();
                     break;
