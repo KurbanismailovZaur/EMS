@@ -33,7 +33,7 @@ namespace UI.Main.Contexts
         private UnityButton _visibilityButton;
 
         [SerializeField]
-        private UnityButton _transparencyButton;
+        private UnityButton _fadeButton;
 
         [SerializeField]
         private UnityButton _removeButton;
@@ -47,5 +47,14 @@ namespace UI.Main.Contexts
         }
 
         public void Import() => Selected.Invoke(Action.Import);
+
+        public void Remove() => Selected.Invoke(Action.Remove);
+
+        public void SetModelButtonsInteractibility(bool state)
+        {
+            _visibilityButton.interactable = state;
+            _fadeButton.interactable = state;
+            _removeButton.interactable = state;
+        }
     }
 }

@@ -100,11 +100,11 @@ Shader "Unlit/Pseudo/Texture"
 				float3 ase_worldViewDir = UnityWorldSpaceViewDir(ase_worldPos);
 				ase_worldViewDir = Unity_SafeNormalize( ase_worldViewDir );
 				float3 ase_worldNormal = i.ase_texcoord2.xyz;
-				float dotResult10 = dot( ase_worldViewDir , ase_worldNormal );
-				float clampResult11 = clamp( dotResult10 , 0.0 , 1.0 );
+				float dotResult3_g2 = dot( ase_worldViewDir , ase_worldNormal );
+				float clampResult4_g2 = clamp( dotResult3_g2 , 0.0 , 1.0 );
 				
 				
-				finalColor = ( _Color * tex2D( _MainTex, uv_MainTex ) * (0.2 + (clampResult11 - 0.0) * (1.0 - 0.2) / (1.0 - 0.0)) );
+				finalColor = ( _Color * tex2D( _MainTex, uv_MainTex ) * (0.2 + (clampResult4_g2 - 0.0) * (1.0 - 0.2) / (1.0 - 0.0)) );
 				return finalColor;
 			}
 			ENDCG
@@ -116,23 +116,15 @@ Shader "Unlit/Pseudo/Texture"
 }
 /*ASEBEGIN
 Version=16400
-581;307;2398;930;1645.598;-88.4209;1;True;True
-Node;AmplifyShaderEditor.ViewDirInputsCoordNode;6;-1232,448;Float;True;World;True;0;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
-Node;AmplifyShaderEditor.WorldNormalVector;12;-1200,672;Float;False;False;1;0;FLOAT3;0,0,1;False;4;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3
-Node;AmplifyShaderEditor.DotProductOpNode;10;-960,448;Float;True;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT;0
-Node;AmplifyShaderEditor.ClampOpNode;11;-720,448;Float;False;3;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;1;FLOAT;0
+630;121;2398;960;1284.598;128.5791;1;True;True
 Node;AmplifyShaderEditor.ColorNode;3;-576,16;Half;False;Property;_Color;Color;1;0;Create;True;0;0;False;0;0,0,0,0;1,1,1,1;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.SamplerNode;5;-656,192;Float;True;Property;_MainTex;MainTex;0;0;Create;True;0;0;False;0;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.TFHCRemapNode;13;-544,448;Float;False;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;0.2;False;4;FLOAT;1;False;1;FLOAT;0
+Node;AmplifyShaderEditor.FunctionNode;15;-560,400;Float;False;ViewDotNormal;-1;;2;2185c0d2c0b238a458278278dbee2aa1;0;4;6;FLOAT;0;False;7;FLOAT;1;False;8;FLOAT;0.2;False;9;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;4;-272,208;Float;True;3;3;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;2;FLOAT;0;False;1;COLOR;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;0;0,208;Float;False;True;2;Float;ASEMaterialInspector;0;1;Unlit/Pseudo/Texture;0770190933193b94aaa3065e307002fa;True;Unlit;0;0;Unlit;2;True;0;1;False;-1;0;False;-1;0;1;False;-1;0;False;-1;True;0;False;-1;0;False;-1;True;False;True;2;False;-1;True;True;True;True;True;0;False;-1;True;False;255;False;-1;255;False;-1;255;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;7;False;-1;1;False;-1;1;False;-1;1;False;-1;True;1;False;-1;True;3;False;-1;True;True;0;False;-1;0;False;-1;True;1;RenderType=Opaque=RenderType;True;2;0;False;False;False;False;False;False;False;False;False;True;0;False;0;;0;0;Standard;1;Vertex Position,InvertActionOnDeselection;1;0;1;True;False;2;0;FLOAT4;0,0,0,0;False;1;FLOAT3;0,0,0;False;0
-WireConnection;10;0;6;0
-WireConnection;10;1;12;0
-WireConnection;11;0;10;0
-WireConnection;13;0;11;0
 WireConnection;4;0;3;0
 WireConnection;4;1;5;0
-WireConnection;4;2;13;0
+WireConnection;4;2;15;0
 WireConnection;0;0;4;0
 ASEEND*/
-//CHKSM=858C404B0E31E95F409E9A43D01DA720AE29CBE4
+//CHKSM=F881B4D8355FADBBD3916E3C2B3F2FAB15AA27AF

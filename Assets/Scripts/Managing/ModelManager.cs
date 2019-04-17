@@ -6,6 +6,8 @@ using static UnityEngine.Debug;
 using Visuals;
 using Dummiesman;
 using Utilities.Geometry;
+using UnityEngine.Events;
+using System;
 
 namespace Managing
 {
@@ -17,8 +19,14 @@ namespace Managing
         [Range(0f, 32f)]
         private float _allowedMaxSize;
 
+        public UnityEvent Imported;
+
+        public UnityEvent Removed;
+
         public void Import(string path)
         {
+            Remove();
+
             var go = new OBJLoader().Load(path);
 
             var bounds = GetBounds(go);
@@ -26,6 +34,9 @@ namespace Managing
             Clamp(go, ref bounds);
             Center(go, bounds);
 
+            _model = Model.Factory.MakeModel(go);
+
+            Imported.Invoke();
         }
 
         private Bounds GetBounds(GameObject go)
@@ -49,6 +60,15 @@ namespace Managing
         private void Center(GameObject go, Bounds bounds)
         {
             go.transform.position -= bounds.center;
+        }
+
+        public void Remove()
+        {
+            if (!_model) return;
+
+            Destroy(_model.gameObject);
+
+            Removed.Invoke();
         }
     }
 }

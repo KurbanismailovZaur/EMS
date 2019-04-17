@@ -39,7 +39,7 @@ public class MTLLoader
                                                           : searchPath;
             string filePath = Path.Combine(processedPath, path);
 
-            //return if eists
+            //return if exists
             if (File.Exists(filePath))
             {
                 var tex = ImageLoader.LoadTexture(filePath);

@@ -44,6 +44,7 @@ namespace Control.Facades
             _cameraController.SetTargetsToCurrentState();
         }
 
+        #region Model
         private void ImportModel() => StartCoroutine(ImportModelRoutine());
 
         private IEnumerator ImportModelRoutine()
@@ -54,6 +55,9 @@ namespace Control.Facades
 
             _modelManager.Import(_explorer.LastResults[0]);
         }
+
+        private void RemoveModel() => _modelManager.Remove();
+        #endregion
 
         #region Event handlers
         public void ProjectContext_Selected(ProjectContext.Action action)
@@ -112,8 +116,19 @@ namespace Control.Facades
                 case ModelContext.Action.Transparency:
                     break;
                 case ModelContext.Action.Remove:
+                    RemoveModel();
                     break;
             }
+        }
+
+        public void ModelManager_Imported()
+        {
+            _modelContext.SetModelButtonsInteractibility(true);
+        }
+
+        public void ModelManager_Removed()
+        {
+            _modelContext.SetModelButtonsInteractibility(false);
         }
         #endregion
     }
