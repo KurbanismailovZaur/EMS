@@ -21,7 +21,13 @@ namespace Managing
 
         public UnityEvent Imported;
 
+        public UnityEvent VisibilityChanged;
+
+        public UnityEvent FadeChanged;
+
         public UnityEvent Removed;
+
+        public Model Model { get => _model; }
 
         public void Import(string path)
         {
@@ -35,6 +41,7 @@ namespace Managing
             Center(go, bounds);
 
             _model = Model.Factory.MakeModel(go);
+            _model.transform.SetParent(transform);
 
             Imported.Invoke();
         }
@@ -60,6 +67,20 @@ namespace Managing
         private void Center(GameObject go, Bounds bounds)
         {
             go.transform.position -= bounds.center;
+        }
+
+        public void ToggleVisibility()
+        {
+            _model.gameObject.SetActive(!_model.gameObject.activeSelf);
+
+            VisibilityChanged.Invoke();
+        }
+
+        public void ToggleFade()
+        {
+            _model.SwitchFading();
+
+            FadeChanged.Invoke();
         }
 
         public void Remove()

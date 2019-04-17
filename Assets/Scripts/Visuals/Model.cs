@@ -30,8 +30,8 @@ namespace Visuals
         #endregion
 
         private Dictionary<Renderer, (Material[] materials, Material[] fadeMaterials)> _pairs = new Dictionary<Renderer, (Material[] materials, Material[] fadeMaterials)>();
-
-        private bool _isFaded;
+        
+        public bool IsFaded { get; private set; }
 
         private void Initialize()
         {
@@ -69,15 +69,15 @@ namespace Visuals
             #endregion
         }
 
-        private void SetFade(bool state)
+        public void SetFade(bool state)
         {
             foreach (var pair in _pairs)
                 pair.Key.sharedMaterials = state ? pair.Value.fadeMaterials : pair.Value.materials;
 
-            _isFaded = state;
+            IsFaded = state;
         }
 
-        public void SwitchFading() => SetFade(!_isFaded);
+        public void SwitchFading() => SetFade(!IsFaded);
 
         private void OnDestroy()
         {

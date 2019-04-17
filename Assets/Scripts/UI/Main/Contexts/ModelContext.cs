@@ -15,22 +15,15 @@ namespace UI.Main.Contexts
         public enum Action
         {
             Import,
-            Remove
-        }
-
-        public enum ToggleAction
-        {
             Visibility,
-            Fade
+            Fade,
+            Remove
         }
         #endregion
 
         #region Class-events
         [Serializable]
         public class SelectedEvent : UnityEvent<Action> { }
-
-        [Serializable]
-        public class ToggledEvent : UnityEvent<ToggleAction, bool> { }
         #endregion
 
         [SerializeField]
@@ -40,16 +33,18 @@ namespace UI.Main.Contexts
         private UnityButton _visibilityButton;
 
         [SerializeField]
+        private Toggle _visibilityToggle;
+
+        [SerializeField]
         private UnityButton _fadeButton;
+
+        [SerializeField]
+        private Toggle _fadeToggle;
 
         [SerializeField]
         private UnityButton _removeButton;
 
-        #region Events
         public SelectedEvent Selected;
-
-        public ToggledEvent Toggled;
-        #endregion
 
         public bool ImportInteractable
         {
@@ -57,13 +52,25 @@ namespace UI.Main.Contexts
             set => _importButton.interactable = value;
         }
 
+        public bool VisibilityState
+        {
+            get => _visibilityToggle.State;
+            set => _visibilityToggle.State = value;
+        }
+
+        public bool FadeState
+        {
+            get => _fadeToggle.State;
+            set => _fadeToggle.State = value;
+        }
+
         public void Import() => Selected.Invoke(Action.Import);
 
+        public void Visibility() => Selected.Invoke(Action.Visibility);
+
+        public void Fade() => Selected.Invoke(Action.Fade);
+
         public void Remove() => Selected.Invoke(Action.Remove);
-
-        public void Visibility(bool state) => Toggled.Invoke(ToggleAction.Visibility, state);
-
-        public void Fade(bool state) => Toggled.Invoke(ToggleAction.Fade, state);
 
         public void SetModelButtonsInteractibility(bool state)
         {

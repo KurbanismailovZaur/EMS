@@ -12,8 +12,8 @@ using Browsing.FileSystem;
 
 namespace Control.Facades
 {
-	public class ApplicationFacade : MonoBehaviour 
-	{
+    public class ApplicationFacade : MonoBehaviour
+    {
         [SerializeField]
         private FileExplorer _explorer;
 
@@ -54,6 +54,16 @@ namespace Control.Facades
             if (_explorer.LastResults.Count == 0) yield break;
 
             _modelManager.Import(_explorer.LastResults[0]);
+        }
+
+        private void ToggleModelVisibility()
+        {
+            _modelManager.ToggleVisibility();
+        }
+
+        private void ToggleModelFade()
+        {
+            _modelManager.ToggleFade();
         }
 
         private void RemoveModel() => _modelManager.Remove();
@@ -111,6 +121,12 @@ namespace Control.Facades
                 case ModelContext.Action.Import:
                     ImportModel();
                     break;
+                case ModelContext.Action.Visibility:
+                    ToggleModelVisibility();
+                    break;
+                case ModelContext.Action.Fade:
+                    ToggleModelFade();
+                    break;
                 case ModelContext.Action.Remove:
                     RemoveModel();
                     break;
@@ -120,6 +136,18 @@ namespace Control.Facades
         public void ModelManager_Imported()
         {
             _modelContext.SetModelButtonsInteractibility(true);
+            _modelContext.VisibilityState = _modelManager.Model.gameObject.activeSelf;
+            _modelContext.FadeState = _modelManager.Model.IsFaded;
+        }
+
+        public void ModelManager_VisibilityChanged()
+        {
+            _modelContext.VisibilityState = _modelManager.Model.gameObject.activeSelf;
+        }
+
+        public void ModelManager_FadeChanged()
+        {
+            _modelContext.FadeState = _modelManager.Model.IsFaded;
         }
 
         public void ModelManager_Removed()
