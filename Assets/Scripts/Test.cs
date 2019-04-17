@@ -6,19 +6,26 @@ using static UnityEngine.Debug;
 using Vectrosity;
 using System.IO;
 using Dummiesman;
-using Browsing.FileSystem;
+using UI.Browsing.FileSystem;
+using Data.XLS;
+using System;
 
-namespace Namespace
+public class Test : MonoBehaviour
 {
-    public class Test : MonoBehaviour
-    {
-        [SerializeField]
-        private FileExplorer _explorer;
+    [SerializeField]
+    private FileExplorer _explorer;
 
-        void Start()
+    private IEnumerator Start()
+    {
+        yield return _explorer.OpenFile();
+
+        try
         {
-            _explorer.Submited.AddListener(x => { Log(x[0]); });
-            _explorer.SaveFile("Импорт Модели", filters: "* | obj fbx blend | png jpg tga lte");
+            WiringDataReader.ReadWiringFromFile(_explorer.LastResult);
+        }
+        catch (Exception)
+        {
+            GameObject.CreatePrimitive(PrimitiveType.Cube);
         }
     }
 }
