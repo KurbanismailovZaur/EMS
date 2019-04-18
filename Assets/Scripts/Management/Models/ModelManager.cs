@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
-using Visuals;
 using Dummiesman;
 using Geometry;
 using UnityEngine.Events;
@@ -16,7 +15,7 @@ namespace Management.Models
         private Model _model;
 
         [SerializeField]
-        [Range(0f, 32f)]
+        [Range(0f, 100f)]
         private float _allowedMaxSize;
 
         public UnityEvent Imported;

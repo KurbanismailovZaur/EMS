@@ -16,6 +16,15 @@ namespace Environments
         private Transform _grid;
 
         [SerializeField]
+        private Transform _minor;
+
+        [SerializeField]
+        private Transform _major;
+
+        [SerializeField]
+        private Transform _perimeter;
+
+        [SerializeField]
         private Camera _camera;
 
         [SerializeField]
@@ -34,6 +43,9 @@ namespace Environments
         private Color _majorLineColor;
 
         [SerializeField]
+        private Color _perimeterColor;
+
+        [SerializeField]
         [Range(1f, 8f)]
         private float _axesMagnitudeMultiplier = 1f;
 
@@ -43,7 +55,7 @@ namespace Environments
 
         [SerializeField]
         [Range(4, 384)]
-        private int _LinesCountPerAxis = 4;
+        private int _linesCountPerAxis = 4;
 
         [SerializeField]
         [Range(8f, 256f)]
@@ -71,33 +83,42 @@ namespace Environments
 
         private void Start()
         {
-            var xLine = CreateAxis("xAxis", _xColor, Vector3.right);
-            var yLine = CreateAxis("yAxis", _yColor, Vector3.up);
-            var zLine = CreateAxis("zAxis", _zColor, Vector3.forward);
+            var xLine = CreateAxis("XAxis", _xColor, Vector3.right);
+            var yLine = CreateAxis("YAxis", _yColor, Vector3.up);
+            var zLine = CreateAxis("ZAxis", _zColor, Vector3.forward);
 
             var axes = new List<VectorLine>() { xLine, yLine, zLine };
             var lines = new List<VectorLine>();
             var majorLines = new List<VectorLine>();
+            var perimeterLines = new List<VectorLine>();
 
-            for (int i = -_LinesCountPerAxis / 2; i < _LinesCountPerAxis / 2; i++)
+            var halfLinesCountPerAxis = _linesCountPerAxis / 2;
+
+            for (int i = -halfLinesCountPerAxis; i < halfLinesCountPerAxis - 1; i++)
             {
                 if ((i + 1) % 10 != 0)
                 {
-                    lines.Add(CreateLine(_lineColor, new Vector3(i + 1f, 0f, -_lineMagnitude / 2f), new Vector3(i + 1f, 0f, _lineMagnitude / 2f)));
-                    lines.Add(CreateLine(_lineColor, new Vector3(-_lineMagnitude / 2f, 0f, i + 1f), new Vector3(_lineMagnitude / 2f, 0f, i + 1f)));
+                    lines.Add(CreateLine("GridLine", _minor, _lineColor, new Vector3(i + 1f, 0f, -_lineMagnitude / 2f), new Vector3(i + 1f, 0f, _lineMagnitude / 2f)));
+                    lines.Add(CreateLine("GridLine", _minor, _lineColor, new Vector3(-_lineMagnitude / 2f, 0f, i + 1f), new Vector3(_lineMagnitude / 2f, 0f, i + 1f)));
                 }
                 else
                 {
-                    majorLines.Add(CreateLine(_majorLineColor, new Vector3(i + 1f, 0f, -_lineMagnitude / 2f), new Vector3(i + 1f, 0f, _lineMagnitude / 2f)));
-                    majorLines.Add(CreateLine(_majorLineColor, new Vector3(-_lineMagnitude / 2f, 0f, i + 1f), new Vector3(_lineMagnitude / 2f, 0f, i + 1f)));
+                    majorLines.Add(CreateLine("GridLine", _major, _majorLineColor, new Vector3(i + 1f, 0f, -_lineMagnitude / 2f), new Vector3(i + 1f, 0f, _lineMagnitude / 2f)));
+                    majorLines.Add(CreateLine("GridLine", _major, _majorLineColor, new Vector3(-_lineMagnitude / 2f, 0f, i + 1f), new Vector3(_lineMagnitude / 2f, 0f, i + 1f)));
                 }
             }
 
-            StartCoroutine(UpdateAxes(axes));
-            StartCoroutine(UpdateLines(lines, majorLines));
+            var halfMagnitude = _lineMagnitude / 2f;
+
+            perimeterLines.Add(CreatePerimeterLine(_perimeterColor, -halfMagnitude, -halfMagnitude, -halfMagnitude, halfMagnitude));
+            perimeterLines.Add(CreatePerimeterLine(_perimeterColor, -halfMagnitude, halfMagnitude, halfMagnitude, halfMagnitude));
+            perimeterLines.Add(CreatePerimeterLine(_perimeterColor, halfMagnitude, halfMagnitude, halfMagnitude, -halfMagnitude));
+            perimeterLines.Add(CreatePerimeterLine(_perimeterColor, halfMagnitude, -halfMagnitude, -halfMagnitude, -halfMagnitude));
+            
+            StartCoroutine(UpdateLines(axes, lines, majorLines, perimeterLines));
         }
 
-        private IEnumerator UpdateAxes(List<VectorLine> axes)
+        private IEnumerator UpdateLines(List<VectorLine> axes, List<VectorLine> lines, List<VectorLine> majorLines, List<VectorLine> perimeterLines)
         {
             while (true)
             {
@@ -107,14 +128,6 @@ namespace Environments
                     axis.Draw3D();
                 }
 
-                yield return null;
-            }
-        }
-
-        private IEnumerator UpdateLines(List<VectorLine> lines, List<VectorLine> majorLines)
-        {
-            while (true)
-            {
                 var angle = Vector3.Angle(_camera.transform.position, new Vector3(_camera.transform.position.x, 0f, _camera.transform.position.z));
 
                 float alpha = Mathf.Min(Mathf.Max(angle - _invisibleAngle, 0f) / _visibleAngleOffset, 1f);
@@ -124,6 +137,9 @@ namespace Environments
 
                 for (int i = 0; i < majorLines.Count; i++)
                     majorLines[i].color = new Color(_majorLineColor.r, _majorLineColor.g, _majorLineColor.b, _majorLineColor.a * alpha);
+
+                for (int i = 0; i < perimeterLines.Count; i++)
+                    perimeterLines[i].color = new Color(_perimeterColor.r, _perimeterColor.g, _perimeterColor.b, _perimeterColor.a * alpha);
 
                 yield return null;
             }
@@ -141,13 +157,19 @@ namespace Environments
             return line;
         }
 
-        private VectorLine CreateLine(Color color, Vector3 pointA, Vector3 pointB)
+        private VectorLine CreateLine(string name, Transform parent, Color color, Vector3 pointA, Vector3 pointB)
         {
             var line = VectorLine.SetLine3D(color, pointA, pointB);
+            line.name = name;
             line.lineWidth = _linesWidth;
-            line.rectTransform.SetParent(_grid);
+            line.rectTransform.SetParent(parent);
 
             return line;
+        }
+
+        private VectorLine CreatePerimeterLine(Color color, float x1, float z1, float x2, float z2)
+        {
+            return CreateLine("PerimeterLine", _perimeter, color, new Vector3(x1, 0f, z1), new Vector3(x2, 0f, z2));
         }
     }
 }

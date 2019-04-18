@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
+using Management.Wires.IO;
 
 namespace Management.Wires
 {
@@ -10,7 +11,7 @@ namespace Management.Wires
 	{
         public void Import(string path)
         {
-
+            WiringDataReader.ReadWiringFromFile(path);
         }
 	}
 }

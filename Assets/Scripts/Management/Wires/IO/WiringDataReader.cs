@@ -1,15 +1,17 @@
-﻿using NPOI.HSSF.UserModel;
+﻿using Management.Wires;
+using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace Data.XLS
+namespace Management.Wires.IO
 {
 	public static class WiringDataReader 
 	{
-        public static bool ReadWiringFromFile(string pathToXLS)
+        public static void ReadWiringFromFile(string pathToXLS)
         {
             //Wiring.Factory wiringFactory = new Wiring.Factory();
             //wiring = wiringFactory.Create();
@@ -29,47 +31,45 @@ namespace Data.XLS
 
                 IRow amplitudeRow = sheet.GetRow(0);
                 if (!IsNumericCell(amplitudeRow, 1))
-                {
-                    return false;
-                }
+                    throw new FormatException("Amplitude must be a numeric value.");
 
                 float amplitude = (float)amplitudeRow.GetCell(1).NumericCellValue;
 
                 IRow frequencyRow = sheet.GetRow(1);
                 if (!IsNumericCell(frequencyRow, 1))
-                {
-                    return false;
-                }
+                    throw new FormatException("Frequency must be a numeric value.");
 
                 float frequency = (float)frequencyRow.GetCell(1).NumericCellValue;
 
                 IRow amperageRow = sheet.GetRow(2);
                 if (!IsNumericCell(frequencyRow, 1))
-                {
-                    return false;
-                }
+                    throw new FormatException("Amperage must be a numeric value.");
 
                 float amperage = (float)amperageRow.GetCell(1).NumericCellValue;
 
-                //Wire wire = wiring.CreateWire(sheet.SheetName, amplitude, frequency, amperage);
+                var points = ReadPoints(sheet);
 
-                for (int j = 5; j <= sheet.LastRowNum; j++)
-                {
-                    IRow row = sheet.GetRow(j);
-
-                    if (!IsCorrectNodeRow(row))
-                    {
-                        break;
-                    }
-
-                    //wire.Add(ReadNode(row), Space.Self);
-                }
+                Wire wire = Wire.Factory.Create(sheet.SheetName, amplitude, frequency, amperage, points);
             }
-
-            return true;
         }
 
-        private static Vector3 ReadNode(IRow row)
+        private static List<Vector3> ReadPoints(ISheet sheet)
+        {
+            var points = new List<Vector3>();
+
+            for (int j = 5; j <= sheet.LastRowNum; j++)
+            {
+                IRow row = sheet.GetRow(j);
+
+                if (!IsCorrectNodeRow(row)) break;
+
+                points.Add(ReadPoint(row));
+            }
+
+            return points;
+        }
+
+        private static Vector3 ReadPoint(IRow row)
         {
             Vector3 node;
 

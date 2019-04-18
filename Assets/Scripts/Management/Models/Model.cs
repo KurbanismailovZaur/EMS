@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using System.Linq;
 
-namespace Visuals
+namespace Management.Models
 {
     public class Model : MonoBehaviour
     {
