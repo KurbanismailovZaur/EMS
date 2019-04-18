@@ -397,7 +397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d5d9727083dc5f4e842e166f160988c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _allowedMaxSize: 100
+  _allowedMaxSize: 50
   Imported:
     m_PersistentCalls:
       m_Calls:
