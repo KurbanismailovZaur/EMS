@@ -87,6 +87,7 @@ namespace Management.Models
             if (!_model) return;
 
             Destroy(_model.gameObject);
+            _model = null;
 
             Removed.Invoke();
         }

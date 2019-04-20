@@ -88,17 +88,11 @@ namespace Facades
             _wiringManager.Import(_explorer.LastResult);
         }
 
-        private void ToggleWiringVisibility()
-        {
-            //_modelManager.ToggleVisibility();
-        }
+        private void ToggleWiringVisibility() => _wiringManager.ToggleVisibility();
 
-        private void EditWiring()
-        {
-            //_modelManager.ToggleVisibility();
-        }
+        private void EditWiring() => _wiringManager.Edit();
 
-        private void RemoveWiring() => _modelManager.Remove();
+        private void RemoveWiring() => _wiringManager.Remove();
         #endregion
 
         #region Event handlers
@@ -130,6 +124,7 @@ namespace Facades
             _projectContext.SetButtonsInteractable(true);
             _modelContext.ImportInteractable = true;
             _wiringContext.ImportInteractable = true;
+            _wiringContext.EditInteractable = true;
 
             _axes.AxesVisibility = _axes.GridVisibility = true;
 
@@ -141,6 +136,7 @@ namespace Facades
             _projectContext.SetButtonsInteractable(false);
             _modelContext.ImportInteractable = false;
             _wiringContext.ImportInteractable = false;
+            _wiringContext.EditInteractable = false;
 
             _axes.AxesVisibility = _axes.GridVisibility = false;
 
@@ -173,8 +169,8 @@ namespace Facades
         public void ModelManager_Imported()
         {
             _modelContext.SetModelButtonsInteractibility(true);
-            _modelContext.VisibilityState = _modelManager.Model.gameObject.activeSelf;
-            _modelContext.FadeState = _modelManager.Model.IsFaded;
+            _modelContext.VisibilityState = true;
+            _modelContext.FadeState = false;
         }
 
         public void ModelManager_VisibilityChanged()
@@ -190,6 +186,8 @@ namespace Facades
         public void ModelManager_Removed()
         {
             _modelContext.SetModelButtonsInteractibility(false);
+            _modelContext.VisibilityState = false;
+            _modelContext.FadeState = false;
         }
         #endregion
 
@@ -211,6 +209,25 @@ namespace Facades
                     RemoveWiring();
                     break;
             }
+        }
+
+        public void WiringManager_Imported()
+        {
+            _wiringContext.SetWiringButtonsinteractibility(true);
+            _wiringContext.VisibilityState = true;
+        }
+
+        public void WiringManager_VisibilityChanged()
+        {
+            _wiringContext.VisibilityState = _wiringManager.Wiring.gameObject.activeSelf;
+        }
+
+        public void WiringManager_Edited() { }
+
+        public void WiringManager_Removed()
+        {
+            _wiringContext.SetWiringButtonsinteractibility(false);
+            _wiringContext.VisibilityState = false;
         }
         #endregion
         #endregion

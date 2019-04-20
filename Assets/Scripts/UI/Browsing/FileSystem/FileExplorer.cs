@@ -42,14 +42,14 @@ namespace UI.Browsing.FileSystem
 
             private void SetResults(string[] results)
             {
-                _explorer._results = results;
-                _explorer.LastResult = _explorer._results.Length > 0 ? _explorer._results[0] : null;
+                _explorer._lastResults = results;
+                _explorer.LastResult = _explorer._lastResults.Length > 0 ? _explorer._lastResults[0] : null;
             }
 
             protected void SetResultsAndSubmit(string[] results)
             {
                 SetResults(results);
-                _explorer.Submited.Invoke(new ReadOnlyCollection<string>(_explorer._results));
+                _explorer.Submited.Invoke(new ReadOnlyCollection<string>(_explorer._lastResults));
             }
 
             #region Event handlers
@@ -208,7 +208,7 @@ namespace UI.Browsing.FileSystem
 
         private Coroutine _routine;
 
-        private string[] _results;
+        private string[] _lastResults;
 
         [Header("Submit")]
         [SerializeField]
@@ -256,7 +256,7 @@ namespace UI.Browsing.FileSystem
 
         private string[] CurrentFlterExtensions { get; set; }
 
-        public ReadOnlyCollection<string> LastResults { get => new ReadOnlyCollection<string>(_results); }
+        public ReadOnlyCollection<string> LastResults { get => new ReadOnlyCollection<string>(_lastResults); }
 
         public string LastResult { get; private set; }
         #endregion
@@ -643,7 +643,8 @@ namespace UI.Browsing.FileSystem
         {
             StopExploring();
 
-            _results = new string[0];
+            LastResult = null;
+            _lastResults = new string[0];
 
             Canceled.Invoke();
         }

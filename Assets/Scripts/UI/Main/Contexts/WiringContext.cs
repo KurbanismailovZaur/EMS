@@ -49,6 +49,30 @@ namespace UI.Main.Contexts
             set => _importButton.interactable = value;
         }
 
+        public bool VisibilityState
+        {
+            get => _visibilityToggle.State;
+            set => _visibilityToggle.State = value;
+        }
+
+        public bool EditInteractable
+        {
+            get => _editButton.interactable;
+            set => _editButton.interactable = value;
+        }
+
+        public void SetWiringButtonsinteractibility(bool state)
+        {
+            _visibilityButton.interactable = state;
+            _removeButton.interactable = state;
+        }
+
         public void Import() => Selected.Invoke(Action.Import);
+
+        public void Visibility() => Selected.Invoke(Action.Visibility);
+
+        public void Edit() => Selected.Invoke(Action.Edit);
+
+        public void Remove() => Selected.Invoke(Action.Remove);
     }
 }

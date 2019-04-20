@@ -11,11 +11,8 @@ namespace Management.Wires.IO
 {
 	public static class WiringDataReader 
 	{
-        public static void ReadWiringFromFile(string pathToXLS)
+        public static Wiring ReadWiringFromFile(string pathToXLS)
         {
-            //Wiring.Factory wiringFactory = new Wiring.Factory();
-            //wiring = wiringFactory.Create();
-
             HSSFWorkbook workbook;
 
             using (FileStream stream = new FileStream(pathToXLS, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -23,7 +20,7 @@ namespace Management.Wires.IO
                 workbook = new HSSFWorkbook(stream);
             }
 
-            //Wire.Factory wireFactory = new Wire.Factory();
+            List<Wire> wires = new List<Wire>();
 
             for (int i = 0; i < workbook.NumberOfSheets; i++)
             {
@@ -49,8 +46,10 @@ namespace Management.Wires.IO
 
                 var points = ReadPoints(sheet);
 
-                Wire wire = Wire.Factory.Create(sheet.SheetName, amplitude, frequency, amperage, points);
+                wires.Add(Wire.Factory.Create(sheet.SheetName, amplitude, frequency, amperage, points));
             }
+
+            return Wiring.Factory.Create(wires);
         }
 
         private static List<Vector3> ReadPoints(ISheet sheet)

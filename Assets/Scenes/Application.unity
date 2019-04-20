@@ -663,6 +663,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 709f78973b7f01d40bb3c0e04dab5dca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Imported:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1511521138}
+        m_MethodName: WiringManager_Imported
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  VisibilityChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1511521138}
+        m_MethodName: WiringManager_VisibilityChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+  Removed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1511521138}
+        m_MethodName: WiringManager_Removed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1 &659992949
 GameObject:
   m_ObjectHideFlags: 0
@@ -3318,7 +3366,7 @@ PrefabInstance:
     - target: {fileID: 3433302200286231601, guid: ee4959d4b320a6246acf14c1fb737da7,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 37
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3433302200286231601, guid: ee4959d4b320a6246acf14c1fb737da7,
         type: 3}
