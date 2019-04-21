@@ -6,7 +6,7 @@ using static UnityEngine.Debug;
 using Vectrosity;
 using System.IO;
 using Dummiesman;
-using UI.Browsing.FileSystem;
+using UI.Exploring.FileSystem;
 using System;
 using Management.Wires.IO;
 
@@ -21,7 +21,7 @@ public class Test : MonoBehaviour
 
         try
         {
-            WiringDataReader.ReadWiringFromFile(_explorer.LastResult);
+            WiringDataReader.ReadFromFile(_explorer.LastResult);
         }
         catch (Exception)
         {

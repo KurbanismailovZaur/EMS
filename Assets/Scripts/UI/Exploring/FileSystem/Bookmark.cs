@@ -7,7 +7,7 @@ using System;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-namespace UI.Browsing.FileSystem
+namespace UI.Exploring.FileSystem
 {
 	public class Bookmark : MonoBehaviour 
 	{

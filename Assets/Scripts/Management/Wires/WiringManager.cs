@@ -22,7 +22,7 @@ namespace Management.Wires
 
         public void Import(string path)
         {
-            _wiring = WiringDataReader.ReadWiringFromFile(path);
+            _wiring = WiringDataReader.ReadFromFile(path);
             _wiring.transform.SetParent(transform);
 
             Imported.Invoke();

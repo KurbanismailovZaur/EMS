@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using System;
 using UnityEngine.Events;
 
-namespace UI.Browsing.FileSystem
+namespace UI.Exploring.FileSystem
 {
 	public class ScrollRect : UnityEngine.UI.ScrollRect, IPointerClickHandler
 	{

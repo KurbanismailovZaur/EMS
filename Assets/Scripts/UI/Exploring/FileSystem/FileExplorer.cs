@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 
-namespace UI.Browsing.FileSystem
+namespace UI.Exploring.FileSystem
 {
     public class FileExplorer : MonoBehaviour
     {

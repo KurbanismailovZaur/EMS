@@ -8,7 +8,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace UI.Browsing.FileSystem
+namespace UI.Exploring.FileSystem
 {
     public class Element : MonoBehaviour, IPointerDownHandler
     {

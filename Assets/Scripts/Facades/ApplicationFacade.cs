@@ -9,7 +9,8 @@ using Control;
 using Management.Projects;
 using Management.Models;
 using Management.Wires;
-using UI.Browsing.FileSystem;
+using UI.Exploring.FileSystem;
+using UI.References;
 
 namespace Facades
 {
@@ -28,6 +29,12 @@ namespace Facades
         private WiringContext _wiringContext;
 
         [SerializeField]
+        private CalculationsContext _calculationsContext;
+
+        [SerializeField]
+        private ReferenceContext _referenceContext;
+
+        [SerializeField]
         private ProjectManager _projectManager;
 
         [SerializeField]
@@ -41,6 +48,9 @@ namespace Facades
 
         [SerializeField]
         private CameraController _cameraController;
+
+        [SerializeField]
+        private Reference _reference;
 
         private void SetCameraToDefaultState()
         {
@@ -95,6 +105,13 @@ namespace Facades
         private void RemoveWiring() => _wiringManager.Remove();
         #endregion
 
+        #region Reference
+        private void EditReference()
+        {
+            _reference.Open();
+        }
+        #endregion
+
         #region Event handlers
         #region Project
         public void ProjectContext_Selected(ProjectContext.Action action)
@@ -125,6 +142,7 @@ namespace Facades
             _modelContext.ImportInteractable = true;
             _wiringContext.ImportInteractable = true;
             _wiringContext.EditInteractable = true;
+            _referenceContext.EditInteractable = true;
 
             _axes.AxesVisibility = _axes.GridVisibility = true;
 
@@ -137,6 +155,7 @@ namespace Facades
             _modelContext.ImportInteractable = false;
             _wiringContext.ImportInteractable = false;
             _wiringContext.EditInteractable = false;
+            _referenceContext.EditInteractable = false;
 
             _axes.AxesVisibility = _axes.GridVisibility = false;
 
@@ -215,6 +234,7 @@ namespace Facades
         {
             _wiringContext.SetWiringButtonsinteractibility(true);
             _wiringContext.VisibilityState = true;
+            _calculationsContext.SetCalculationsButtonsInteractibility(true);
         }
 
         public void WiringManager_VisibilityChanged()
@@ -228,6 +248,44 @@ namespace Facades
         {
             _wiringContext.SetWiringButtonsinteractibility(false);
             _wiringContext.VisibilityState = false;
+            _calculationsContext.SetCalculationsButtonsInteractibility(false);
+        }
+        #endregion
+
+        #region Calculations
+        public void CalculationsContext_Selected(CalculationsContext.Action action)
+        {
+            switch (action)
+            {
+                case CalculationsContext.Action.CalculateElectricFieldStrenght:
+                    break;
+                case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
+                    break;
+                case CalculationsContext.Action.ToggleOfElectricFieldStrenght:
+                    break;
+                case CalculationsContext.Action.ToggleMutualActionOfBCSAndBA:
+                    break;
+                case CalculationsContext.Action.StaticTime:
+                    break;
+                case CalculationsContext.Action.DynamicTime:
+                    break;
+                case CalculationsContext.Action.RemoveOfElectricFieldStrenght:
+                    break;
+                case CalculationsContext.Action.RemoveMutualActionOfBCSAndBA:
+                    break;
+            }
+        }
+        #endregion
+
+        #region Reference
+        public void ReferenceContext_Selected(ReferenceContext.Action action)
+        {
+            switch (action)
+            {
+                case ReferenceContext.Action.Edit:
+                    EditReference();
+                    break;
+            }
         }
         #endregion
         #endregion

@@ -11,7 +11,7 @@ namespace Management.Wires.IO
 {
 	public static class WiringDataReader 
 	{
-        public static Wiring ReadWiringFromFile(string pathToXLS)
+        public static Wiring ReadFromFile(string pathToXLS)
         {
             HSSFWorkbook workbook;
 

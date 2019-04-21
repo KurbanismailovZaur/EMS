@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEditor;
 
-namespace UI.Browsing.FileSystem.Editor
+namespace UI.Exploring.FileSystem.Editor
 {
     [CustomEditor(typeof(ScrollRect))]
     public class ScrollRectEditor : UnityEditor.UI.ScrollRectEditor
