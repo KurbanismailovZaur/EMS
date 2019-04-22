@@ -14,6 +14,7 @@ using UI.References;
 using UI.Modals.Calculations;
 using Management.Calculations;
 using System.Linq;
+using UI.Reporting;
 
 namespace Facades
 {
@@ -33,6 +34,9 @@ namespace Facades
         private Reference _reference;
 
         [SerializeField]
+        private Reports _reports;
+
+        [SerializeField]
         private PointCalculationOptions _pointCalculationOptions;
 
         [Header("Contexts")]
@@ -47,6 +51,9 @@ namespace Facades
 
         [SerializeField]
         private CalculationsContext _calculationsContext;
+
+        [SerializeField]
+        private ReportsContext _reportsContext;
 
         [SerializeField]
         private ReferenceContext _referenceContext;
@@ -118,14 +125,23 @@ namespace Facades
                     yield return _explorer.OpenFile("Импорт точек", null, "xls");
 
                     var positions = new List<Vector3>(1000);
-                    for (int i = 0; i < positions.Count; i++)
-                        positions.Add(new Vector3(Random.value * 20f, Random.value * 20f, Random.value * 20f));
+                    for (int i = 0; i < positions.Capacity; i++)
+                        positions.Add(new Vector3(Random.Range(-20f, 20f), Random.Range(-20f, 20f), Random.Range(-20f, 20f)));
 
                     _calculationsManager.CalculateElectricFieldStrenght(positions, 1f);
                     break;
                 default:
                     yield break;
             }
+        }
+        #endregion
+
+        #region Reports
+        private void Generate() => StartCoroutine(GenerateRoutine());
+
+        private IEnumerator GenerateRoutine()
+        {
+            yield return _reports.Open();
         }
         #endregion
 
@@ -159,6 +175,7 @@ namespace Facades
             _modelContext.ImportInteractable = true;
             _wiringContext.ImportInteractable = true;
             _wiringContext.EditInteractable = true;
+            _reportsContext.GenerateInteractable = true;
             _referenceContext.EditInteractable = true;
 
             _axes.AxesVisibility = _axes.GridVisibility = true;
@@ -172,6 +189,7 @@ namespace Facades
             _modelContext.ImportInteractable = false;
             _wiringContext.ImportInteractable = false;
             _wiringContext.EditInteractable = false;
+            _reportsContext.GenerateInteractable = false;
             _referenceContext.EditInteractable = false;
 
             _axes.AxesVisibility = _axes.GridVisibility = false;
@@ -310,6 +328,18 @@ namespace Facades
         public void ElectricFieldStrenght_VisibilityChanged()
         {
             _calculationsContext.ElectricFieldStrenghtVisibilityState = _calculationsManager.ElectricFieldStrenght.IsVisible;
+        }
+        #endregion
+
+        #region Reports
+        public void ReportsContext_Selected(ReportsContext.Action action)
+        {
+            switch (action)
+            {
+                case ReportsContext.Action.Generate:
+                    Generate();
+                    break;
+            }
         }
         #endregion
 
