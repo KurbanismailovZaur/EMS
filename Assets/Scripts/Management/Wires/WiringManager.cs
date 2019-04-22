@@ -22,6 +22,8 @@ namespace Management.Wires
 
         public void Import(string path)
         {
+            Remove();
+
             _wiring = WiringDataReader.ReadFromFile(path);
             _wiring.transform.SetParent(transform);
 

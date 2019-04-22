@@ -11,14 +11,31 @@ using Management.Models;
 using Management.Wires;
 using UI.Exploring.FileSystem;
 using UI.References;
+using UI.Modals.Calculations;
+using Management.Calculations;
+using System.Linq;
 
 namespace Facades
 {
     public class ApplicationFacade : MonoBehaviour
     {
         [SerializeField]
+        private Axes _axes;
+
+        [SerializeField]
+        private CameraController _cameraController;
+
+        [Header("Modals")]
+        [SerializeField]
         private FileExplorer _explorer;
 
+        [SerializeField]
+        private Reference _reference;
+
+        [SerializeField]
+        private PointCalculationOptions _pointCalculationOptions;
+
+        [Header("Contexts")]
         [SerializeField]
         private ProjectContext _projectContext;
 
@@ -34,6 +51,7 @@ namespace Facades
         [SerializeField]
         private ReferenceContext _referenceContext;
 
+        [Header("Managers")]
         [SerializeField]
         private ProjectManager _projectManager;
 
@@ -44,13 +62,7 @@ namespace Facades
         private WiringManager _wiringManager;
 
         [SerializeField]
-        private Axes _axes;
-
-        [SerializeField]
-        private CameraController _cameraController;
-
-        [SerializeField]
-        private Reference _reference;
+        private CalculationsManager _calculationsManager;
 
         private void SetCameraToDefaultState()
         {
@@ -72,18 +84,6 @@ namespace Facades
 
             _modelManager.Import(_explorer.LastResult);
         }
-
-        private void ToggleModelVisibility()
-        {
-            _modelManager.ToggleVisibility();
-        }
-
-        private void ToggleModelFade()
-        {
-            _modelManager.ToggleFade();
-        }
-
-        private void RemoveModel() => _modelManager.Remove();
         #endregion
 
         #region Wiring
@@ -97,18 +97,35 @@ namespace Facades
 
             _wiringManager.Import(_explorer.LastResult);
         }
-
-        private void ToggleWiringVisibility() => _wiringManager.ToggleVisibility();
-
-        private void EditWiring() => _wiringManager.Edit();
-
-        private void RemoveWiring() => _wiringManager.Remove();
         #endregion
 
-        #region Reference
-        private void EditReference()
+        #region Calculations
+        private void CalculateElectricFieldStrenght()
         {
-            _reference.Open();
+            StartCoroutine(CalculateElectricFieldStrenghtRoutine());
+        }
+
+        private IEnumerator CalculateElectricFieldStrenghtRoutine()
+        {
+            yield return _pointCalculationOptions.Open();
+
+            switch (_pointCalculationOptions.LastResultType)
+            {
+                case PointCalculationOptions.CalculationType.Default:
+                    _calculationsManager.CalculateElectricFieldStrenght(_pointCalculationOptions.PointsByAxis, _wiringManager.Wiring.Bounds);
+                    break;
+                case PointCalculationOptions.CalculationType.Import:
+                    yield return _explorer.OpenFile("Импорт точек", null, "xls");
+
+                    var positions = new List<Vector3>(1000);
+                    for (int i = 0; i < positions.Count; i++)
+                        positions.Add(new Vector3(Random.value * 20f, Random.value * 20f, Random.value * 20f));
+
+                    _calculationsManager.CalculateElectricFieldStrenght(positions, 1f);
+                    break;
+                default:
+                    yield break;
+            }
         }
         #endregion
 
@@ -174,13 +191,13 @@ namespace Facades
                     ImportModel();
                     break;
                 case ModelContext.Action.Visibility:
-                    ToggleModelVisibility();
+                    _modelManager.ToggleVisibility();
                     break;
                 case ModelContext.Action.Fade:
-                    ToggleModelFade();
+                    _modelManager.ToggleFade();
                     break;
                 case ModelContext.Action.Remove:
-                    RemoveModel();
+                    _modelManager.Remove();
                     break;
             }
         }
@@ -219,13 +236,13 @@ namespace Facades
                     ImportWiring();
                     break;
                 case WiringContext.Action.Visibility:
-                    ToggleWiringVisibility();
+                    _wiringManager.ToggleVisibility();
                     break;
                 case WiringContext.Action.Edit:
-                    EditWiring();
+                    _wiringManager.Edit();
                     break;
                 case WiringContext.Action.Remove:
-                    RemoveWiring();
+                    _wiringManager.Remove();
                     break;
             }
         }
@@ -258,22 +275,41 @@ namespace Facades
             switch (action)
             {
                 case CalculationsContext.Action.CalculateElectricFieldStrenght:
+                    CalculateElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
                     break;
-                case CalculationsContext.Action.ToggleOfElectricFieldStrenght:
+                case CalculationsContext.Action.ElectricFieldStrenghtVisibility:
+                    _calculationsManager.ElectricFieldStrenght.ToggleVisibility();
                     break;
-                case CalculationsContext.Action.ToggleMutualActionOfBCSAndBA:
+                case CalculationsContext.Action.MutualActionOfBCSAndBAVisibility:
                     break;
                 case CalculationsContext.Action.StaticTime:
                     break;
                 case CalculationsContext.Action.DynamicTime:
                     break;
-                case CalculationsContext.Action.RemoveOfElectricFieldStrenght:
+                case CalculationsContext.Action.ElectricFieldStrenghtRemove:
                     break;
-                case CalculationsContext.Action.RemoveMutualActionOfBCSAndBA:
+                case CalculationsContext.Action.MutualActionOfBCSAndBARemove:
                     break;
             }
+        }
+
+        public void ElectricFieldStrenght_Calculated()
+        {
+            _calculationsContext.ElectricFieldStrenghtVisibilityInteractibility = true;
+            _calculationsContext.ElectricFieldStrenghtVisibilityState = true;
+        }
+
+        public void ElectricFieldStrenght_Removed()
+        {
+            _calculationsContext.ElectricFieldStrenghtVisibilityInteractibility = false;
+            _calculationsContext.ElectricFieldStrenghtVisibilityState = false;
+        }
+
+        public void ElectricFieldStrenght_VisibilityChanged()
+        {
+            _calculationsContext.ElectricFieldStrenghtVisibilityState = _calculationsManager.ElectricFieldStrenght.IsVisible;
         }
         #endregion
 
@@ -283,7 +319,7 @@ namespace Facades
             switch (action)
             {
                 case ReferenceContext.Action.Edit:
-                    EditReference();
+                    _reference.Open();
                     break;
             }
         }

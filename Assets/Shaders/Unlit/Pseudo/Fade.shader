@@ -117,10 +117,10 @@ Shader "Unlit/Pseudo/Fade"
 }
 /*ASEBEGIN
 Version=16400
-630;109;2398;972;1024.565;248.4447;1;True;True
+723;396;2398;1002;1024.565;263.4447;1;True;True
 Node;AmplifyShaderEditor.FunctionNode;16;-528,144;Float;False;ViewDotNormal;-1;;3;2185c0d2c0b238a458278278dbee2aa1;0;4;6;FLOAT;0;False;7;FLOAT;1;False;8;FLOAT;0.2;False;9;FLOAT;1;False;1;FLOAT;0
-Node;AmplifyShaderEditor.ColorNode;3;-528,304;Float;False;Property;_Color;Color;0;0;Create;True;0;0;False;0;1,1,1,1;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.SamplerNode;4;-614,-56;Float;True;Property;_MainTex;MainTex;1;0;Create;True;0;0;False;0;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.ColorNode;3;-528,304;Float;False;Property;_Color;Color;0;0;Create;True;0;0;False;0;1,1,1,1;1,1,1,1;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SamplerNode;4;-614,-56;Float;True;Property;_MainTex;MainTex;1;0;Create;True;0;0;False;0;None;826f80ee0ad07444c8558af826a4df2e;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;6;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;5;-240,144;Float;False;3;3;0;COLOR;0,0,0,0;False;1;FLOAT;0;False;2;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.ComponentMaskNode;9;-80,208;Float;False;True;True;True;False;1;0;COLOR;0,0,0,0;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.DynamicAppendNode;12;160,304;Float;False;COLOR;4;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;0;False;3;FLOAT;0;False;1;COLOR;0
@@ -133,4 +133,4 @@ WireConnection;12;0;9;0
 WireConnection;12;3;3;4
 WireConnection;0;0;12;0
 ASEEND*/
-//CHKSM=4FBE03989D0CC3E078BDE11949C38D9F21C490F5
+//CHKSM=6B427A04F2FFFFF7691A69BB39684FE989A0B6FE

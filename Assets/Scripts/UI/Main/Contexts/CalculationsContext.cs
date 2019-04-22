@@ -9,19 +9,19 @@ using UnityButton = UnityEngine.UI.Button;
 
 namespace UI.Main.Contexts
 {
-	public class CalculationsContext : MonoBehaviour 
-	{
+    public class CalculationsContext : MonoBehaviour
+    {
         #region Enums
         public enum Action
         {
             CalculateElectricFieldStrenght,
             CalculateMutualActionOfBCSAndBA,
-            ToggleOfElectricFieldStrenght,
-            ToggleMutualActionOfBCSAndBA,
+            ElectricFieldStrenghtVisibility,
+            MutualActionOfBCSAndBAVisibility,
             StaticTime,
             DynamicTime,
-            RemoveOfElectricFieldStrenght,
-            RemoveMutualActionOfBCSAndBA,
+            ElectricFieldStrenghtRemove,
+            MutualActionOfBCSAndBARemove,
         }
         #endregion
 
@@ -38,6 +38,9 @@ namespace UI.Main.Contexts
 
         [SerializeField]
         private UnityButton _visibilityElectricFieldStrenghtButton;
+
+        [SerializeField]
+        private Toggle _visibilityElectricFieldStrenghtToggle;
 
         [SerializeField]
         private UnityButton _visibilityMutualActionOfBCSAndBAButton;
@@ -61,5 +64,33 @@ namespace UI.Main.Contexts
             _calculateElectricFieldStrenghtButton.interactable = state;
             _calculateMutualActionOfBCSAndBAButton.interactable = state;
         }
+
+        public bool ElectricFieldStrenghtVisibilityInteractibility
+        {
+            get => _visibilityElectricFieldStrenghtButton.interactable;
+            set => _visibilityElectricFieldStrenghtButton.interactable = value;
+        }
+
+        public bool ElectricFieldStrenghtVisibilityState
+        {
+            get => _visibilityElectricFieldStrenghtToggle.State;
+            set => _visibilityElectricFieldStrenghtToggle.State = value;
+        }
+
+        public void CalculateElectricFieldStrenght() => Selected.Invoke(Action.CalculateElectricFieldStrenght);
+
+        public void CalculateMutualActionOfBCSAndBA() => Selected.Invoke(Action.CalculateMutualActionOfBCSAndBA);
+
+        public void VisibilityElectricFieldStrenght() => Selected.Invoke(Action.ElectricFieldStrenghtVisibility);
+
+        public void VisibilityMutualActionOfBCSAndBA() => Selected.Invoke(Action.MutualActionOfBCSAndBAVisibility);
+
+        public void StaticTime() => Selected.Invoke(Action.StaticTime);
+
+        public void DynamicTime() => Selected.Invoke(Action.DynamicTime);
+
+        public void RemoveElectricFieldStrenght() => Selected.Invoke(Action.ElectricFieldStrenghtRemove);
+
+        public void RemoveMutualActionOfBCSAndBA() => Selected.Invoke(Action.MutualActionOfBCSAndBARemove);
     }
 }

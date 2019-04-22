@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using System.Collections.ObjectModel;
+using Geometry;
+using System.Linq;
 
 namespace Management.Wires
 {
@@ -20,6 +22,8 @@ namespace Management.Wires
                 foreach (var wire in wiring._wires)
                     wire.transform.SetParent(wiring.transform);
 
+                wiring.Bounds = GeometryUtility.CalculateBounds(wiring.Wires.SelectMany(w => w.Points).ToArray(), Matrix4x4.identity);
+
                 return wiring;
             }
         }
@@ -28,5 +32,7 @@ namespace Management.Wires
         private List<Wire> _wires;
 
         public ReadOnlyCollection<Wire> Wires { get => _wires.AsReadOnly(); }
-	}
+
+        public Bounds Bounds { get; private set; }
+    }
 }

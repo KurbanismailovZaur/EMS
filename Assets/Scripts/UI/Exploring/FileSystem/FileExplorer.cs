@@ -206,8 +206,6 @@ namespace UI.Exploring.FileSystem
 
         private State _currentState;
 
-        private Coroutine _routine;
-
         private string[] _lastResults;
 
         [Header("Submit")]
@@ -259,6 +257,8 @@ namespace UI.Exploring.FileSystem
         public ReadOnlyCollection<string> LastResults { get => new ReadOnlyCollection<string>(_lastResults); }
 
         public string LastResult { get; private set; }
+
+        public Coroutine Routine { get; private set; }
         #endregion
 
         #region Methods
@@ -310,7 +310,7 @@ namespace UI.Exploring.FileSystem
 
             ShowExplorer(State.Type.OpenFile, title, path, null);
 
-            return _routine;
+            return Routine;
         }
 
         public Coroutine SaveFile(string title = null, string path = null, string filters = null, string filename = null)
@@ -319,14 +319,14 @@ namespace UI.Exploring.FileSystem
 
             ShowExplorer(State.Type.SaveFile, title, path, filename);
 
-            return _routine;
+            return Routine;
         }
 
-        private IEnumerator Routine()
+        private IEnumerator BusyRoutine()
         {
             while (IsBusy) yield return null;
 
-            _routine = null;
+            Routine = null;
         }
 
         #region Exploring
@@ -344,7 +344,7 @@ namespace UI.Exploring.FileSystem
             _currentState.ShowContent(path);
             _currentState.SetFooterState(filename);
 
-            _routine = StartCoroutine(Routine());
+            Routine = StartCoroutine(BusyRoutine());
         }
 
         private void StopExploring()
