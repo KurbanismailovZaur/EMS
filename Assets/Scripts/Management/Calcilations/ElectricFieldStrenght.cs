@@ -25,7 +25,7 @@ namespace Management.Calculations
 
         [SerializeField]
         private Point _pointPrefab;
-
+        
         [SerializeField]
         private Gradient _gradient;
 
@@ -50,20 +50,40 @@ namespace Management.Calculations
             }
         }
 
+        private void Start()
+        {
+            Log(new Vector3(1f, 1f, 1f).magnitude);
+        }
+
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
-            bounds.size += bounds.size * 0.1f;
+            // make sphere bounds all points.
+            bounds.size *= 1.732051f;
+
+            // make spehere bounds 10% (by both sides) offset from max points.
+            bounds.size *= 1.2f;
 
             var maxSize = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z);
-            var distanceBetween = maxSize / pointsByAxis - 1;
+
+            var sphereRadius = maxSize / 2f;
+            var distanceBetween = maxSize / (pointsByAxis - 1);
             var halfCount = (pointsByAxis - 1) * distanceBetween / 2f;
 
             List<Vector3> positions = new List<Vector3>();
 
             for (int i = 0; i < pointsByAxis; i++)
+            {
                 for (int j = 0; j < pointsByAxis; j++)
+                {
                     for (int k = 0; k < pointsByAxis; k++)
-                        positions.Add(new Vector3(i * distanceBetween - halfCount, j * distanceBetween - halfCount, k * distanceBetween - halfCount));
+                    {
+                        var position = new Vector3(i * distanceBetween - halfCount, j * distanceBetween - halfCount, k * distanceBetween - halfCount);
+
+                        if (position.magnitude <= sphereRadius)
+                            positions.Add(position);
+                    }
+                }
+            }
 
             Calculate(positions, distanceBetween);
         }
