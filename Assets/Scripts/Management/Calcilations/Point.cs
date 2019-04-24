@@ -11,12 +11,13 @@ namespace Management.Calculations
         #region Classes
         public static class Factory
         {
-            public static Point Create(Point prefab, Transform parent, Vector3 position, float radius, Color color)
+            public static Point Create(Point prefab, Transform parent, Vector3 position, float radius, Color color, float value)
             {
                 var point = Instantiate(prefab, parent);
                 point.transform.position = position;
                 point.transform.localScale = new Vector3(radius, radius, radius) * 2f;
                 point._renderer.material.color = color;
+                point.Value = value;
 
                 return point;
             }
@@ -25,5 +26,7 @@ namespace Management.Calculations
 
         [SerializeField]
         private MeshRenderer _renderer;
+
+        public float Value { get; private set; }
     }
 }

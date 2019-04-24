@@ -49,12 +49,7 @@ namespace Management.Calculations
                 VisibilityChanged.Invoke();
             }
         }
-
-        private void Start()
-        {
-            Log(new Vector3(1f, 1f, 1f).magnitude);
-        }
-
+        
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
             // make sphere bounds all points.
@@ -93,7 +88,10 @@ namespace Management.Calculations
             Remove();
 
             for (int i = 0; i < positions.Count; i++)
-                Point.Factory.Create(_pointPrefab, transform, positions[i], radius, _gradient.Evaluate(UnityRandom.value));
+            {
+                var value = UnityRandom.value;
+                Point.Factory.Create(_pointPrefab, transform, positions[i], radius, _gradient.Evaluate(value), value);
+            }
 
             IsCalculated = true;
             IsVisible = true;
