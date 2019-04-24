@@ -19,5 +19,12 @@ namespace Management.Calculations
         }
 
         public void CalculateElectricFieldStrenght(List<Vector3> positions, float radius) => _electricFieldStrenght.Calculate(positions, radius);
+
+        public void RemoveElectricFieldStrenght()
+        {
+            _electricFieldStrenght.Remove();
+        }
+
+        public void FilterElectricFieldStrenght(float min, float max) => _electricFieldStrenght.Filter(min, max);
     }
 }

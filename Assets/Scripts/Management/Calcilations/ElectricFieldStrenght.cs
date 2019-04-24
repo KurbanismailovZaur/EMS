@@ -6,6 +6,7 @@ using static UnityEngine.Debug;
 using System;
 using UnityEngine.Events;
 using UnityRandom = UnityEngine.Random;
+using System.Linq;
 
 namespace Management.Calculations
 {
@@ -28,6 +29,8 @@ namespace Management.Calculations
         
         [SerializeField]
         private Gradient _gradient;
+
+        private List<Point> _points;
 
         public UnityEvent Calculated;
 
@@ -87,10 +90,12 @@ namespace Management.Calculations
         {
             Remove();
 
+            _points = new List<Point>();
+
             for (int i = 0; i < positions.Count; i++)
             {
                 var value = UnityRandom.value;
-                Point.Factory.Create(_pointPrefab, transform, positions[i], radius, _gradient.Evaluate(value), value);
+                _points.Add(Point.Factory.Create(_pointPrefab, transform, positions[i], radius, _gradient.Evaluate(value), value));
             }
 
             IsCalculated = true;
@@ -103,8 +108,10 @@ namespace Management.Calculations
         {
             if (!IsCalculated) return;
 
-            foreach (Transform child in transform)
-                Destroy(child.gameObject);
+            foreach (var point in _points)
+                Destroy(point.gameObject);
+
+            _points = null;
 
             IsCalculated = false;
             IsVisible = false;
@@ -113,5 +120,11 @@ namespace Management.Calculations
         }
 
         public void ToggleVisibility() => IsVisible = !IsVisible;
+
+        public void Filter(float min, float max)
+        {
+            foreach (var point in _points)
+                point.gameObject.SetActive(point.Value >= min && point.Value <= max);
+        }
     }
 }

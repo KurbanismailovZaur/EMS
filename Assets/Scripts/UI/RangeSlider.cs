@@ -30,56 +30,59 @@ namespace UI
 
         private bool _eatEvents;
 
+        [SerializeField]
+        private string _valueSuffix;
+
         [Header("Events")]
         public ChangedEvent Changed;
 
-        public float MinValue
+        public float MinRange
         {
             get => _minSlider.minValue;
             set
             {
-                if (value > MaxValue)
-                    MaxValue = value;
+                if (value > MaxRange)
+                    MaxRange = value;
 
                 _minSlider.minValue = value;
 
                 _eatEvents = true;
 
-                var currentMaxValue = CurrentMaxValue;
+                var currentMaxValue = MaxValue;
                 _maxSlider.minValue = value;
-                CurrentMaxValue = currentMaxValue;
+                MaxValue = currentMaxValue;
 
-                if (currentMaxValue != CurrentMaxValue)
+                if (currentMaxValue != MaxValue)
                     CallEvent();
 
                 _eatEvents = false;
             }
         }
 
-        public float MaxValue
+        public float MaxRange
         {
             get => _maxSlider.maxValue;
             set
             {
-                if (value < MinValue)
-                    MinValue = value;
+                if (value < MinRange)
+                    MinRange = value;
 
                 _minSlider.maxValue = value;
 
                 _eatEvents = true;
 
-                var currentMaxValue = CurrentMaxValue;
+                var currentMaxValue = MaxValue;
                 _maxSlider.maxValue = value;
-                CurrentMaxValue = currentMaxValue;
+                MaxValue = currentMaxValue;
 
-                if (currentMaxValue != CurrentMaxValue)
+                if (currentMaxValue != MaxValue)
                     CallEvent();
 
                 _eatEvents = false;
             }
         }
 
-        public float CurrentMinValue
+        public float MinValue
         {
             get => _minSlider.value;
             set
@@ -90,7 +93,7 @@ namespace UI
             }
         }
 
-        public float CurrentMaxValue
+        public float MaxValue
         {
             get => _maxSlider.minValue + _maxSlider.maxValue - _maxSlider.value;
             set
@@ -109,20 +112,20 @@ namespace UI
 
         private void CheckMinChanging()
         {
-            if (CurrentMaxValue < CurrentMinValue)
-                CurrentMaxValue = CurrentMinValue;
+            if (MaxValue < MinValue)
+                MaxValue = MinValue;
         }
 
         private void CheckMaxChanging()
         {
-            if (CurrentMaxValue < CurrentMinValue)
-                CurrentMinValue = CurrentMaxValue;
+            if (MaxValue < MinValue)
+                MinValue = MaxValue;
         }
 
         private void UpdateTexts()
         {
-            _minTextComponent.text = CurrentMinValue.ToString();
-            _maxTextComponent.text = CurrentMaxValue.ToString();
+            _minTextComponent.text = $"{MinValue} {_valueSuffix}";
+            _maxTextComponent.text = $"{MaxValue} {_valueSuffix}";
         }
 
         private void CallEvent()
@@ -131,7 +134,7 @@ namespace UI
 
             UpdateTexts();
 
-            Changed.Invoke(CurrentMinValue, CurrentMaxValue);
+            Changed.Invoke(MinValue, MaxValue);
         }
 
         #region Event handlers

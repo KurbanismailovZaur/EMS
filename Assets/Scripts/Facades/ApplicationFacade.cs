@@ -15,6 +15,7 @@ using UI.Modals.Calculations;
 using Management.Calculations;
 using System.Linq;
 using UI.Reporting;
+using UI;
 
 namespace Facades
 {
@@ -35,6 +36,9 @@ namespace Facades
 
         [SerializeField]
         private Reports _reports;
+
+        [SerializeField]
+        private Filter _filter;
 
         [SerializeField]
         private PointCalculationOptions _pointCalculationOptions;
@@ -306,28 +310,34 @@ namespace Facades
                     break;
                 case CalculationsContext.Action.DynamicTime:
                     break;
-                case CalculationsContext.Action.ElectricFieldStrenghtRemove:
+                case CalculationsContext.Action.RemoveElectricFieldStrenght:
+                    _calculationsManager.RemoveElectricFieldStrenght();
                     break;
-                case CalculationsContext.Action.MutualActionOfBCSAndBARemove:
+                case CalculationsContext.Action.RemoveMutualActionOfBCSAndBA:
                     break;
             }
         }
 
         public void ElectricFieldStrenght_Calculated()
         {
-            _calculationsContext.ElectricFieldStrenghtVisibilityInteractibility = true;
-            _calculationsContext.ElectricFieldStrenghtVisibilityState = true;
+            _calculationsContext.SetElectricFieldStrenghtButtonsTo(true);
+            _filter.SetRanges(0f, 1f);
+            _filter.ResetValues();
         }
 
         public void ElectricFieldStrenght_Removed()
         {
-            _calculationsContext.ElectricFieldStrenghtVisibilityInteractibility = false;
-            _calculationsContext.ElectricFieldStrenghtVisibilityState = false;
+            _calculationsContext.SetElectricFieldStrenghtButtonsTo(false);
         }
 
         public void ElectricFieldStrenght_VisibilityChanged()
         {
             _calculationsContext.ElectricFieldStrenghtVisibilityState = _calculationsManager.ElectricFieldStrenght.IsVisible;
+
+            if (_calculationsManager.ElectricFieldStrenght.IsVisible)
+                _filter.Show();
+            else
+                _filter.Hide();
         }
         #endregion
 
@@ -354,6 +364,8 @@ namespace Facades
             }
         }
         #endregion
+
+        public void Filter_Changed(float min, float max) => _calculationsManager.FilterElectricFieldStrenght(min, max);
         #endregion
     }
 }

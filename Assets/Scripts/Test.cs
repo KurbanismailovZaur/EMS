@@ -25,6 +25,6 @@ public class Test : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        _rangeSlider.MinValue = 2f;
+        _rangeSlider.MinRange = 2f;
     }
 }

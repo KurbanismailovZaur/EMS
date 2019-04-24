@@ -20,8 +20,8 @@ namespace UI.Main.Contexts
             MutualActionOfBCSAndBAVisibility,
             StaticTime,
             DynamicTime,
-            ElectricFieldStrenghtRemove,
-            MutualActionOfBCSAndBARemove,
+            RemoveElectricFieldStrenght,
+            RemoveMutualActionOfBCSAndBA,
         }
         #endregion
 
@@ -77,6 +77,13 @@ namespace UI.Main.Contexts
             set => _visibilityElectricFieldStrenghtToggle.State = value;
         }
 
+        public void SetElectricFieldStrenghtButtonsTo(bool state)
+        {
+            ElectricFieldStrenghtVisibilityInteractibility = state;
+            ElectricFieldStrenghtVisibilityState = state;
+            _removeElectricFieldStrenghtButton.interactable = state;
+        }
+
         public void CalculateElectricFieldStrenght() => Selected.Invoke(Action.CalculateElectricFieldStrenght);
 
         public void CalculateMutualActionOfBCSAndBA() => Selected.Invoke(Action.CalculateMutualActionOfBCSAndBA);
@@ -89,8 +96,8 @@ namespace UI.Main.Contexts
 
         public void DynamicTime() => Selected.Invoke(Action.DynamicTime);
 
-        public void RemoveElectricFieldStrenght() => Selected.Invoke(Action.ElectricFieldStrenghtRemove);
+        public void RemoveElectricFieldStrenght() => Selected.Invoke(Action.RemoveElectricFieldStrenght);
 
-        public void RemoveMutualActionOfBCSAndBA() => Selected.Invoke(Action.MutualActionOfBCSAndBARemove);
+        public void RemoveMutualActionOfBCSAndBA() => Selected.Invoke(Action.RemoveMutualActionOfBCSAndBA);
     }
 }
