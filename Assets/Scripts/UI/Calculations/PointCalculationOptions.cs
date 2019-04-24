@@ -7,7 +7,7 @@ using Exceptions;
 using UnityEngine.UI;
 using System;
 
-namespace UI.Modals.Calculations
+namespace UI.Calculations
 {
 	public class PointCalculationOptions : MonoBehaviour 
 	{

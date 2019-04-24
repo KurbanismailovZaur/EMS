@@ -11,7 +11,7 @@ using Management.Models;
 using Management.Wires;
 using UI.Exploring.FileSystem;
 using UI.References;
-using UI.Modals.Calculations;
+using UI.Calculations;
 using Management.Calculations;
 using System.Linq;
 using UI.Reporting;
