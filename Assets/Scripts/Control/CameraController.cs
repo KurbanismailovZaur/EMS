@@ -9,8 +9,6 @@ namespace Control
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour
     {
-        private Camera _camera;
-
         [SerializeField]
         private KeyCode _key;
 
@@ -64,7 +62,7 @@ namespace Control
 #endif
         #endregion
 
-        public Camera Camera { get => _camera; }
+        public Camera Camera { get; private set; }
 
         private float Size
         {
@@ -76,8 +74,7 @@ namespace Control
 
         private void Awake()
         {
-            _camera = GetComponent<Camera>();
-
+            Camera = GetComponent<Camera>();
             SetTargetsToCurrentState();
         }
 
@@ -129,12 +126,12 @@ namespace Control
 
         private void SetSizeToTarget()
         {
-            _camera.orthographicSize = Mathf.Lerp(_camera.orthographicSize, Size, _sizeInterpolation * Time.deltaTime);
+            Camera.orthographicSize = Mathf.Lerp(Camera.orthographicSize, Size, _sizeInterpolation * Time.deltaTime);
         }
 
         public void SetTargetsToCurrentState()
         {
-            _size = _camera.orthographicSize;
+            _size = Camera.orthographicSize;
 
             _targetVector = transform.position - _origin;
 
@@ -158,11 +155,11 @@ namespace Control
         #endregion
 
         #region Event handlers
-        public void EventTrigger_PointerEnter(BaseEventData eventData) => _isMouseInViewport = true;
+        public void CameraViewport_PointerEnter() => _isMouseInViewport = true;
 
-        public void EventTrigger_PointerExit(BaseEventData eventData) => _isMouseInViewport = false;
+        public void CameraViewport_PointerExit() => _isMouseInViewport = false;
 
-        public void EventTrigger_Drag(BaseEventData eventData) => CalculateTargetTransform();
+        public void CameraViewport_Drag() => CalculateTargetTransform();
         #endregion
     }
 }

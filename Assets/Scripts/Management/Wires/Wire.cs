@@ -29,15 +29,15 @@ namespace Management.Wires
             }
         }
 
-        private VectorLine _line;
+        protected VectorLine _line;
 
-        public string Name { get; private set; }
+        public string Name { get; protected set; }
 
-        public float Amplitude { get; private set; }
+        public float Amplitude { get; protected set; }
 
-        public float Frequency { get; private set; }
+        public float Frequency { get; protected set; }
 
-        public float Amperage { get; private set; }
+        public float Amperage { get; protected set; }
 
         public ReadOnlyCollection<Vector3> Points { get => _line.points3.AsReadOnly(); }
     }

@@ -29,7 +29,9 @@ namespace Control.Behaviour.States
         {
             Screen.SetResolution((int)_initialResolution.x, (int)_initialResolution.y, FullScreenMode.Windowed);
 
+#if !UNITY_EDITOR
             _scaler.scaleFactor = Screen.dpi / _referenceDPI;
+#endif
 
             yield return _foreground.Hide();
 

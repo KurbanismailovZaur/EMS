@@ -27,12 +27,6 @@ public class Test : MonoBehaviour
         }
     }
 
-    private void CopyMeshData(Mesh source, Mesh destination)
-    {
-        destination.vertices = source.vertices;
-        destination.normals = source.normals;
-    }
-
     public void OnClick()
     {
         Log("Clicked");

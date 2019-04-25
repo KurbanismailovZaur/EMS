@@ -10,48 +10,12 @@ using System.Linq;
 
 namespace Management.Calculations
 {
-    public class ElectricFieldStrenght : MonoBehaviour
+    public class ElectricFieldStrenght : CalculationBase
     {
-        #region Classes
-        public static class Factory
-        {
-            public static ElectricFieldStrenght Create()
-            {
-                var field = new GameObject("ElectricFieldStrenght").AddComponent<ElectricFieldStrenght>();
-
-                return field;
-            }
-        }
-        #endregion
-
         [SerializeField]
         private Point _pointPrefab;
         
-        [SerializeField]
-        private Gradient _gradient;
-
         private List<Point> _points;
-
-        public UnityEvent Calculated;
-
-        public UnityEvent Removed;
-
-        public UnityEvent VisibilityChanged;
-
-        public bool IsCalculated { get; private set; }
-
-        public bool IsVisible
-        {
-            get => gameObject.activeSelf;
-            set
-            {
-                if (value == gameObject.activeSelf) return;
-
-                gameObject.SetActive(value);
-
-                VisibilityChanged.Invoke();
-            }
-        }
         
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
@@ -104,7 +68,7 @@ namespace Management.Calculations
             Calculated.Invoke();
         }
 
-        public void Remove()
+        public override void Remove()
         {
             if (!IsCalculated) return;
 
@@ -119,9 +83,7 @@ namespace Management.Calculations
             Removed.Invoke();
         }
 
-        public void ToggleVisibility() => IsVisible = !IsVisible;
-
-        public void Filter(float min, float max)
+        public override void Filter(float min, float max)
         {
             foreach (var point in _points)
                 point.gameObject.SetActive(point.Value >= min && point.Value <= max);

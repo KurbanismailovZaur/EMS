@@ -12,7 +12,12 @@ namespace Management.Calculations
         [SerializeField]
         private ElectricFieldStrenght _electricFieldStrenght;
 
+        [SerializeField]
+        private MutualActionOfBCSAndBA _mutualActionOfBCSAndBA;
+
         public ElectricFieldStrenght ElectricFieldStrenght => _electricFieldStrenght;
+
+        public MutualActionOfBCSAndBA MutualActionOfBCSAndBA => _mutualActionOfBCSAndBA;
 
         public void CalculateElectricFieldStrenght(int pointsByAxis, Bounds bounds)
         {
@@ -21,10 +26,7 @@ namespace Management.Calculations
 
         public void CalculateElectricFieldStrenght(List<Vector3> positions, float radius) => _electricFieldStrenght.Calculate(positions, radius);
 
-        public void CalculateMutualActionOfBCSAndBA(Wiring wiring)
-        {
-
-        }
+        public void CalculateMutualActionOfBCSAndBA(Wiring wiring) => _mutualActionOfBCSAndBA.Calculate(wiring);
 
         public void RemoveElectricFieldStrenght()
         {
