@@ -300,6 +300,7 @@ namespace Facades
                     CalculateElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
+                    _calculationsManager.CalculateMutualActionOfBCSAndBA(_wiringManager.Wiring);
                     break;
                 case CalculationsContext.Action.ElectricFieldStrenghtVisibility:
                     _calculationsManager.ElectricFieldStrenght.ToggleVisibility();

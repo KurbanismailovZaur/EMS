@@ -13,18 +13,28 @@ using UI;
 
 public class Test : MonoBehaviour
 {
-    [SerializeField]
-    private FileExplorer _explorer;
-
-    [SerializeField]
-    private RangeSlider _rangeSlider;
-
     private IEnumerator Start()
     {
-        _rangeSlider.Changed.AddListener((min, max) => Log($"{min}, {max}"));
+        var line = VectorLine.SetLine3D(Color.yellow, Vector3.zero, Vector3.one);
+        line.lineWidth = 2f;
+        var mesh = line.rectTransform.GetComponent<MeshFilter>().sharedMesh;
+        var collider = line.rectTransform.gameObject.AddComponent<MeshCollider>();
+        
+        while (true)
+        {
+            yield return null;
+            collider.sharedMesh = mesh;
+        }
+    }
 
-        yield return new WaitForSeconds(2f);
+    private void CopyMeshData(Mesh source, Mesh destination)
+    {
+        destination.vertices = source.vertices;
+        destination.normals = source.normals;
+    }
 
-        _rangeSlider.MinRange = 2f;
+    public void OnClick()
+    {
+        Log("Clicked");
     }
 }

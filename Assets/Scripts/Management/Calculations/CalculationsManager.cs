@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
+using Management.Wires;
 
 namespace Management.Calculations
 {
@@ -19,6 +20,11 @@ namespace Management.Calculations
         }
 
         public void CalculateElectricFieldStrenght(List<Vector3> positions, float radius) => _electricFieldStrenght.Calculate(positions, radius);
+
+        public void CalculateMutualActionOfBCSAndBA(Wiring wiring)
+        {
+
+        }
 
         public void RemoveElectricFieldStrenght()
         {
