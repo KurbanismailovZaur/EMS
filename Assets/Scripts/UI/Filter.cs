@@ -15,25 +15,11 @@ namespace UI
         [SerializeField]
         private RangeSlider _slider;
 
-        private bool _isOpen;
+        public RangeSlider RangeSlider => _slider;
 
-        public void Show()
-        {
-            if (_isOpen) throw new BusyException("Already opened.");
+        public void Show() => SetCanvasGroupOptions(1f, true);
 
-            _isOpen = true;
-
-            SetCanvasGroupOptions(1f, true);
-        }
-
-        public void Hide()
-        {
-            if (!_isOpen) throw new BusyException("Already closed.");
-
-            _isOpen = false;
-
-            SetCanvasGroupOptions(0f, false);
-        }
+        public void Hide() => SetCanvasGroupOptions(0f, false);
 
         private void SetCanvasGroupOptions(float alpha, bool blockRaycast)
         {

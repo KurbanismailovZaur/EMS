@@ -162,6 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9eb3ac1a6ad18574ab56948d718dc375, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _physicsRaycaster: {fileID: 534669907}
   PointerEnter:
     m_PersistentCalls:
       m_Calls:

@@ -5,12 +5,32 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using Management.Wires;
 using System.Linq;
+using UnityEngine.Events;
 
 namespace Management.Calculations
 {
     public class MutualActionOfBCSAndBA : CalculationBase
     {
         private Wire[] _wires;
+
+        //public UnityEvent Calculated;
+
+        //public UnityEvent Removed;
+
+        //public UnityEvent VisibilityChanged;
+
+        //public bool IsVisible
+        //{
+        //    get => gameObject.activeSelf;
+        //    set
+        //    {
+        //        if (value == gameObject.activeSelf) return;
+
+        //        gameObject.SetActive(value);
+
+        //        VisibilityChanged.Invoke();
+        //    }
+        //}
 
         public void Calculate(Wiring wiring)
         {
@@ -41,6 +61,8 @@ namespace Management.Calculations
 
         private float Calculate(Wires.Wire a, Wires.Wire b) => Random.value;
 
+        //public void ToggleVisibility() => IsVisible = !IsVisible;
+
         public override void Remove()
         {
             if (!IsCalculated) return;
@@ -58,8 +80,8 @@ namespace Management.Calculations
 
         public override void Filter(float min, float max)
         {
-            //foreach (var wire in _wires)
-            //    wire.gameObject.SetActive(wire.Value >= min && point.Value <= max);
+            foreach (var wire in _wires)
+                wire.gameObject.SetActive(wire.Value >= min && wire.Value <= max);
         }
 
         public void LogSomething() => Log("Clicked");

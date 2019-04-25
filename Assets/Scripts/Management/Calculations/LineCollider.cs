@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 namespace Management.Calculations
 {
@@ -25,13 +26,15 @@ namespace Management.Calculations
             while (true)
             {
                 yield return null;
-                _collider.sharedMesh = _filter.sharedMesh;
+
+                if (!_filter.sharedMesh.vertices.All(v => v == Vector3.zero))
+                    _collider.sharedMesh = _filter.sharedMesh;
             }
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            Log("Clicked");
+
         }
     }
 }

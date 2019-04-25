@@ -8,8 +8,8 @@ using UnityEngine.Events;
 
 namespace Management.Wires
 {
-	public class WiringManager : MonoBehaviour 
-	{
+    public class WiringManager : MonoBehaviour
+    {
         private Wiring _wiring;
 
         public UnityEvent Imported;
@@ -30,12 +30,16 @@ namespace Management.Wires
             Imported.Invoke();
         }
 
-        public void ToggleVisibility()
+        public void SetVisibility(bool state)
         {
-            _wiring.gameObject.SetActive(!_wiring.gameObject.activeSelf);
+            if (state == _wiring.gameObject.activeSelf) return;
+
+            _wiring.gameObject.SetActive(state);
 
             VisibilityChanged.Invoke();
         }
+
+        public void ToggleVisibility() => SetVisibility(!_wiring.gameObject.activeSelf);
 
         public void Edit() { }
 
@@ -48,5 +52,5 @@ namespace Management.Wires
 
             Removed.Invoke();
         }
-	}
+    }
 }

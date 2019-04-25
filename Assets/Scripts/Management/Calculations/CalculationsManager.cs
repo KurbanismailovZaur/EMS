@@ -28,10 +28,9 @@ namespace Management.Calculations
 
         public void CalculateMutualActionOfBCSAndBA(Wiring wiring) => _mutualActionOfBCSAndBA.Calculate(wiring);
 
-        public void RemoveElectricFieldStrenght()
-        {
-            _electricFieldStrenght.Remove();
-        }
+        public void RemoveElectricFieldStrenght() => _electricFieldStrenght.Remove();
+
+        public void RemoveMutualActionOfBCSAndBA() => _mutualActionOfBCSAndBA.Remove();
 
         public void FilterElectricFieldStrenght(float min, float max) => _electricFieldStrenght.Filter(min, max);
     }

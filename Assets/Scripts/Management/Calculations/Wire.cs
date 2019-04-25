@@ -45,6 +45,7 @@ namespace Management.Calculations
                 wire.transform.SetParent(parent);
 
                 wire._line = line;
+                //wire._line.lineWidth = 2f;
 
                 wire.name = wire.Name = name;
                 wire.Amplitude = amplitude;
@@ -55,7 +56,9 @@ namespace Management.Calculations
                 var colliderLine = VectorLine.SetLine3D(new Color(0f, 0f, 0f, 0f), points.ToArray());
                 colliderLine.Draw3DAuto();
 
-                colliderLine.lineWidth = 4f;
+                colliderLine.name = "Collider";
+
+                colliderLine.lineWidth = 8f;
 
                 colliderLine.rectTransform.SetParent(wire.transform);
                 colliderLine.rectTransform.gameObject.AddComponent<LineCollider>();

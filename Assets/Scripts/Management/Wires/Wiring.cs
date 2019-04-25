@@ -9,8 +9,8 @@ using System.Linq;
 
 namespace Management.Wires
 {
-	public class Wiring : MonoBehaviour
-	{
+    public class Wiring : MonoBehaviour
+    {
         #region classes
         public static class Factory
         {
@@ -34,5 +34,7 @@ namespace Management.Wires
         public ReadOnlyCollection<Wire> Wires { get => _wires.AsReadOnly(); }
 
         public Bounds Bounds { get; private set; }
+
+        public bool IsVisible => gameObject.activeSelf;
     }
 }

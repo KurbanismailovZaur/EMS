@@ -31,19 +31,22 @@ namespace UI.Main.Contexts
         #endregion
 
         [SerializeField]
-        private UnityButton _calculateElectricFieldStrenghtButton;
+        private UnityButton _calculateElectricButton;
 
         [SerializeField]
-        private UnityButton _calculateMutualActionOfBCSAndBAButton;
+        private UnityButton _calculateMutualButton;
 
         [SerializeField]
-        private UnityButton _visibilityElectricFieldStrenghtButton;
+        private UnityButton _electricVisibilityButton;
 
         [SerializeField]
-        private Toggle _visibilityElectricFieldStrenghtToggle;
+        private Toggle _electricVisibilityToggle;
 
         [SerializeField]
-        private UnityButton _visibilityMutualActionOfBCSAndBAButton;
+        private UnityButton _mutualVisibilityButton;
+
+        [SerializeField]
+        private Toggle _mutualVisibilityToggle;
 
         [SerializeField]
         private UnityButton _staticTimeButton;
@@ -52,36 +55,55 @@ namespace UI.Main.Contexts
         private UnityButton _dynamicTimeButton;
 
         [SerializeField]
-        private UnityButton _removeElectricFieldStrenghtButton;
+        private UnityButton _electricRemoveButton;
 
         [SerializeField]
-        private UnityButton _removeMutualActionOfBCSAndBAButton;
+        private UnityButton _mutualRemoveButton;
 
         public SelectedEvent Selected;
 
-        public void SetCalculationsButtonsInteractibility(bool state)
+        public void SetCalcBtnsInteractable(bool state)
         {
-            _calculateElectricFieldStrenghtButton.interactable = state;
-            _calculateMutualActionOfBCSAndBAButton.interactable = state;
+            _calculateElectricButton.interactable = state;
+            _calculateMutualButton.interactable = state;
         }
 
-        public bool ElectricFieldStrenghtVisibilityInteractibility
+        public bool ElectricVisibilityInteractible
         {
-            get => _visibilityElectricFieldStrenghtButton.interactable;
-            set => _visibilityElectricFieldStrenghtButton.interactable = value;
+            get => _electricVisibilityButton.interactable;
+            set => _electricVisibilityButton.interactable = value;
         }
 
-        public bool ElectricFieldStrenghtVisibilityState
+        public bool ElectricVisibilityState
         {
-            get => _visibilityElectricFieldStrenghtToggle.State;
-            set => _visibilityElectricFieldStrenghtToggle.State = value;
+            get => _electricVisibilityToggle.State;
+            set => _electricVisibilityToggle.State = value;
         }
 
-        public void SetElectricFieldStrenghtButtonsTo(bool state)
+        public bool MutualVisibilityInteractible
         {
-            ElectricFieldStrenghtVisibilityInteractibility = state;
-            ElectricFieldStrenghtVisibilityState = state;
-            _removeElectricFieldStrenghtButton.interactable = state;
+            get => _mutualVisibilityButton.interactable;
+            set => _mutualVisibilityButton.interactable = value;
+        }
+
+        public bool MutualVisibilityState
+        {
+            get => _mutualVisibilityToggle.State;
+            set => _mutualVisibilityToggle.State = value;
+        }
+
+        public void SetElectricButtonsTo(bool state)
+        {
+            ElectricVisibilityInteractible = state;
+            ElectricVisibilityState = state;
+            _electricRemoveButton.interactable = state;
+        }
+
+        public void SetMutualButtonsTo(bool state)
+        {
+            MutualVisibilityInteractible = state;
+            MutualVisibilityState = state;
+            _mutualRemoveButton.interactable = state;
         }
 
         public void CalculateElectricFieldStrenght() => Selected.Invoke(Action.CalculateElectricFieldStrenght);
