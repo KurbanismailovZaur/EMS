@@ -17,25 +17,6 @@ namespace Management.Calculations
         
         private List<Point> _points;
 
-        //public UnityEvent Calculated;
-
-        //public UnityEvent Removed;
-
-        //public UnityEvent VisibilityChanged;
-
-        //public bool IsVisible
-        //{
-        //    get => gameObject.activeSelf;
-        //    set
-        //    {
-        //        if (value == gameObject.activeSelf) return;
-
-        //        gameObject.SetActive(value);
-
-        //        VisibilityChanged.Invoke();
-        //    }
-        //}
-
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
             // make sphere bounds all points.
@@ -86,9 +67,7 @@ namespace Management.Calculations
 
             Calculated.Invoke();
         }
-
-        //public void ToggleVisibility() => IsVisible = !IsVisible;
-
+        
         public override void Remove()
         {
             if (!IsCalculated) return;

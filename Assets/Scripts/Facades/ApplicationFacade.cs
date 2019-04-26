@@ -16,6 +16,7 @@ using Management.Calculations;
 using System.Linq;
 using UI.Reporting;
 using UI;
+using UI.Panels.Wire;
 
 namespace Facades
 {
@@ -27,6 +28,12 @@ namespace Facades
         [SerializeField]
         private CameraController _cameraController;
 
+        [SerializeField]
+        private Filter _filter;
+
+        [SerializeField]
+        private WirePanel _wirePanel;
+
         [Header("Modals")]
         [SerializeField]
         private FileExplorer _explorer;
@@ -36,9 +43,6 @@ namespace Facades
 
         [SerializeField]
         private Reports _reports;
-
-        [SerializeField]
-        private Filter _filter;
 
         [SerializeField]
         private PointCalculationOptions _pointCalculationOptions;
@@ -140,6 +144,14 @@ namespace Facades
                     yield break;
             }
         }
+
+        private void SetCurrentCalculations(CalculationBase calculation)
+        {
+            if (_currentCalculations)
+                _currentCalculations.IsVisible = false;
+
+            _currentCalculations = calculation;
+        }
         #endregion
 
         #region Reports
@@ -161,6 +173,17 @@ namespace Facades
             FilterCurrentCalculations(_filter.RangeSlider.MinValue, _filter.RangeSlider.MaxValue);
         }
 
+        private void SetCurrentCalculationsAndPrepareOther(CalculationBase calculation)
+        {
+            SetCurrentCalculations(calculation);
+            ResetAndShowCurrentCalculationsFilter();
+        }
+
+        private void HandleNoCalculations()
+        {
+            _currentCalculations = null;
+            _filter.Hide();
+        }
         #region Event handlers
         #region Project
         public void ProjectContext_Selected(ProjectContext.Action action)
@@ -354,18 +377,9 @@ namespace Facades
             _calculationsContext.ElectricVisibilityState = _calculationsManager.ElectricFieldStrenght.IsVisible;
 
             if (_calculationsManager.ElectricFieldStrenght.IsVisible)
-            {
-                _calculationsManager.MutualActionOfBCSAndBA.IsVisible = false;
-
-                _currentCalculations = _calculationsManager.ElectricFieldStrenght;
-
-                ResetAndShowCurrentCalculationsFilter();
-            }
+                SetCurrentCalculationsAndPrepareOther(_calculationsManager.ElectricFieldStrenght);
             else
-            {
-                _currentCalculations = null;
-                _filter.Hide();
-            }
+                HandleNoCalculations();
         }
         #endregion
 
@@ -392,17 +406,22 @@ namespace Facades
                 if (_wiringManager.Wiring.IsVisible)
                     _wiringManager.SetVisibility(false);
 
-                _calculationsManager.ElectricFieldStrenght.IsVisible = false;
-
-                _currentCalculations = _calculationsManager.MutualActionOfBCSAndBA;
-
-                ResetAndShowCurrentCalculationsFilter();
+                SetCurrentCalculationsAndPrepareOther(_calculationsManager.MutualActionOfBCSAndBA);
             }
             else
             {
-                _currentCalculations = null;
-                _filter.Hide();
+                HandleNoCalculations();
+                _wirePanel.Close();
             }
+        }
+
+        public void MutualActionOfBCSAndBA_Clicked(Management.Calculations.Wire wire)
+        {
+            if (_wirePanel.IsOpen)
+                _wirePanel.Open(wire);
+            else
+                _wirePanel.Open(wire, Input.mousePosition);
+            
         }
         #endregion
         #endregion
@@ -432,6 +451,11 @@ namespace Facades
         #endregion
 
         public void Filter_Changed(float min, float max) => FilterCurrentCalculations(min, max);
+
+        public void CameraViewport_EmptyClick()
+        {
+            _wirePanel.Close();
+        }
         #endregion
     }
 }

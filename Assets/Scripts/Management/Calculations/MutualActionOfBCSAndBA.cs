@@ -6,31 +6,19 @@ using static UnityEngine.Debug;
 using Management.Wires;
 using System.Linq;
 using UnityEngine.Events;
+using System;
+using UnityRandom = UnityEngine.Random;
 
 namespace Management.Calculations
 {
     public class MutualActionOfBCSAndBA : CalculationBase
     {
+        [Serializable]
+        public class ClickedEvent : UnityEvent<Wire> { }
+
         private Wire[] _wires;
 
-        //public UnityEvent Calculated;
-
-        //public UnityEvent Removed;
-
-        //public UnityEvent VisibilityChanged;
-
-        //public bool IsVisible
-        //{
-        //    get => gameObject.activeSelf;
-        //    set
-        //    {
-        //        if (value == gameObject.activeSelf) return;
-
-        //        gameObject.SetActive(value);
-
-        //        VisibilityChanged.Invoke();
-        //    }
-        //}
+        public ClickedEvent Clicked;
 
         public void Calculate(Wiring wiring)
         {
@@ -53,15 +41,16 @@ namespace Management.Calculations
 
             _wires = Wire.Factory.Create(wires, influences, values, colors, transform);
 
+            foreach (var wire in _wires)
+                wire.Clicked += Wire_Clicked;
+
             IsCalculated = true;
             IsVisible = true;
 
             Calculated.Invoke();
         }
 
-        private float Calculate(Wires.Wire a, Wires.Wire b) => Random.value;
-
-        //public void ToggleVisibility() => IsVisible = !IsVisible;
+        private float Calculate(Wires.Wire a, Wires.Wire b) => UnityRandom.value;
 
         public override void Remove()
         {
@@ -84,6 +73,6 @@ namespace Management.Calculations
                 wire.gameObject.SetActive(wire.Value >= min && wire.Value <= max);
         }
 
-        public void LogSomething() => Log("Clicked");
+        private void Wire_Clicked(Wire wire) => Clicked.Invoke(wire);
     }
 }

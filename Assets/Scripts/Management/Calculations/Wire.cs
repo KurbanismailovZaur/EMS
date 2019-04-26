@@ -6,6 +6,7 @@ using static UnityEngine.Debug;
 using Vectrosity;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System;
 
 namespace Management.Calculations
 {
@@ -45,7 +46,7 @@ namespace Management.Calculations
                 wire.transform.SetParent(parent);
 
                 wire._line = line;
-                //wire._line.lineWidth = 2f;
+                wire._line.lineWidth = 2f;
 
                 wire.name = wire.Name = name;
                 wire.Amplitude = amplitude;
@@ -61,7 +62,9 @@ namespace Management.Calculations
                 colliderLine.lineWidth = 8f;
 
                 colliderLine.rectTransform.SetParent(wire.transform);
-                colliderLine.rectTransform.gameObject.AddComponent<LineCollider>();
+
+                var collider = colliderLine.rectTransform.gameObject.AddComponent<LineCollider>();
+                collider.SetClickHandler(wire.LineCollider_ClickHandler);
                 #endregion
 
                 return wire;
@@ -86,5 +89,11 @@ namespace Management.Calculations
         public ReadOnlyCollection<Influence> Influences => _influences.AsReadOnly();
 
         public float Value { get; private set; }
+
+        public event Action<Wire> Clicked;
+
+        #region Events handler
+        private void LineCollider_ClickHandler() => Clicked?.Invoke(this);
+        #endregion
     }
 }

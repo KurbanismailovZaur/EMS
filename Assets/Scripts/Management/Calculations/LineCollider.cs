@@ -5,13 +5,17 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.EventSystems;
 using System.Linq;
+using System;
 
 namespace Management.Calculations
 {
     public class LineCollider : MonoBehaviour, IPointerClickHandler
     {
         private MeshFilter _filter;
+
         private MeshCollider _collider;
+
+        private Action _clickHandler;
 
         private void Awake()
         {
@@ -32,9 +36,8 @@ namespace Management.Calculations
             }
         }
 
-        public void OnPointerClick(PointerEventData eventData)
-        {
+        public void SetClickHandler(Action handler) => _clickHandler = handler;
 
-        }
+        public void OnPointerClick(PointerEventData eventData) => _clickHandler?.Invoke();
     }
 }
