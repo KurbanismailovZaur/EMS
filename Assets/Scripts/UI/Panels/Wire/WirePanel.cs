@@ -13,6 +13,9 @@ namespace UI.Panels.Wire
     public class WirePanel : MonoBehaviour
     {
         [SerializeField]
+        private CanvasScaler _scaler;
+
+        [SerializeField]
         private CanvasGroup _canvasGroup;
 
         [SerializeField]
@@ -163,7 +166,7 @@ namespace UI.Panels.Wire
 
         private void EventTrigger_Drag(BaseEventData eventData)
         {
-            SetPosition(_startPosition + (Vector2)Input.mousePosition - _mouseStartPosition);
+            SetPosition(_startPosition + ((Vector2)Input.mousePosition - _mouseStartPosition) / _scaler.scaleFactor);
         }
         #endregion
     }
