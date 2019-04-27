@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace Management.Wires
 {
-    public class WiringManager : MonoBehaviour
+    public class WiringManager : MonoSingleton<WiringManager>
     {
         private Wiring _wiring;
 

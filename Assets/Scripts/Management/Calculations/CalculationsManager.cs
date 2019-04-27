@@ -7,7 +7,7 @@ using Management.Wires;
 
 namespace Management.Calculations
 {
-    public class CalculationsManager : MonoBehaviour
+    public class CalculationsManager : MonoSingleton<CalculationsManager>
     {
         [SerializeField]
         private ElectricFieldStrenght _electricFieldStrenght;

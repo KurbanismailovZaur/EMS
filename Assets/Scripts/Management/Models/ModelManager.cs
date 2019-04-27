@@ -10,8 +10,8 @@ using System;
 
 namespace Management.Models
 {
-	public class ModelManager : MonoBehaviour 
-	{
+	public class ModelManager : MonoSingleton<ModelManager>
+    {
         private Model _model;
 
         [SerializeField]

@@ -35,5 +35,17 @@ namespace UI.Main.Contexts
         }
 
         public void Generate() => Selected.Invoke(Action.Generate);
+
+        #region Event handlers
+        public void ProjectManager_Created()
+        {
+            GenerateInteractable = true;
+        }
+
+        public void ProjectManager_Closed()
+        {
+            GenerateInteractable = false;
+        }
+        #endregion
     }
 }

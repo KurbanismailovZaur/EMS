@@ -49,35 +49,10 @@ namespace Facades
 
         [Header("Contexts")]
         [SerializeField]
-        private ProjectContext _projectContext;
-
-        [SerializeField]
-        private ModelContext _modelContext;
-
-        [SerializeField]
         private WiringContext _wiringContext;
 
         [SerializeField]
         private CalculationsContext _calculationsContext;
-
-        [SerializeField]
-        private ReportsContext _reportsContext;
-
-        [SerializeField]
-        private ReferenceContext _referenceContext;
-
-        [Header("Managers")]
-        [SerializeField]
-        private ProjectManager _projectManager;
-
-        [SerializeField]
-        private ModelManager _modelManager;
-
-        [SerializeField]
-        private WiringManager _wiringManager;
-
-        [SerializeField]
-        private CalculationsManager _calculationsManager;
 
         private CalculationBase _currentCalculations;
 
@@ -99,7 +74,7 @@ namespace Facades
 
             if (_explorer.LastResult == null) yield break;
 
-            _modelManager.Import(_explorer.LastResult);
+            ModelManager.Instance.Import(_explorer.LastResult);
         }
         #endregion
 
@@ -112,7 +87,7 @@ namespace Facades
 
             if (_explorer.LastResult == null) yield break;
 
-            _wiringManager.Import(_explorer.LastResult);
+            WiringManager.Instance.Import(_explorer.LastResult);
         }
         #endregion
 
@@ -129,7 +104,7 @@ namespace Facades
             switch (_pointCalculationOptions.LastResultType)
             {
                 case PointCalculationOptions.CalculationType.Default:
-                    _calculationsManager.CalculateElectricFieldStrenght(_pointCalculationOptions.PointsByAxis, _wiringManager.Wiring.Bounds);
+                    CalculationsManager.Instance.CalculateElectricFieldStrenght(_pointCalculationOptions.PointsByAxis, WiringManager.Instance.Wiring.Bounds);
                     break;
                 case PointCalculationOptions.CalculationType.Import:
                     yield return _explorer.OpenFile("Импорт точек", null, "xls");
@@ -138,7 +113,7 @@ namespace Facades
                     for (int i = 0; i < positions.Capacity; i++)
                         positions.Add(new Vector3(Random.Range(-20f, 20f), Random.Range(-20f, 20f), Random.Range(-20f, 20f)));
 
-                    _calculationsManager.CalculateElectricFieldStrenght(positions, 1f);
+                    CalculationsManager.Instance.CalculateElectricFieldStrenght(positions, 1f);
                     break;
                 default:
                     yield break;
@@ -184,6 +159,7 @@ namespace Facades
             _currentCalculations = null;
             _filter.Hide();
         }
+
         #region Event handlers
         #region Project
         public void ProjectContext_Selected(ProjectContext.Action action)
@@ -191,32 +167,25 @@ namespace Facades
             switch (action)
             {
                 case ProjectContext.Action.New:
-                    _projectManager.New();
+                    ProjectManager.Instance.New();
                     break;
                 case ProjectContext.Action.Load:
-                    _projectManager.Load();
+                    ProjectManager.Instance.Load();
                     break;
                 case ProjectContext.Action.Save:
-                    _projectManager.Save();
+                    ProjectManager.Instance.Save();
                     break;
                 case ProjectContext.Action.Close:
-                    _projectManager.Close();
+                    ProjectManager.Instance.Close();
                     break;
                 case ProjectContext.Action.Quit:
-                    _projectManager.Quit();
+                    ProjectManager.Instance.Quit();
                     break;
             }
         }
 
         public void ProjectManager_Created()
         {
-            _projectContext.SetButtonsInteractable(true);
-            _modelContext.ImportInteractable = true;
-            _wiringContext.ImportInteractable = true;
-            _wiringContext.EditInteractable = true;
-            _reportsContext.GenerateInteractable = true;
-            _referenceContext.EditInteractable = true;
-
             _axes.AxesVisibility = _axes.GridVisibility = true;
 
             _cameraController.IsActive = true;
@@ -224,13 +193,6 @@ namespace Facades
 
         public void ProjectManager_Closed()
         {
-            _projectContext.SetButtonsInteractable(false);
-            _modelContext.ImportInteractable = false;
-            _wiringContext.ImportInteractable = false;
-            _wiringContext.EditInteractable = false;
-            _reportsContext.GenerateInteractable = false;
-            _referenceContext.EditInteractable = false;
-
             _axes.AxesVisibility = _axes.GridVisibility = false;
 
             SetCameraToDefaultState();
@@ -248,39 +210,15 @@ namespace Facades
                     ImportModel();
                     break;
                 case ModelContext.Action.Visibility:
-                    _modelManager.ToggleVisibility();
+                    ModelManager.Instance.ToggleVisibility();
                     break;
                 case ModelContext.Action.Fade:
-                    _modelManager.ToggleFade();
+                    ModelManager.Instance.ToggleFade();
                     break;
                 case ModelContext.Action.Remove:
-                    _modelManager.Remove();
+                    ModelManager.Instance.Remove();
                     break;
             }
-        }
-
-        public void ModelManager_Imported()
-        {
-            _modelContext.SetModelButtonsInteractibility(true);
-            _modelContext.VisibilityState = true;
-            _modelContext.FadeState = false;
-        }
-
-        public void ModelManager_VisibilityChanged()
-        {
-            _modelContext.VisibilityState = _modelManager.Model.gameObject.activeSelf;
-        }
-
-        public void ModelManager_FadeChanged()
-        {
-            _modelContext.FadeState = _modelManager.Model.IsFaded;
-        }
-
-        public void ModelManager_Removed()
-        {
-            _modelContext.SetModelButtonsInteractibility(false);
-            _modelContext.VisibilityState = false;
-            _modelContext.FadeState = false;
         }
         #endregion
 
@@ -293,39 +231,21 @@ namespace Facades
                     ImportWiring();
                     break;
                 case WiringContext.Action.Visibility:
-                    _wiringManager.ToggleVisibility();
+                    WiringManager.Instance.ToggleVisibility();
                     break;
                 case WiringContext.Action.Edit:
-                    _wiringManager.Edit();
+                    WiringManager.Instance.Edit();
                     break;
                 case WiringContext.Action.Remove:
-                    _wiringManager.Remove();
+                    WiringManager.Instance.Remove();
                     break;
             }
         }
-
-        public void WiringManager_Imported()
-        {
-            _wiringContext.SetWiringButtonsinteractibility(true);
-            _wiringContext.VisibilityState = true;
-            _calculationsContext.SetCalcBtnsInteractable(true);
-        }
-
+        
         public void WiringManager_VisibilityChanged()
         {
-            _wiringContext.VisibilityState = _wiringManager.Wiring.gameObject.activeSelf;
-
-            if (_wiringManager.Wiring.IsVisible && _calculationsManager.MutualActionOfBCSAndBA.IsVisible)
-                _calculationsManager.MutualActionOfBCSAndBA.IsVisible = false;
-        }
-
-        public void WiringManager_Edited() { }
-
-        public void WiringManager_Removed()
-        {
-            _wiringContext.SetWiringButtonsinteractibility(false);
-            _wiringContext.VisibilityState = false;
-            _calculationsContext.SetCalcBtnsInteractable(false);
+            if (WiringManager.Instance.Wiring.IsVisible && CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible)
+                CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible = false;
         }
         #endregion
 
@@ -338,23 +258,23 @@ namespace Facades
                     CalculateElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
-                    _calculationsManager.CalculateMutualActionOfBCSAndBA(_wiringManager.Wiring);
+                    CalculationsManager.Instance.CalculateMutualActionOfBCSAndBA(WiringManager.Instance.Wiring);
                     break;
                 case CalculationsContext.Action.ElectricFieldStrenghtVisibility:
-                    _calculationsManager.ElectricFieldStrenght.ToggleVisibility();
+                    CalculationsManager.Instance.ElectricFieldStrenght.ToggleVisibility();
                     break;
                 case CalculationsContext.Action.MutualActionOfBCSAndBAVisibility:
-                    _calculationsManager.MutualActionOfBCSAndBA.ToggleVisibility();
+                    CalculationsManager.Instance.MutualActionOfBCSAndBA.ToggleVisibility();
                     break;
                 case CalculationsContext.Action.StaticTime:
                     break;
                 case CalculationsContext.Action.DynamicTime:
                     break;
                 case CalculationsContext.Action.RemoveElectricFieldStrenght:
-                    _calculationsManager.RemoveElectricFieldStrenght();
+                    CalculationsManager.Instance.RemoveElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.RemoveMutualActionOfBCSAndBA:
-                    _calculationsManager.RemoveMutualActionOfBCSAndBA();
+                    CalculationsManager.Instance.RemoveMutualActionOfBCSAndBA();
                     break;
             }
         }
@@ -362,22 +282,14 @@ namespace Facades
         #region Electric
         public void ElectricFieldStrenght_Calculated()
         {
-            _calculationsContext.SetElectricButtonsTo(true);
             _filter.SetRanges(0f, 1f);
             _filter.ResetValues();
         }
 
-        public void ElectricFieldStrenght_Removed()
-        {
-            _calculationsContext.SetElectricButtonsTo(false);
-        }
-
         public void ElectricFieldStrenght_VisibilityChanged()
         {
-            _calculationsContext.ElectricVisibilityState = _calculationsManager.ElectricFieldStrenght.IsVisible;
-
-            if (_calculationsManager.ElectricFieldStrenght.IsVisible)
-                SetCurrentCalculationsAndPrepareOther(_calculationsManager.ElectricFieldStrenght);
+            if (CalculationsManager.Instance.ElectricFieldStrenght.IsVisible)
+                SetCurrentCalculationsAndPrepareOther(CalculationsManager.Instance.ElectricFieldStrenght);
             else
                 HandleNoCalculations();
         }
@@ -386,27 +298,20 @@ namespace Facades
         #region Mutual
         public void MutualActionOfBCSAndBA_Calculated()
         {
-            _wiringManager.SetVisibility(false);
-            _calculationsContext.SetMutualButtonsTo(true);
+            WiringManager.Instance.SetVisibility(false);
+
             _filter.SetRanges(0f, 1f);
             _filter.ResetValues();
         }
 
-        public void MutualActionOfBCSAndBA_Removed()
-        {
-            _calculationsContext.SetMutualButtonsTo(false);
-        }
-
         public void MutualActionOfBCSAndBA_VisibilityChanged()
         {
-            _calculationsContext.MutualVisibilityState = _calculationsManager.MutualActionOfBCSAndBA.IsVisible;
-
-            if (_calculationsManager.MutualActionOfBCSAndBA.IsVisible)
+            if (CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible)
             {
-                if (_wiringManager.Wiring.IsVisible)
-                    _wiringManager.SetVisibility(false);
+                if (WiringManager.Instance.Wiring.IsVisible)
+                    WiringManager.Instance.SetVisibility(false);
 
-                SetCurrentCalculationsAndPrepareOther(_calculationsManager.MutualActionOfBCSAndBA);
+                SetCurrentCalculationsAndPrepareOther(CalculationsManager.Instance.MutualActionOfBCSAndBA);
             }
             else
             {
@@ -421,7 +326,6 @@ namespace Facades
                 _wirePanel.Open(wire);
             else
                 _wirePanel.Open(wire, Input.mousePosition);
-            
         }
         #endregion
         #endregion

@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace Management.Projects
 {
-	public class ProjectManager : MonoBehaviour 
+	public class ProjectManager : MonoSingleton<ProjectManager> 
 	{
         private Project? _project;
 

@@ -6,6 +6,7 @@ using static UnityEngine.Debug;
 using System;
 using UnityEngine.Events;
 using UnityButton = UnityEngine.UI.Button;
+using Management.Models;
 
 namespace UI.Main.Contexts
 {
@@ -78,5 +79,41 @@ namespace UI.Main.Contexts
             _fadeButton.interactable = state;
             _removeButton.interactable = state;
         }
+
+        #region Event handles
+        public void ProjectManager_Created()
+        {
+            ImportInteractable = true;
+        }
+
+        public void ProjectManager_Closed()
+        {
+            ImportInteractable = false;
+        }
+
+        public void ModelManager_Imported()
+        {
+            SetModelButtonsInteractibility(true);
+            VisibilityState = true;
+            FadeState = false;
+        }
+
+        public void ModelManager_VisibilityChanged()
+        {
+            VisibilityState = ModelManager.Instance.Model.gameObject.activeSelf;
+        }
+
+        public void ModelManager_FadeChanged()
+        {
+            FadeState = ModelManager.Instance.Model.IsFaded;
+        }
+
+        public void ModelManager_Removed()
+        {
+            SetModelButtonsInteractibility(false);
+            VisibilityState = false;
+            FadeState = false;
+        }
+        #endregion
     }
 }

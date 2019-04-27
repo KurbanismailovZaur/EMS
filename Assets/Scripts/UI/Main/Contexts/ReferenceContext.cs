@@ -35,5 +35,17 @@ namespace UI.Main.Contexts
         }
 
         public void Edit() => Selected.Invoke(Action.Edit);
+
+        #region Event handlers
+        public void ProjectManager_Created()
+        {
+            EditInteractable = true;
+        }
+
+        public void ProjectManager_Closed()
+        {
+            EditInteractable = false;
+        }
+        #endregion
     }
 }

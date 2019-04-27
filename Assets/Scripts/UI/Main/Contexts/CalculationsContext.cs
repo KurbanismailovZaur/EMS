@@ -6,6 +6,7 @@ using static UnityEngine.Debug;
 using System;
 using UnityEngine.Events;
 using UnityButton = UnityEngine.UI.Button;
+using Management.Calculations;
 
 namespace UI.Main.Contexts
 {
@@ -121,5 +122,47 @@ namespace UI.Main.Contexts
         public void RemoveElectricFieldStrenght() => Selected.Invoke(Action.RemoveElectricFieldStrenght);
 
         public void RemoveMutualActionOfBCSAndBA() => Selected.Invoke(Action.RemoveMutualActionOfBCSAndBA);
+
+        #region Event handlers
+        public void WiringManager_Imported()
+        {
+            SetCalcBtnsInteractable(true);
+        }
+
+        public void WiringManager_Removed()
+        {
+            SetCalcBtnsInteractable(false);
+        }
+
+        public void ElectricFieldStrenght_Calculated()
+        {
+            SetElectricButtonsTo(true);
+        }
+
+        public void ElectricFieldStrenght_Removed()
+        {
+            SetElectricButtonsTo(false);
+        }
+
+        public void ElectricFieldStrenght_VisibilityChanged()
+        {
+            ElectricVisibilityState = CalculationsManager.Instance.ElectricFieldStrenght.IsVisible;
+        }
+
+        public void MutualActionOfBCSAndBA_Calculated()
+        {
+            SetMutualButtonsTo(true);
+        }
+
+        public void MutualActionOfBCSAndBA_Removed()
+        {
+            SetMutualButtonsTo(false);
+        }
+
+        public void MutualActionOfBCSAndBA_VisibilityChanged()
+        {
+            MutualVisibilityState = CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible;
+        }
+        #endregion
     }
 }

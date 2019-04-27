@@ -6,8 +6,8 @@ using static UnityEngine.Debug;
 
 namespace Management.Reporting
 {
-	public class ReportManager : MonoBehaviour 
-	{
+	public class ReportManager : MonoSingleton<ReportManager>
+    {
 
 	}
 }

@@ -6,11 +6,12 @@ using static UnityEngine.Debug;
 using System;
 using UnityEngine.Events;
 using UnityButton = UnityEngine.UI.Button;
+using Management.Wires;
 
 namespace UI.Main.Contexts
 {
-	public class WiringContext : MonoBehaviour 
-	{
+    public class WiringContext : MonoBehaviour
+    {
         #region Enums
         public enum Action
         {
@@ -74,5 +75,36 @@ namespace UI.Main.Contexts
         public void Edit() => Selected.Invoke(Action.Edit);
 
         public void Remove() => Selected.Invoke(Action.Remove);
+
+        #region Event handlers
+        public void ProjectManager_Created()
+        {
+            ImportInteractable = true;
+            EditInteractable = true;
+        }
+
+        public void ProjectManager_Closed()
+        {
+            ImportInteractable = false;
+            EditInteractable = false;
+        }
+
+        public void WiringManager_Imported()
+        {
+            SetWiringButtonsinteractibility(true);
+            VisibilityState = true;
+        }
+
+        public void WiringManager_VisibilityChanged()
+        {
+            VisibilityState = WiringManager.Instance.Wiring.gameObject.activeSelf;
+        }
+
+        public void WiringManager_Removed()
+        {
+            SetWiringButtonsinteractibility(false);
+            VisibilityState = false;
+        }
+        #endregion
     }
 }
