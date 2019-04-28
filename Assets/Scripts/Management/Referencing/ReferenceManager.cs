@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using Management.Referencing.IO;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace Management.Referencing
 {
@@ -18,6 +19,12 @@ namespace Management.Referencing
         private List<WireMark> _wireMarks;
 
         private List<ConnectorType> _connectorTypes;
+
+        public ReadOnlyCollection<Material> Materials => new ReadOnlyCollection<Material>(_materials);
+
+        public ReadOnlyCollection<WireMark> WireMarks => new ReadOnlyCollection<WireMark>(_wireMarks);
+
+        public ReadOnlyCollection<ConnectorType> ConnectorTypes => new ReadOnlyCollection<ConnectorType>(_connectorTypes);
 
         public void LoadDefaultData()
         {

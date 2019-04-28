@@ -6,17 +6,17 @@ using static UnityEngine.Debug;
 using Exceptions;
 using System;
 using System.Linq;
-using UnityEngine.UI;
+using UnityButton = UnityEngine.UI.Button;
 
-namespace UI.References
+namespace UI.Referencing
 {
-    public class Reference : MonoBehaviour
+    public class References : MonoBehaviour
     {
         [Serializable]
         private struct TabAssociation
         {
             public Tab tab;
-            public GameObject table;
+            public Table table;
         }
 
         [SerializeField]
@@ -27,16 +27,17 @@ namespace UI.References
         [SerializeField]
         private Transform _tabsContainer;
 
-        private Tab[] _tabs;
-
         [SerializeField]
         private Transform _content;
 
         [SerializeField]
-        private Button _saveButton;
+        private InputController _inputController;
 
         [SerializeField]
-        private Button _cancelButton;
+        private UnityButton _saveButton;
+
+        [SerializeField]
+        private UnityButton _cancelButton;
 
         [SerializeField]
         private TabAssociation[] _tabsAssociations;
@@ -49,14 +50,16 @@ namespace UI.References
         [SerializeField]
         private Color _defaultColor = Color.gray;
 
+        [Header("Prefabs")]
+        [SerializeField]
+        private Cell _cellPrefab;
+
         public bool IsOpen { get => _isOpen; }
 
         private void Start()
         {
-            _tabs = _tabsAssociations.Select(ass => ass.tab).ToArray();
-
-            foreach (var tab in _tabs)
-                tab.Clicked.AddListener(Tab_Clicked);
+            foreach (var association in _tabsAssociations)
+                association.tab.Clicked.AddListener(Tab_Clicked);
 
             _saveButton.onClick.AddListener(SaveButton_OnClick);
             _cancelButton.onClick.AddListener(CancelButton_OnClick);
@@ -68,9 +71,16 @@ namespace UI.References
 
             _isOpen = true;
 
+            LoadTablesData();
             Show();
 
             SelectFirstTab();
+        }
+
+        private void LoadTablesData()
+        {
+            foreach (var association in _tabsAssociations)
+                association.table.LoadData(_cellPrefab, Cell_Clicked);
         }
 
         private void Show() => SetVisibility(1f, true);
@@ -89,13 +99,15 @@ namespace UI.References
         {
             DeselectCurrentTab();
 
-            var table = Array.Find(_tabsAssociations, ass => ass.tab == tab).table;
+            var table = GetTable(tab);
 
             tab.Select(_selectedColor);
-            table.SetActive(true);
+            table.gameObject.SetActive(true);
 
             _currentTab = tab;
         }
+
+        private Table GetTable(Tab tab) => Array.Find(_tabsAssociations, ass => ass.tab == tab).table;
 
         private void DeselectCurrentTab()
         {
@@ -109,7 +121,7 @@ namespace UI.References
         private void DeselectTab(Tab tab)
         {
             tab.Deselect(_defaultColor);
-            Array.Find(_tabsAssociations, ass => ass.tab == tab).table.SetActive(false);
+            GetTable(tab).gameObject.SetActive(false);
         }
 
         private void Close()
@@ -125,6 +137,8 @@ namespace UI.References
         private void SaveButton_OnClick() => Close();
 
         private void CancelButton_OnClick() => Close();
+
+        private void Cell_Clicked(Cell cell) => _inputController.Edit(cell);
         #endregion
     }
 }

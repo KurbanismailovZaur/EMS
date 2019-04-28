@@ -10,7 +10,7 @@ using Management.Projects;
 using Management.Models;
 using Management.Wires;
 using UI.Exploring.FileSystem;
-using UI.References;
+using UI.Referencing;
 using UI.Calculations;
 using Management.Calculations;
 using System.Linq;
@@ -40,7 +40,7 @@ namespace Facades
         private FileExplorer _explorer;
 
         [SerializeField]
-        private Reference _reference;
+        private References _reference;
 
         [SerializeField]
         private Reports _reports;

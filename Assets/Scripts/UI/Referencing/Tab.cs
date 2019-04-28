@@ -7,7 +7,7 @@ using System;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace UI.References
+namespace UI.Referencing
 {
     public class Tab : MonoBehaviour
     {
