@@ -17,6 +17,7 @@ using System.Linq;
 using UI.Reporting;
 using UI;
 using UI.Panels.Wire;
+using Management.Referencing;
 
 namespace Facades
 {
@@ -168,6 +169,7 @@ namespace Facades
             {
                 case ProjectContext.Action.New:
                     ProjectManager.Instance.New();
+                    ReferenceManager.Instance.LoadDefaultData();
                     break;
                 case ProjectContext.Action.Load:
                     ProjectManager.Instance.Load();

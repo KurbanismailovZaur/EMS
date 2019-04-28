@@ -3552,49 +3552,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1359041353430371180}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2038416818
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2038416820}
-  - component: {fileID: 2038416819}
-  m_Layer: 0
-  m_Name: ScalerController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2038416819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2038416818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdb642ecf553cc944879deb77a100f28, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &2038416820
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2038416818}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 374.5295, y: 185.97707, z: -5.824216}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2053896602 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2053896602, guid: 0b5b5ecf096c5f74584f5e0726689ffe,
@@ -3616,6 +3573,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2057505481}
+  - component: {fileID: 2057505482}
   m_Layer: 0
   m_Name: ReferencesManager
   m_TagString: Untagged
@@ -3637,6 +3595,19 @@ Transform:
   m_Father: {fileID: 555021973}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2057505482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057505480}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d27fca23817f2ca47a59a45803131d60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _defaultDataPath: References.xls
 --- !u!114 &216071381673742379 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 216071381673742379, guid: dd49fda250ca2c14bb0550a51b9973a1,
