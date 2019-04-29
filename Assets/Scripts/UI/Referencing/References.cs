@@ -16,6 +16,7 @@ namespace UI.Referencing
         private struct TabAssociation
         {
             public Tab tab;
+            public GameObject header;
             public Table table;
         }
 
@@ -98,14 +99,15 @@ namespace UI.Referencing
         private void SelectTab(Tab tab)
         {
             DeselectCurrentTab();
-
-            var table = GetTable(tab);
-
+            
             tab.Select(_selectedColor);
-            table.gameObject.SetActive(true);
+            GetHeader(tab).SetActive(true);
+            GetTable(tab).gameObject.SetActive(true);
 
             _currentTab = tab;
         }
+
+        private GameObject GetHeader(Tab tab) => Array.Find(_tabsAssociations, ass => ass.tab == tab).header;
 
         private Table GetTable(Tab tab) => Array.Find(_tabsAssociations, ass => ass.tab == tab).table;
 
@@ -121,6 +123,7 @@ namespace UI.Referencing
         private void DeselectTab(Tab tab)
         {
             tab.Deselect(_defaultColor);
+            GetHeader(tab).SetActive(false);
             GetTable(tab).gameObject.SetActive(false);
         }
 

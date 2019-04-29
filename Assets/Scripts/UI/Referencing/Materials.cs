@@ -28,35 +28,18 @@ namespace UI.Referencing
         [SerializeField]
         private RectTransform _dielectricConstants;
 
-        public override void LoadData(Cell cellPrefab, UnityAction<Cell> cellClickHandler)
+        public override void LoadData(Cell cellPrefab, Action<Cell> cellClickHandler)
         {
             ClearData();
 
             foreach (var material in ReferenceManager.Instance.Materials)
             {
-                InstantiateCell(cellPrefab, _codes, material.Code.ToString(), cellClickHandler);
-                InstantiateCell(cellPrefab, _names, material.Name.ToString(), cellClickHandler);
-                InstantiateCell(cellPrefab, _conductivities, material.Conductivity.ToString(), cellClickHandler);
-                InstantiateCell(cellPrefab, _magneticPermeabilities, material.MagneticPermeability.ToString(), cellClickHandler);
-                InstantiateCell(cellPrefab, _dielectricConstants, material.DielectricConstant.ToString(), cellClickHandler);
+                Cell.Factory.Create(cellPrefab, Cell.Type.Int, _codes, material.Code.ToString(), cellClickHandler);
+                Cell.Factory.Create(cellPrefab, Cell.Type.String, _names, material.Name.ToString(), cellClickHandler);
+                Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _conductivities, material?.Conductivity.ToString(), cellClickHandler);
+                Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _magneticPermeabilities, material?.MagneticPermeability.ToString(), cellClickHandler);
+                Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _dielectricConstants, material?.DielectricConstant.ToString(), cellClickHandler);
             }
-        }
-
-        private void ClearData()
-        {
-            foreach (Transform column in transform)
-                foreach (Transform cell in column)
-                    Destroy(cell.gameObject);
-        }
-
-        private Cell InstantiateCell(Cell cellPrefab, Transform parent, string value, UnityAction<Cell> cellClickHandler)
-        {
-            var cell = Instantiate(cellPrefab, parent);
-            cell.Text.text = value;
-
-            cell.Clicked.AddListener(cellClickHandler);
-
-            return cell;
         }
     }
 }

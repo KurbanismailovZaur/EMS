@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.UI;
 using System;
+using UnityEngine.EventSystems;
 
 namespace UI.Referencing
 {
@@ -14,32 +15,37 @@ namespace UI.Referencing
         private RectTransform _rectTransform;
 
         [SerializeField]
-        private Transform _content;
-
-        [SerializeField]
         private InputField _input;
 
         private Text _targetText;
-
+        
         private Func<string, string> _endCheckFunction;
+
+        [SerializeField]
+        private ScrollRect _scrollRect;
 
         public InputField Input => _input;
 
         public void Edit(Cell cell)
         {
-            transform.SetParent(cell.transform);
-            _rectTransform.Stretch();
+            var cellRectTransform = ((RectTransform)cell.transform);
+
+            var position = ((RectTransform)cellRectTransform.parent).anchoredPosition + cellRectTransform.anchoredPosition;
+            var sizeDelta = cellRectTransform.sizeDelta;
+
+            _rectTransform.anchoredPosition = position;
+            _rectTransform.sizeDelta = sizeDelta;
+
+            SetEditType(cell.CellType);
 
             Input.text = cell.Text.text;
             _targetText = cell.Text;
-
-            SetEditType(cell.CellType);
 
             gameObject.SetActive(true);
 
             Input.Select();
         }
-
+        
         private void SetEditType(Cell.Type cellType)
         {
             switch (cellType)
@@ -56,6 +62,22 @@ namespace UI.Referencing
                     _input.contentType = InputField.ContentType.Alphanumeric;
                     _endCheckFunction = CheckNullableString;
                     break;
+                case Cell.Type.Float:
+                    _input.contentType = InputField.ContentType.DecimalNumber;
+                    _endCheckFunction = CheckFloat;
+                    break;
+                case Cell.Type.NullableFloat:
+                    _input.contentType = InputField.ContentType.DecimalNumber;
+                    _endCheckFunction = CheckNullableFloat;
+                    break;
+                case Cell.Type.Material:
+                    _input.contentType = InputField.ContentType.Alphanumeric;
+                    _endCheckFunction = CheckString;
+                    break;
+                case Cell.Type.NullableMaterial:
+                    _input.contentType = InputField.ContentType.Alphanumeric;
+                    _endCheckFunction = CheckNullableString;
+                    break;
             }
         }
 
@@ -67,21 +89,24 @@ namespace UI.Referencing
 
         private string CheckString(string text)
         {
-            return text;
+            return string.IsNullOrWhiteSpace(text) ? _targetText.text : text;
         }
 
-        private string CheckNullableString(string text)
+        private string CheckNullableString(string text) => text;
+
+        private string CheckFloat(string text)
         {
-            return text;
+            return string.IsNullOrWhiteSpace(text) ? _targetText.text : text;
         }
+
+        private string CheckNullableFloat(string text) => text;
         #endregion
 
         #region Event handlers
         public void InputField_OnEndEdit(string text)
         {
-            _targetText.text = CheckInt(text);
+            _targetText.text = _endCheckFunction(text);
 
-            transform.SetParent(_content);
             gameObject.SetActive(false);
         }
         #endregion

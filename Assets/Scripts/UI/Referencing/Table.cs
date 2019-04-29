@@ -10,6 +10,13 @@ namespace UI.Referencing
 {
 	public abstract class Table : MonoBehaviour 
 	{
-        public abstract void LoadData(Cell cellPrefab, UnityAction<Cell> cellClickHandler);
-	}
+        public abstract void LoadData(Cell cellPrefab, Action<Cell> cellClickHandler);
+
+        protected void ClearData()
+        {
+            foreach (Transform column in transform)
+                foreach (Transform cell in column)
+                    Destroy(cell.gameObject);
+        }
+    }
 }

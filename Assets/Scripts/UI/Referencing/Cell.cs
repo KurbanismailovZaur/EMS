@@ -15,27 +15,66 @@ namespace UI.Referencing
         {
             Int,
             String,
-            NullableString
+            NullableString,
+            Float,
+            NullableFloat,
+            Material,
+            NullableMaterial
+        }
+
+        public static class Factory
+        {
+            public static Cell Create(Cell cellPrefab, Type type, Transform parent, string value, Action<Cell> cellClickHandler)
+            {
+                var cell = Instantiate(cellPrefab, parent);
+
+                cell._type = type;
+                cell.Text.text = value;
+
+                cell.DoubleClicked += cellClickHandler;
+
+                return cell;
+            }
         }
 
         [Serializable]
-        public class ClickedEvent : UnityEvent<Cell> { }
+        public class DoubleClickedEvent : UnityEvent<Cell> { }
 
         [SerializeField]
         private Text _text;
 
         [SerializeField]
         private Type _type;
-
-        [Header("Events")]
-        public ClickedEvent Clicked;
+        
+        public event Action<Cell> DoubleClicked;
 
         public Text Text => _text;
 
         public Type CellType => _type;
 
+        private Coroutine _doubleClickRoutine;
+
+        private void HandleClick()
+        {
+            if (_doubleClickRoutine != null)
+            {
+                StopCoroutine(_doubleClickRoutine);
+                _doubleClickRoutine = null;
+
+                DoubleClicked?.Invoke(this);
+            }
+            else
+                _doubleClickRoutine = StartCoroutine(DoubleClickRoutine());
+        }
+
+        private IEnumerator DoubleClickRoutine()
+        {
+            yield return new WaitForSeconds(0.250f);
+            _doubleClickRoutine = null;
+        }
+
         #region Event handlers
-        public void Button_OnClick() => Clicked.Invoke(this);
+        public void Button_OnClick() => HandleClick();
         #endregion
     }
 }
