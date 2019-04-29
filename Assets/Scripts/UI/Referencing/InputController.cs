@@ -6,6 +6,7 @@ using static UnityEngine.Debug;
 using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 namespace UI.Referencing
 {
@@ -23,6 +24,9 @@ namespace UI.Referencing
 
         [SerializeField]
         private ScrollRect _scrollRect;
+
+        [SerializeField]
+        private References _references;
 
         public InputField Input => _input;
 
@@ -72,15 +76,15 @@ namespace UI.Referencing
                     break;
                 case Cell.Type.NullableFloat:
                     _input.contentType = InputField.ContentType.DecimalNumber;
-                    _endCheckFunction = CheckNullableFloat;
+                    _endCheckFunction = CheckFloat;
                     break;
                 case Cell.Type.Material:
-                    _input.contentType = InputField.ContentType.Alphanumeric;
-                    _endCheckFunction = CheckString;
+                    _input.contentType = InputField.ContentType.IntegerNumber;
+                    _endCheckFunction = CheckMaterial;
                     break;
                 case Cell.Type.NullableMaterial:
-                    _input.contentType = InputField.ContentType.Alphanumeric;
-                    _endCheckFunction = CheckNullableString;
+                    _input.contentType = InputField.ContentType.IntegerNumber;
+                    _endCheckFunction = CheckNullableMaterial;
                     break;
             }
         }
@@ -106,6 +110,28 @@ namespace UI.Referencing
         }
 
         private string CheckNullableFloat(string text) => text;
+
+        private string CheckMaterial(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return _targetText.text;
+
+            var materials = (Materials)_references.GetTable("Materials");
+            var materialExist = materials.Codes.GetChildren().Select(ch => ch.GetComponent<Cell>().Text).Where(t => t.text == text).Count() > 0;
+
+            return materialExist ? text : _targetText.text;
+        }
+
+        private string CheckNullableMaterial(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return text;
+
+            var materials = (Materials)_references.GetTable("Materials");
+            var children = materials.Codes.GetChildren();
+            var selected = children.Select(ch => ch.GetComponent<Cell>().Text);
+            var materialExist = selected.First(t => t.text == text) != null;
+
+            return materialExist ? text : _targetText.text;
+        }
         #endregion
 
         #region Event handlers

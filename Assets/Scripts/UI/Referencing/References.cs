@@ -7,6 +7,7 @@ using Exceptions;
 using System;
 using System.Linq;
 using UnityButton = UnityEngine.UI.Button;
+using Management.Referencing;
 
 namespace UI.Referencing
 {
@@ -15,6 +16,7 @@ namespace UI.Referencing
         [Serializable]
         private struct TabAssociation
         {
+            public string name;
             public Tab tab;
             public GameObject header;
             public Table table;
@@ -35,6 +37,12 @@ namespace UI.Referencing
         private InputController _inputController;
 
         [SerializeField]
+        private UnityButton _addButton;
+
+        [SerializeField]
+        private UnityButton _removeButton;
+
+        [SerializeField]
         private UnityButton _saveButton;
 
         [SerializeField]
@@ -51,6 +59,9 @@ namespace UI.Referencing
         [SerializeField]
         private Color _defaultColor = Color.gray;
 
+        [SerializeField]
+        private RemoveDialog _removeDialog;
+
         [Header("Prefabs")]
         [SerializeField]
         private Cell _cellPrefab;
@@ -61,6 +72,9 @@ namespace UI.Referencing
         {
             foreach (var association in _tabsAssociations)
                 association.tab.Clicked.AddListener(Tab_Clicked);
+
+            _addButton.onClick.AddListener(AddButton_OnClick);
+            _removeButton.onClick.AddListener(RemoveButton_OnClick);
 
             _saveButton.onClick.AddListener(SaveButton_OnClick);
             _cancelButton.onClick.AddListener(CancelButton_OnClick);
@@ -111,6 +125,8 @@ namespace UI.Referencing
 
         private Table GetTable(Tab tab) => Array.Find(_tabsAssociations, ass => ass.tab == tab).table;
 
+        public Table GetTable(string name) => Array.Find(_tabsAssociations, ass => ass.name == name).table;
+
         private void DeselectCurrentTab()
         {
             if (!_currentTab) return;
@@ -139,10 +155,30 @@ namespace UI.Referencing
             GetTable(_currentTab).Add(_cellPrefab, Cell_Clicked);
         }
 
+        public void Save()
+        {
+            var materials = ((Materials)GetTable("Materials")).GetMaterials();
+            var wireMarks = ((WireMarks)GetTable("WireMarks")).GetWireMarks(materials);
+            var connectorTypes = ((ConnectorTypes)GetTable("ConnectorTypes")).GetConnectroTypes();
+
+            ReferenceManager.Instance.SetData(materials, wireMarks, connectorTypes);
+
+            Close();
+        }
+
+        private void OpenRemoveDialog()
+        {
+            _removeDialog.Open(GetTable(_currentTab).GetRemoveData());
+        }
+
         #region Event handlers
         private void Tab_Clicked(Tab tab) => SelectTab(tab);
 
-        private void SaveButton_OnClick() => Close();
+        private void AddButton_OnClick() => Add();
+
+        private void RemoveButton_OnClick() => OpenRemoveDialog();
+
+        private void SaveButton_OnClick() => Save();
 
         private void CancelButton_OnClick() => Close();
 

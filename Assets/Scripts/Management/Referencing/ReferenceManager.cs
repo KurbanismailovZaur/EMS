@@ -30,5 +30,10 @@ namespace Management.Referencing
         {
             (_materials, _wireMarks, _connectorTypes) = ReferencesDataReader.ReadFromFile(Path.Combine(Application.streamingAssetsPath, _defaultDataPath));
         }
+
+        public void SetData(List<Material> materials, List<WireMark> wireMarks, List<ConnectorType> connectorTypes)
+        {
+            (_materials, _wireMarks, _connectorTypes) = (materials, wireMarks, connectorTypes);
+        }
     }
 }

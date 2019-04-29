@@ -20,5 +20,7 @@ namespace UI.Referencing
         }
 
         public abstract void Add(Cell cellPrefab, Action<Cell> cellClickHandler);
+
+        public abstract (string titleRemoveName, string labelName, (string label, Action deleteHandler)[] panelsData) GetRemoveData();
     }
 }
