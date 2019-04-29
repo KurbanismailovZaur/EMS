@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Management.Referencing;
 using System;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace UI.Referencing
 {
@@ -28,18 +29,33 @@ namespace UI.Referencing
         [SerializeField]
         private RectTransform _dielectricConstants;
 
+        public RectTransform Codes => _codes;
+
         public override void LoadData(Cell cellPrefab, Action<Cell> cellClickHandler)
         {
             ClearData();
 
             foreach (var material in ReferenceManager.Instance.Materials)
             {
-                Cell.Factory.Create(cellPrefab, Cell.Type.Int, _codes, material.Code.ToString(), cellClickHandler);
-                Cell.Factory.Create(cellPrefab, Cell.Type.String, _names, material.Name.ToString(), cellClickHandler);
-                Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _conductivities, material?.Conductivity.ToString(), cellClickHandler);
-                Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _magneticPermeabilities, material?.MagneticPermeability.ToString(), cellClickHandler);
-                Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _dielectricConstants, material?.DielectricConstant.ToString(), cellClickHandler);
+                Add(cellPrefab, material.Code.ToString(), material.Name.ToString(), material?.Conductivity.ToString(), 
+                    material?.MagneticPermeability.ToString(),  material?.DielectricConstant.ToString(), cellClickHandler);
             }
+        }
+
+        public override void Add(Cell cellPrefab, Action<Cell> cellClickHandler)
+        {
+            var code = _codes.GetChildren().Select(ch => ch.GetComponent<Cell>().Text).Max(t => int.Parse(t.text)) + 1;
+
+            Add(cellPrefab, code.ToString(), "материал", null, null, null, cellClickHandler);
+        }
+
+        private void Add(Cell cellPrefab, string code, string name, string conductivity, string magneticPermeability, string dielectricConstant, Action<Cell> cellClickHandler)
+        {
+            Cell.Factory.Create(cellPrefab, Cell.Type.Int, _codes, code, cellClickHandler);
+            Cell.Factory.Create(cellPrefab, Cell.Type.String, _names, name, cellClickHandler);
+            Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _conductivities, conductivity, cellClickHandler);
+            Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _magneticPermeabilities, magneticPermeability, cellClickHandler);
+            Cell.Factory.Create(cellPrefab, Cell.Type.NullableFloat, _dielectricConstants, dielectricConstant, cellClickHandler);
         }
     }
 }

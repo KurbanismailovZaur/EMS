@@ -14,6 +14,7 @@ namespace UI.Referencing
         public enum Type
         {
             Int,
+            NullableInt,
             String,
             NullableString,
             Float,

@@ -54,6 +54,10 @@ namespace UI.Referencing
                     _input.contentType = InputField.ContentType.IntegerNumber;
                     _endCheckFunction = CheckInt;
                     break;
+                case Cell.Type.NullableInt:
+                    _input.contentType = InputField.ContentType.IntegerNumber;
+                    _endCheckFunction = CheckNullableInt;
+                    break;
                 case Cell.Type.String:
                     _input.contentType = InputField.ContentType.Alphanumeric;
                     _endCheckFunction = CheckString;
@@ -86,6 +90,8 @@ namespace UI.Referencing
         {
             return string.IsNullOrWhiteSpace(text) ? "0" : text;
         }
+
+        private string CheckNullableInt(string text) => text;
 
         private string CheckString(string text)
         {

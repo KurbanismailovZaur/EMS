@@ -18,5 +18,7 @@ namespace UI.Referencing
                 foreach (Transform cell in column)
                     Destroy(cell.gameObject);
         }
+
+        public abstract void Add(Cell cellPrefab, Action<Cell> cellClickHandler);
     }
 }

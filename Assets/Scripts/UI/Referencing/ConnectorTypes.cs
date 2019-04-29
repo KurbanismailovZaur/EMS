@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using System;
 using Management.Referencing;
+using System.Linq;
 
 namespace UI.Referencing
 {
@@ -21,10 +22,20 @@ namespace UI.Referencing
             ClearData();
 
             foreach (var mark in ReferenceManager.Instance.ConnectorTypes)
-            {
-                Cell.Factory.Create(cellPrefab, Cell.Type.String, _codes, mark.Code.ToString(), cellClickHandler);
-                Cell.Factory.Create(cellPrefab, Cell.Type.String, _types, mark.Type, cellClickHandler);
-            }
+                Add(cellPrefab, mark.Code.ToString(), mark.Type, cellClickHandler);
+        }
+
+        public override void Add(Cell cellPrefab, Action<Cell> cellClickHandler)
+        {
+            var code = $"Р{_codes.GetChildren().Select(ch => ch.GetComponent<Cell>().Text).Max(t => int.Parse(t.text.Substring(1))) + 1}";
+
+            Add(cellPrefab, code, "тип", cellClickHandler);
+        }
+
+        private void Add(Cell cellPrefab, string code, string type, Action<Cell> cellClickHandler)
+        {
+            Cell.Factory.Create(cellPrefab, Cell.Type.String, _codes, code, cellClickHandler);
+            Cell.Factory.Create(cellPrefab, Cell.Type.String, _types, type, cellClickHandler);
         }
     }
 }

@@ -134,6 +134,11 @@ namespace UI.Referencing
             _isOpen = false;
         }
 
+        public void Add()
+        {
+            GetTable(_currentTab).Add(_cellPrefab, Cell_Clicked);
+        }
+
         #region Event handlers
         private void Tab_Clicked(Tab tab) => SelectTab(tab);
 
