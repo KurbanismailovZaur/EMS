@@ -7750,6 +7750,16 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7911809081587986966, guid: dd49fda250ca2c14bb0550a51b9973a1,
+        type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7911809081587986966, guid: dd49fda250ca2c14bb0550a51b9973a1,
+        type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1570862687, guid: dd49fda250ca2c14bb0550a51b9973a1, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0

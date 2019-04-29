@@ -200,6 +200,12 @@ namespace Facades
             SetCameraToDefaultState();
 
             _cameraController.IsActive = false;
+
+            ModelManager.Instance.Remove();
+            WiringManager.Instance.Remove();
+            CalculationsManager.Instance.RemoveElectricFieldStrenght();
+            CalculationsManager.Instance.RemoveMutualActionOfBCSAndBA();
+            ReferenceManager.Instance.Remove();
         }
         #endregion
 

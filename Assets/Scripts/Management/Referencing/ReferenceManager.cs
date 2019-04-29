@@ -35,5 +35,10 @@ namespace Management.Referencing
         {
             (_materials, _wireMarks, _connectorTypes) = (materials, wireMarks, connectorTypes);
         }
+
+        public void Remove()
+        {
+            (_materials, _wireMarks, _connectorTypes) = (null, null, null);
+        }
     }
 }
