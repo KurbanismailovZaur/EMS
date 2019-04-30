@@ -45,11 +45,22 @@ namespace UI.Referencing
             Input.text = cell.Text.text;
             _targetText = cell.Text;
 
+            RoutineHelper.Instance.StartCoroutine(nameof(HoldScrollsRoutine), HoldScrollsRoutine());
+
             gameObject.SetActive(true);
 
             Input.Select();
         }
         
+        private IEnumerator HoldScrollsRoutine()
+        {
+            var positions = _scrollRect.normalizedPosition;
+
+            yield return null;
+
+            _scrollRect.normalizedPosition = positions;
+        }
+
         private void SetEditType(Cell.Type cellType)
         {
             switch (cellType)
@@ -138,6 +149,8 @@ namespace UI.Referencing
         public void InputField_OnEndEdit(string text)
         {
             _targetText.text = _endCheckFunction(text);
+
+            RoutineHelper.Instance.StartCoroutine(nameof(HoldScrollsRoutine), HoldScrollsRoutine());
 
             gameObject.SetActive(false);
         }
