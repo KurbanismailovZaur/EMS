@@ -1278,18 +1278,6 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1332465357 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5585918439178007976, guid: dd49fda250ca2c14bb0550a51b9973a1,
-    type: 3}
-  m_PrefabInstance: {fileID: 9152933436094242843}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1367256648, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1384369861 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1384369861, guid: 0b5b5ecf096c5f74584f5e0726689ffe,
@@ -7825,10 +7813,6 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 368876454, guid: dd49fda250ca2c14bb0550a51b9973a1, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1804931630332798525, guid: dd49fda250ca2c14bb0550a51b9973a1,
         type: 3}
       propertyPath: m_SizeDelta.x
@@ -7939,11 +7923,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7911809081587986966, guid: dd49fda250ca2c14bb0550a51b9973a1,
-        type: 3}
-      propertyPath: m_Alpha
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1570862687, guid: dd49fda250ca2c14bb0550a51b9973a1, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
@@ -7958,10 +7937,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1570862687, guid: dd49fda250ca2c14bb0550a51b9973a1, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1570862687, guid: dd49fda250ca2c14bb0550a51b9973a1, type: 3}
-      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5033381315481923878, guid: dd49fda250ca2c14bb0550a51b9973a1,
@@ -8044,10 +8019,5 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3434139417346401835, guid: dd49fda250ca2c14bb0550a51b9973a1,
-        type: 3}
-      propertyPath: _scrollRect
-      value: 
-      objectReference: {fileID: 1332465357}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dd49fda250ca2c14bb0550a51b9973a1, type: 3}

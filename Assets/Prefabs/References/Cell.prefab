@@ -245,5 +245,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0407695df10105b45b63a59efbb6ce53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _rectTransform: {fileID: 477007100727764885}
   _text: {fileID: 7551051233067442422}
   _type: 0

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System;
 using UnityEngine.EventSystems;
 using System.Linq;
+using System.Globalization;
 
 namespace UI.Referencing
 {
@@ -18,9 +19,9 @@ namespace UI.Referencing
         [SerializeField]
         private InputField _input;
 
-        private Text _targetText;
-        
-        private Func<string, string> _endCheckFunction;
+        private Cell _targetCell;
+
+        private Action<string> _setFunction;
 
         [SerializeField]
         private ScrollRect _scrollRect;
@@ -28,22 +29,22 @@ namespace UI.Referencing
         [SerializeField]
         private References _references;
 
+        private static readonly NumberFormatInfo _numberFormatInfo = new NumberFormatInfo { NumberDecimalSeparator = "." };
+
         public InputField Input => _input;
 
         public void Edit(Cell cell)
         {
-            var cellRectTransform = ((RectTransform)cell.transform);
-
-            var position = ((RectTransform)cellRectTransform.parent).anchoredPosition + cellRectTransform.anchoredPosition;
-            var sizeDelta = cellRectTransform.sizeDelta;
+            var position = ((RectTransform)cell.RectTransform.parent).anchoredPosition + cell.RectTransform.anchoredPosition;
+            var sizeDelta = cell.RectTransform.sizeDelta;
 
             _rectTransform.anchoredPosition = position;
             _rectTransform.sizeDelta = sizeDelta;
 
             SetEditType(cell.CellType);
 
-            Input.text = cell.Text.text;
-            _targetText = cell.Text;
+            Input.text = cell.NullableStringValue;
+            _targetCell = cell;
 
             RoutineHelper.Instance.StartCoroutine(nameof(HoldScrollsRoutine), HoldScrollsRoutine());
 
@@ -51,7 +52,7 @@ namespace UI.Referencing
 
             Input.Select();
         }
-        
+
         private IEnumerator HoldScrollsRoutine()
         {
             var positions = _scrollRect.normalizedPosition;
@@ -67,88 +68,83 @@ namespace UI.Referencing
             {
                 case Cell.Type.Int:
                     _input.contentType = InputField.ContentType.IntegerNumber;
-                    _endCheckFunction = CheckInt;
+                    _setFunction = SetInt;
                     break;
                 case Cell.Type.NullableInt:
                     _input.contentType = InputField.ContentType.IntegerNumber;
-                    _endCheckFunction = CheckNullableInt;
+                    _setFunction = SetNullableInt;
                     break;
                 case Cell.Type.String:
-                    _input.contentType = InputField.ContentType.Alphanumeric;
-                    _endCheckFunction = CheckString;
+                    _input.contentType = InputField.ContentType.Standard;
+                    _setFunction = SetString;
                     break;
                 case Cell.Type.NullableString:
-                    _input.contentType = InputField.ContentType.Alphanumeric;
-                    _endCheckFunction = CheckNullableString;
+                    _input.contentType = InputField.ContentType.Standard;
+                    _setFunction = SetNullableString;
                     break;
                 case Cell.Type.Float:
                     _input.contentType = InputField.ContentType.DecimalNumber;
-                    _endCheckFunction = CheckFloat;
+                    _setFunction = SetFloat;
                     break;
                 case Cell.Type.NullableFloat:
                     _input.contentType = InputField.ContentType.DecimalNumber;
-                    _endCheckFunction = CheckFloat;
-                    break;
-                case Cell.Type.Material:
-                    _input.contentType = InputField.ContentType.IntegerNumber;
-                    _endCheckFunction = CheckMaterial;
-                    break;
-                case Cell.Type.NullableMaterial:
-                    _input.contentType = InputField.ContentType.IntegerNumber;
-                    _endCheckFunction = CheckNullableMaterial;
+                    _setFunction = SetNullableFloat;
                     break;
             }
         }
 
-        #region End checkers
-        private string CheckInt(string text)
+        #region Set functions
+        private void SetInt(string text)
         {
-            return string.IsNullOrWhiteSpace(text) ? "0" : text;
+            if (!string.IsNullOrWhiteSpace(text) && int.TryParse(text, out int value))
+                _targetCell.IntValue = value;
         }
+
+        private void SetNullableInt(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                _targetCell.NullableIntValue = null;
+                return;
+            }
+
+            if (int.TryParse(text, out int value))
+                _targetCell.NullableIntValue = value;
+        }
+
+        private void SetString(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+                _targetCell.StringValue = text;
+        }
+
+        private void SetNullableString(string text) => _targetCell.StringValue = text;
 
         private string CheckNullableInt(string text) => text;
 
-        private string CheckString(string text)
+        private void SetFloat(string text)
         {
-            return string.IsNullOrWhiteSpace(text) ? _targetText.text : text;
+            if (!string.IsNullOrWhiteSpace(text) && float.TryParse(text, NumberStyles.Float, _numberFormatInfo, out float value))
+                _targetCell.FloatValue = value;
         }
 
-        private string CheckNullableString(string text) => text;
-
-        private string CheckFloat(string text)
+        private void SetNullableFloat(string text)
         {
-            return string.IsNullOrWhiteSpace(text) ? _targetText.text : text;
-        }
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                _targetCell.NullableFloatValue = null;
+                return;
+            }
 
-        private string CheckNullableFloat(string text) => text;
-
-        private string CheckMaterial(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return _targetText.text;
-
-            var materials = (Materials)_references.GetTable("Materials");
-            var materialExist = materials.Codes.GetChildren().Select(ch => ch.GetComponent<Cell>().Text).Where(t => t.text == text).Count() > 0;
-
-            return materialExist ? text : _targetText.text;
-        }
-
-        private string CheckNullableMaterial(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return text;
-
-            var materials = (Materials)_references.GetTable("Materials");
-            var children = materials.Codes.GetChildren();
-            var selected = children.Select(ch => ch.GetComponent<Cell>().Text);
-            var materialExist = selected.First(t => t.text == text) != null;
-
-            return materialExist ? text : _targetText.text;
+            if (float.TryParse(text, NumberStyles.Float, _numberFormatInfo, out float value))
+                _targetCell.NullableFloatValue = value;
         }
         #endregion
 
         #region Event handlers
         public void InputField_OnEndEdit(string text)
         {
-            _targetText.text = _endCheckFunction(text);
+            _setFunction(text);
 
             RoutineHelper.Instance.StartCoroutine(nameof(HoldScrollsRoutine), HoldScrollsRoutine());
 

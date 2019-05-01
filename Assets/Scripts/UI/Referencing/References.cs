@@ -7,7 +7,7 @@ using Exceptions;
 using System;
 using System.Linq;
 using UnityButton = UnityEngine.UI.Button;
-using Management.Referencing;
+using UI.Referencing.Tables;
 
 namespace UI.Referencing
 {
@@ -62,10 +62,6 @@ namespace UI.Referencing
         [SerializeField]
         private RemoveDialog _removeDialog;
 
-        [Header("Prefabs")]
-        [SerializeField]
-        private Cell _cellPrefab;
-
         public bool IsOpen { get => _isOpen; }
 
         private void Start()
@@ -94,8 +90,18 @@ namespace UI.Referencing
 
         private void LoadTablesData()
         {
-            foreach (var association in _tabsAssociations)
-                association.table.LoadData(_cellPrefab, Cell_Clicked);
+            var materialsTable = ((MaterialsTable)GetTable("Materials"));
+            var wireMarksTable = ((WireMarksTable)GetTable("WireMarks"));
+            var connectorTypesTable = ((ConnectorTypesTable)GetTable("ConnectorTypes"));
+
+            materialsTable.Clear();
+            materialsTable.AddMaterials(Cell_Clicked);
+
+            wireMarksTable.Clear();
+            wireMarksTable.AddWireMarks(Cell_Clicked);
+
+            connectorTypesTable.Clear();
+            connectorTypesTable.AddConnectorTypes(Cell_Clicked);
         }
 
         private void Show() => SetVisibility(1f, true);
@@ -152,23 +158,23 @@ namespace UI.Referencing
 
         public void Add()
         {
-            GetTable(_currentTab).Add(_cellPrefab, Cell_Clicked);
+            GetTable(_currentTab).AddEmpty(Cell_Clicked);
         }
 
         public void Save()
         {
-            var materials = ((Materials)GetTable("Materials")).GetMaterials();
-            var wireMarks = ((WireMarks)GetTable("WireMarks")).GetWireMarks(materials);
-            var connectorTypes = ((ConnectorTypes)GetTable("ConnectorTypes")).GetConnectroTypes();
+            var materials = ((MaterialsTable)GetTable("Materials")).Materials;
+            //var wireMarks = ((WireMarks)GetTable("WireMarks")).GetWireMarks(materials);
+            //var connectorTypes = ((ConnectorTypes)GetTable("ConnectorTypes")).GetConnectroTypes();
 
-            ReferenceManager.Instance.SetData(materials, wireMarks, connectorTypes);
+            //ReferenceManager.Instance.SetData(materials, wireMarks, connectorTypes);
 
             Close();
         }
 
         private void OpenRemoveDialog()
         {
-            _removeDialog.Open(GetTable(_currentTab).GetRemoveData());
+            //_removeDialog.Open(GetTable(_currentTab));
         }
 
         #region Event handlers
