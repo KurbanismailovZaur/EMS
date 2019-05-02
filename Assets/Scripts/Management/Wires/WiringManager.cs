@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
-using Management.Wires.IO;
 using UnityEngine.Events;
 
 namespace Management.Wires
@@ -24,7 +23,7 @@ namespace Management.Wires
         {
             Remove();
 
-            _wiring = WiringDataReader.ReadFromFile(path);
+            //_wiring = KVID3DataReader.ReadFromFile(path);
             _wiring.transform.SetParent(transform);
 
             Imported.Invoke();

@@ -10,14 +10,15 @@ using Management.Projects;
 using Management.Models;
 using Management.Wires;
 using UI.Exploring.FileSystem;
-using UI.Referencing;
+using UI.Tables;
 using UI.Calculations;
 using Management.Calculations;
 using System.Linq;
 using UI.Reporting;
 using UI;
 using UI.Panels.Wire;
-using Management.Referencing;
+using Management.Tables;
+using UI.TableViews;
 
 namespace Facades
 {
@@ -40,7 +41,10 @@ namespace Facades
         private FileExplorer _explorer;
 
         [SerializeField]
-        private References _reference;
+        private KVID3View _kvid3View;
+
+        [SerializeField]
+        private ReferencesView _referencesView;
 
         [SerializeField]
         private Reports _reports;
@@ -79,8 +83,8 @@ namespace Facades
         }
         #endregion
 
-        #region Wiring
-        private void Edit3KVID() => StartCoroutine(ImportWiringRoutine());
+        #region KVIDS
+        private void Edit3KVID() => _kvid3View.Open();
 
         private IEnumerator ImportWiringRoutine()
         {
@@ -169,7 +173,7 @@ namespace Facades
             {
                 case ProjectContext.Action.New:
                     ProjectManager.Instance.New();
-                    ReferenceManager.Instance.LoadDefaultData();
+                    TableDataManager.Instance.LoadDefaultData();
                     break;
                 case ProjectContext.Action.Load:
                     ProjectManager.Instance.Load();
@@ -205,7 +209,7 @@ namespace Facades
             WiringManager.Instance.Remove();
             CalculationsManager.Instance.RemoveElectricFieldStrenght();
             CalculationsManager.Instance.RemoveMutualActionOfBCSAndBA();
-            ReferenceManager.Instance.Remove();
+            TableDataManager.Instance.Remove();
         }
         #endregion
 
@@ -368,7 +372,7 @@ namespace Facades
             switch (action)
             {
                 case ReferenceContext.Action.Edit:
-                    _reference.Open();
+                    _referencesView.Open();
                     break;
             }
         }
