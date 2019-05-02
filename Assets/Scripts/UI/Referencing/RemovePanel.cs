@@ -6,6 +6,7 @@ using static UnityEngine.Debug;
 using UnityEngine.UI;
 using System;
 using UnityEngine.Events;
+using UI.Referencing.Tables;
 
 namespace UI.Referencing
 {
@@ -13,25 +14,28 @@ namespace UI.Referencing
 	{
         public static class Factory
         {
-            public static RemovePanel Create(RemovePanel prefab, Transform parent, string label, Action deleteHandler)
+            public static RemovePanel Create(RemovePanel prefab, Transform parent, string label, Table table, Panel panel)
             {
-                var panel = Instantiate(prefab, parent);
-                panel._labelText.text = label;
-                panel._deleteHandler = deleteHandler;
+                var removePanel = Instantiate(prefab, parent);
+                removePanel._labelText.text = label;
+                removePanel._table = table;
+                removePanel._panel = panel;
 
-                return panel;
+                return removePanel;
             }
         }
 
         [SerializeField]
         private Text _labelText;
 
-        public Action _deleteHandler;
+        private Table _table;
+
+        private Panel _panel;
 
         #region Event handlers
         public void Button_OnClick()
         {
-            _deleteHandler?.Invoke();
+            _table.Remove(_panel);
             Destroy(transform.parent.GetChild(transform.GetSiblingIndex() + 1).gameObject);
             Destroy(gameObject);
         }

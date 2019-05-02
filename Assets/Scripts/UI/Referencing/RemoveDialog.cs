@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using System;
 using UnityEngine.UI;
+using UI.Referencing.Tables;
 
 namespace UI.Referencing
 {
@@ -12,12 +13,6 @@ namespace UI.Referencing
 	{
         [SerializeField]
         private CanvasGroup _canvasGroup;
-
-        [SerializeField]
-        private Text _titleText;
-
-        [SerializeField]
-        private Text _labelText;
 
         [SerializeField]
         private RectTransform _content;
@@ -29,25 +24,22 @@ namespace UI.Referencing
         [SerializeField]
         private RectTransform _deviderPrefab;
 
-        public void Open((string titleRemoveName, string labelName, (string label, Action deleteHandler)[] panelsData) data)
+        public void Open(Table table, List<Panel> panels)
         {
-            _titleText.text = $"Удаление {data.titleRemoveName}";
-            _labelText.text = data.labelName;
-
-            UpdatePanels(data.panelsData);
+            UpdatePanels(table, panels);
 
             Show();
         }
 
         public void Close() => Hide();
 
-        private void UpdatePanels((string label, Action deleteHandler)[] panelsData)
+        private void UpdatePanels(Table table, List<Panel> panels)
         {
             ClearPanels();
 
-            foreach (var (label, deleteHandler) in panelsData)
+            foreach (var panel in panels)
             {
-                RemovePanel.Factory.Create(_removePanelPrefab, _content, label, deleteHandler);
+                RemovePanel.Factory.Create(_removePanelPrefab, _content, panel.GetCell(table.RemoveCellName).NullableStringValue, table, panel);
                 Instantiate(_deviderPrefab, _content);
             }
         }

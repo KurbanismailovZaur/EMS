@@ -25,12 +25,12 @@ namespace Management.Referencing
 
         public Material CoreMaterial { get; set; }
 
-        public float CoreDiameter { get; set; }
+        public float? CoreDiameter { get; set; }
 
         public Screen Screen1 { get; set; }
 
         public Screen Screen2 { get; set; }
 
-        public float CrossSectionDiameter { get; set; }
+        public float? CrossSectionDiameter { get; set; }
     }
 }

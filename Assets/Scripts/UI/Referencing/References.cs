@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using UnityButton = UnityEngine.UI.Button;
 using UI.Referencing.Tables;
+using Management.Referencing;
 
 namespace UI.Referencing
 {
@@ -22,6 +23,7 @@ namespace UI.Referencing
             public Table table;
         }
 
+        #region Fields
         [SerializeField]
         private CanvasGroup _group;
 
@@ -61,9 +63,11 @@ namespace UI.Referencing
 
         [SerializeField]
         private RemoveDialog _removeDialog;
+        #endregion
 
         public bool IsOpen { get => _isOpen; }
 
+        #region Methods
         private void Start()
         {
             foreach (var association in _tabsAssociations)
@@ -163,18 +167,19 @@ namespace UI.Referencing
 
         public void Save()
         {
-            var materials = ((MaterialsTable)GetTable("Materials")).Materials;
-            //var wireMarks = ((WireMarks)GetTable("WireMarks")).GetWireMarks(materials);
-            //var connectorTypes = ((ConnectorTypes)GetTable("ConnectorTypes")).GetConnectroTypes();
+            var materials = ((MaterialsTable)GetTable("Materials")).MaterialPanels.Select(p => p.ToMaterial()).ToList();
+            var wireMarks = ((WireMarksTable)GetTable("WireMarks")).WireMarkPanels.Select(p => p.ToWireMark(materials)).ToList();
+            var connectorTypes = ((ConnectorTypesTable)GetTable("ConnectorTypes")).ConnectorTypePanels.Select(p => p.ToConnectorType()).ToList();
 
-            //ReferenceManager.Instance.SetData(materials, wireMarks, connectorTypes);
-
+            ReferenceManager.Instance.SetData(materials, wireMarks, connectorTypes);
+            
             Close();
         }
 
         private void OpenRemoveDialog()
         {
-            //_removeDialog.Open(GetTable(_currentTab));
+            var table = GetTable(_currentTab);
+            _removeDialog.Open(table, table.GetSafeRemovingPanels());
         }
 
         #region Event handlers
@@ -189,6 +194,7 @@ namespace UI.Referencing
         private void CancelButton_OnClick() => Close();
 
         private void Cell_Clicked(Cell cell) => _inputController.Edit(cell);
+        #endregion
         #endregion
     }
 }

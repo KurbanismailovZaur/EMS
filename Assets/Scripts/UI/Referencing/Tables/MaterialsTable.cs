@@ -17,7 +17,7 @@ namespace UI.Referencing.Tables
 {
     public class MaterialsTable : Table
     {
-        public class MaterialPanel
+        public class MaterialPanel : Panel
         {
             public Cell Code { get; private set; }
 
@@ -36,9 +36,15 @@ namespace UI.Referencing.Tables
                 Conductivity = conductivity;
                 MagneticPermeability = magneticPermeability;
                 DielectricConstant = dielectricConstant;
+
+                Code.Changed += Cell_Changed;
+                Name.Changed += Cell_Changed;
+                Conductivity.Changed += Cell_Changed;
+                MagneticPermeability.Changed += Cell_Changed;
+                DielectricConstant.Changed += Cell_Changed;
             }
 
-            public void Destroy()
+            public override void Destroy()
             {
                 UnityObject.Destroy(Code.gameObject);
                 UnityObject.Destroy(Name.gameObject);
@@ -46,26 +52,84 @@ namespace UI.Referencing.Tables
                 UnityObject.Destroy(MagneticPermeability.gameObject);
                 UnityObject.Destroy(DielectricConstant.gameObject);
             }
+
+            public override Cell GetCell(string name)
+            {
+                switch (name)
+                {
+                    case "Code":
+                        return Code;
+                    case "Name":
+                        return Name;
+                    case "Conductivity":
+                        return Conductivity;
+                    case "MagneticPermeability":
+                        return MagneticPermeability;
+                    case "DielectricConstant":
+                        return DielectricConstant;
+                    default:
+                        throw new ArgumentException($"No cell with name \"{ name }\"");
+                }
+            }
+
+            public override ReferenceCell GetReferenceCell(string name)
+            {
+                throw new ArgumentException($"No reference cell with name \"{ name }\"");
+            }
+
+            public Material ToMaterial()
+            {
+                return new Material
+                {
+                    Code = Code.IntValue,
+                    Name = Name.NullableStringValue,
+                    Conductivity = Conductivity.NullableFloatValue,
+                    MagneticPermeability = MagneticPermeability.NullableFloatValue,
+                    DielectricConstant = DielectricConstant.NullableFloatValue
+                };
+            }
+
+            #region Event handlers
+            protected override void Cell_Changed(Cell cell)
+            {
+                if (cell == Code)
+                    InvokeChangedEvent("Code");
+                else if (cell == Name)
+                    InvokeChangedEvent("Name");
+                else if (cell == Conductivity)
+                    InvokeChangedEvent("Conductivity");
+                else if (cell == MagneticPermeability)
+                    InvokeChangedEvent("MagneticPermeability");
+                else if (cell == DielectricConstant)
+                    InvokeChangedEvent("DielectricConstant");
+            }
+            #endregion
         }
 
+        [Header("Columns")]
         [SerializeField]
-        private RectTransform _codes;
+        private Column _codes;
 
         [SerializeField]
-        private RectTransform _names;
+        private Column _names;
 
         [SerializeField]
-        private RectTransform _conductivities;
+        private Column _conductivities;
 
         [SerializeField]
-        private RectTransform _magneticPermeabilities;
+        private Column _magneticPermeabilities;
 
         [SerializeField]
-        private RectTransform _dielectricConstants;
+        private Column _dielectricConstants;
 
         private List<MaterialPanel> _materialPanels = new List<MaterialPanel>();
 
-        public ReadOnlyCollection<MaterialPanel> Materials => new ReadOnlyCollection<MaterialPanel>(_materialPanels);
+        public ReadOnlyCollection<MaterialPanel> MaterialPanels => new ReadOnlyCollection<MaterialPanel>(_materialPanels);
+
+        public override string RemoveCellName => "Name";
+
+        [SerializeField]
+        private WireMarksTable _wireMarksTable;
 
         public void AddMaterials(Action<Cell> cellClickHandler)
         {
@@ -75,7 +139,7 @@ namespace UI.Referencing.Tables
 
         private void Add(int code, string name, float? conductivity, float? magneticPermeability, float? dielectricConstant, Action<Cell> cellClickHandler)
         {
-            var codeCell = Cell.Factory.Create(_cellPrefab, code, _codes, cellClickHandler);
+            var codeCell = Cell.Factory.CreateUnique(_cellPrefab, code, _codes, cellClickHandler);
             var nameCell = Cell.Factory.Create(_cellPrefab, name, true, _names, cellClickHandler);
             var conductivityCell = Cell.Factory.Create(_cellPrefab, conductivity, _conductivities, cellClickHandler);
             var magneticPermeabilityCell = Cell.Factory.Create(_cellPrefab, magneticPermeability, _magneticPermeabilities, cellClickHandler);
@@ -83,19 +147,86 @@ namespace UI.Referencing.Tables
 
             var panel = new MaterialPanel(codeCell, nameCell, conductivityCell, magneticPermeabilityCell, dielectricConstantCell);
             _materialPanels.Add(panel);
+
+            AddPanelToColumns(panel);
+
+            Added.Invoke(panel);
         }
 
         public override void AddEmpty(Action<Cell> cellClickHandler)
         {
-            Add(GetNextCode(), "Материал", null, null, null, cellClickHandler);
+            Add(GetNextCode(), null, null, null, null, cellClickHandler);
         }
 
-        private int GetNextCode() => _materialPanels.Max(p => p.Code).IntValue + 1;
+        private int GetNextCode() => _materialPanels.Max(p => p.Code.IntValue) + 1;
 
         public override void Clear()
         {
             foreach (var panel in _materialPanels)
                 panel.Destroy();
+
+            _materialPanels.Clear();
+        }
+
+        public override List<Panel> GetSafeRemovingPanels()
+        {
+            List<Panel> panels = new List<Panel>();
+
+            foreach (var materialPanel in _materialPanels)
+            {
+                bool noReference = true;
+
+                foreach (var wireMarkPanel in _wireMarksTable.WireMarkPanels)
+                {
+                    if (wireMarkPanel.CoreMaterial.SelectedPanel == materialPanel || wireMarkPanel.Screen1Material.SelectedPanel == materialPanel || wireMarkPanel.Screen2Material.SelectedPanel == materialPanel)
+                    {
+                        noReference = false;
+                        break;
+                    }
+                }
+
+                if (noReference)
+                    panels.Add(materialPanel);
+            }
+
+            return panels;
+
+            //return _materialPanels.Where(p => _wireMarksTable.WireMarkPanels.All(wp => wp.CoreMaterial?.SelectedPanel != p && wp.Screen1Material?.SelectedPanel != p && wp.Screen2Material?.SelectedPanel != p))
+            //    .Cast<Panel>()
+            //    .ToList();
+        }
+
+        public override void Remove(Panel panel)
+        {
+            if (!_materialPanels.Contains(panel)) return;
+            
+            _materialPanels.Remove((MaterialPanel)panel);
+            RemovePanelFromColumns(panel);
+            panel.Destroy();
+
+            Removed.Invoke(panel);
+        }
+
+        protected override void AddPanelToColumns(Panel panel)
+        {
+            var materialPanel = (MaterialPanel)panel;
+
+            _codes.AddCell(materialPanel.Code);
+            _names.AddCell(materialPanel.Name);
+            _conductivities.AddCell(materialPanel.Conductivity);
+            _magneticPermeabilities.AddCell(materialPanel.MagneticPermeability);
+            _dielectricConstants.AddCell(materialPanel.DielectricConstant);
+        }
+
+        protected override void RemovePanelFromColumns(Panel panel)
+        {
+            var materialPanel = (MaterialPanel)panel;
+
+            _codes.RemoveCell(materialPanel.Code);
+            _names.RemoveCell(materialPanel.Name);
+            _conductivities.RemoveCell(materialPanel.Conductivity);
+            _magneticPermeabilities.RemoveCell(materialPanel.MagneticPermeability);
+            _dielectricConstants.RemoveCell(materialPanel.DielectricConstant);
         }
     }
 }

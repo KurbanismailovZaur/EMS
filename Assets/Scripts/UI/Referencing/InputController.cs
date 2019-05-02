@@ -8,6 +8,7 @@ using System;
 using UnityEngine.EventSystems;
 using System.Linq;
 using System.Globalization;
+using UI.Referencing.Tables;
 
 namespace UI.Referencing
 {
@@ -74,6 +75,10 @@ namespace UI.Referencing
                     _input.contentType = InputField.ContentType.IntegerNumber;
                     _setFunction = SetNullableInt;
                     break;
+                case Cell.Type.UniqueInt:
+                    _input.contentType = InputField.ContentType.IntegerNumber;
+                    _setFunction = SetUniqueInt;
+                    break;
                 case Cell.Type.String:
                     _input.contentType = InputField.ContentType.Standard;
                     _setFunction = SetString;
@@ -81,6 +86,10 @@ namespace UI.Referencing
                 case Cell.Type.NullableString:
                     _input.contentType = InputField.ContentType.Standard;
                     _setFunction = SetNullableString;
+                    break;
+                case Cell.Type.UniqueString:
+                    _input.contentType = InputField.ContentType.Standard;
+                    _setFunction = SetUniqueString;
                     break;
                 case Cell.Type.Float:
                     _input.contentType = InputField.ContentType.DecimalNumber;
@@ -112,6 +121,12 @@ namespace UI.Referencing
                 _targetCell.NullableIntValue = value;
         }
 
+        private void SetUniqueInt(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text) && int.TryParse(text, out int value) && !_targetCell.Column.Cells.Any(c => c.IntValue == value))
+                _targetCell.IntValue = value;
+        }
+
         private void SetString(string text)
         {
             if (!string.IsNullOrWhiteSpace(text))
@@ -119,6 +134,12 @@ namespace UI.Referencing
         }
 
         private void SetNullableString(string text) => _targetCell.StringValue = text;
+
+        private void SetUniqueString(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text) && !_targetCell.Column.Cells.Any(c => c.StringValue == text))
+                _targetCell.StringValue = text;
+        }
 
         private string CheckNullableInt(string text) => text;
 
