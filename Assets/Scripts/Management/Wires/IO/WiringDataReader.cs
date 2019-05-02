@@ -9,8 +9,8 @@ using UnityEngine;
 
 namespace Management.Wires.IO
 {
-	public static class WiringDataReader 
-	{
+    public static class WiringDataReader
+    {
         public static Wiring ReadFromFile(string pathToXLS)
         {
             HSSFWorkbook workbook;
@@ -26,37 +26,19 @@ namespace Management.Wires.IO
             {
                 ISheet sheet = workbook.GetSheetAt(i);
 
-                IRow amplitudeRow = sheet.GetRow(0);
-                if (!IsNumericCell(amplitudeRow, 1))
-                    throw new FormatException("Amplitude must be a numeric value.");
-
-                float amplitude = (float)amplitudeRow.GetCell(1).NumericCellValue;
-
-                IRow frequencyRow = sheet.GetRow(1);
-                if (!IsNumericCell(frequencyRow, 1))
-                    throw new FormatException("Frequency must be a numeric value.");
-
-                float frequency = (float)frequencyRow.GetCell(1).NumericCellValue;
-
-                IRow amperageRow = sheet.GetRow(2);
-                if (!IsNumericCell(frequencyRow, 1))
-                    throw new FormatException("Amperage must be a numeric value.");
-
-                float amperage = (float)amperageRow.GetCell(1).NumericCellValue;
-
                 var points = ReadPoints(sheet);
 
-                wires.Add(Wire.Factory.Create(sheet.SheetName, amplitude, frequency, amperage, points));
+                wires.Add(Wire.Factory.Create(sheet.SheetName, points));
             }
 
             return Wiring.Factory.Create(wires);
         }
 
-        private static List<Vector3> ReadPoints(ISheet sheet)
+        private static List<Wire.Point> ReadPoints(ISheet sheet)
         {
-            var points = new List<Vector3>();
+            var points = new List<Wire.Point>();
 
-            for (int j = 5; j <= sheet.LastRowNum; j++)
+            for (int j = 3; j <= sheet.LastRowNum; j++)
             {
                 IRow row = sheet.GetRow(j);
 
@@ -68,28 +50,37 @@ namespace Management.Wires.IO
             return points;
         }
 
-        private static Vector3 ReadPoint(IRow row)
+        private static Wire.Point ReadPoint(IRow row)
         {
-            Vector3 node;
+            Wire.Point point = new Wire.Point();
 
-            node.x = (float)row.GetCell(0).NumericCellValue;
-            node.y = (float)row.GetCell(1).NumericCellValue;
-            node.z = (float)row.GetCell(2).NumericCellValue;
+            point.position.x = (float)row.GetCell(0).NumericCellValue;
+            point.position.y = (float)row.GetCell(1).NumericCellValue;
+            point.position.z = (float)row.GetCell(2).NumericCellValue;
 
-            return node;
+            var metallization1Cell = row.GetCell(3);
+            var metallization2Cell = row.GetCell(4);
+
+            point.metallization1 = metallization1Cell.CellType == CellType.Blank ? null : (float?)metallization1Cell.NumericCellValue;
+            point.metallization2 = metallization1Cell.CellType == CellType.Blank ? null : (float?)metallization2Cell.NumericCellValue;
+
+            return point;
         }
 
         private static bool IsCorrectNodeRow(IRow row)
         {
             for (int i = 0; i < 3; i++)
-            {
-                ICell cell = row.GetCell(i);
-
-                if (cell.CellType != CellType.Numeric)
-                {
+                if (row.GetCell(i).CellType != CellType.Numeric)
                     return false;
-                }
+
+            for (int i = 3; i < 5; i++)
+            {
+                var cell = row.GetCell(i);
+
+                if (cell.CellType != CellType.Blank && cell.CellType != CellType.Numeric)
+                    return false;
             }
+
 
             return true;
         }
@@ -100,5 +91,5 @@ namespace Management.Wires.IO
 
             return cell.CellType == CellType.Numeric;
         }
-	}
+    }
 }

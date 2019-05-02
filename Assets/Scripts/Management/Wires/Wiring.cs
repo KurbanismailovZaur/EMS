@@ -22,7 +22,7 @@ namespace Management.Wires
                 foreach (var wire in wiring._wires)
                     wire.transform.SetParent(wiring.transform);
 
-                wiring.Bounds = GeometryUtility.CalculateBounds(wiring.Wires.SelectMany(w => w.Points).ToArray(), Matrix4x4.identity);
+                wiring.Bounds = GeometryUtility.CalculateBounds(wiring.Wires.SelectMany(w => w.Points.Select(p => p.position)).ToArray(), Matrix4x4.identity);
 
                 return wiring;
             }

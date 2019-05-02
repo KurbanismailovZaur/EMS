@@ -15,7 +15,11 @@ namespace UI.Main.Contexts
         #region Enums
         public enum Action
         {
-            Import,
+            Edit2KVID,
+            Edit3KVID,
+            Edit5KVID,
+            Edit7KVID,
+            Edit8KVID,
             Visibility,
             Edit,
             Remove
@@ -28,47 +32,52 @@ namespace UI.Main.Contexts
         #endregion
 
         [SerializeField]
-        private UnityButton _importButton;
+        private UnityButton _2KVIDButton;
 
         [SerializeField]
-        private UnityButton _visibilityButton;
+        private UnityButton _3KVIDButton;
 
         [SerializeField]
-        private Toggle _visibilityToggle;
+        private UnityButton _5KVIDButton;
 
         [SerializeField]
-        private UnityButton _editButton;
+        private UnityButton _7KVIDButton;
+
+        [SerializeField]
+        private UnityButton _8KVIDButton;
+
+        [SerializeField]
+        private UnityButton _3KVIDVisibilityButton;
+
+        [SerializeField]
+        private Toggle _3KVIDVisibilityToggle;
 
         [SerializeField]
         private UnityButton _removeButton;
 
         public SelectedEvent Selected;
 
-        public bool ImportInteractable
-        {
-            get => _importButton.interactable;
-            set => _importButton.interactable = value;
-        }
-
         public bool VisibilityState
         {
-            get => _visibilityToggle.State;
-            set => _visibilityToggle.State = value;
-        }
-
-        public bool EditInteractable
-        {
-            get => _editButton.interactable;
-            set => _editButton.interactable = value;
+            get => _3KVIDVisibilityToggle.State;
+            set => _3KVIDVisibilityToggle.State = value;
         }
 
         public void SetWiringButtonsinteractibility(bool state)
         {
-            _visibilityButton.interactable = state;
+            _3KVIDVisibilityButton.interactable = state;
             _removeButton.interactable = state;
         }
 
-        public void Import() => Selected.Invoke(Action.Import);
+        public void Edit2KVID() => Selected.Invoke(Action.Edit2KVID);
+
+        public void Edit3KVID() => Selected.Invoke(Action.Edit3KVID);
+
+        public void Edit5KVID() => Selected.Invoke(Action.Edit5KVID);
+
+        public void Edit7KVID() => Selected.Invoke(Action.Edit7KVID);
+
+        public void Edit8KVID() => Selected.Invoke(Action.Edit8KVID);
 
         public void Visibility() => Selected.Invoke(Action.Visibility);
 
@@ -79,14 +88,12 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void ProjectManager_Created()
         {
-            ImportInteractable = true;
-            EditInteractable = true;
+            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _7KVIDButton.interactable = _8KVIDButton.interactable = true;
         }
 
         public void ProjectManager_Closed()
         {
-            ImportInteractable = false;
-            EditInteractable = false;
+            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _7KVIDButton.interactable = _8KVIDButton.interactable = false;
         }
 
         public void WiringManager_Imported()

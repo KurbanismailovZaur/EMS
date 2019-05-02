@@ -16,7 +16,7 @@ namespace Management.Calculations
         {
             public static Wire[] Create(IEnumerable<Wires.Wire> wires, List<(int a, int b, float value)> influences, float[] values, Color[] colors, Transform parent)
             {
-                var wiresArray = wires.Select(w => Create(w, parent)).ToArray();
+                var wiresArray = wires.Select(w => Create(w.Name, w.Points, parent)).ToArray();
 
                 for (int i = 0; i < wiresArray.Length; i++)
                 {
@@ -32,14 +32,9 @@ namespace Management.Calculations
                 return wiresArray;
             }
 
-            private static Wire Create(Wires.Wire wire, Transform parent)
+            private static Wire Create(string name, IList<Point> points, Transform parent)
             {
-                return Create(wire.Name, wire.Amplitude, wire.Frequency, wire.Amperage, wire.Points.ToList(), parent);
-            }
-
-            private static Wire Create(string name, float amplitude, float frequency, float amperage, List<Vector3> points, Transform parent)
-            {
-                var line = VectorLine.SetLine3D(Color.yellow, points.ToArray());
+                var line = VectorLine.SetLine3D(Color.yellow, points.Select(p => p.position).ToArray());
                 line.Draw3DAuto();
 
                 var wire = line.rectTransform.gameObject.AddComponent<Wire>();
@@ -49,12 +44,10 @@ namespace Management.Calculations
                 wire._line.lineWidth = 2f;
 
                 wire.name = wire.Name = name;
-                wire.Amplitude = amplitude;
-                wire.Frequency = frequency;
-                wire.Amperage = amperage;
-
+                wire._points = points.ToList();
+                
                 #region Collider line
-                var colliderLine = VectorLine.SetLine3D(new Color(0f, 0f, 0f, 0f), points.ToArray());
+                var colliderLine = VectorLine.SetLine3D(new Color(0f, 0f, 0f, 0f), points.Select(p => p.position).ToArray());
                 colliderLine.Draw3DAuto();
 
                 colliderLine.name = "Collider";
@@ -85,7 +78,7 @@ namespace Management.Calculations
         }
 
         private List<Influence> _influences = new List<Influence>();
-        
+
         public ReadOnlyCollection<Influence> Influences => _influences.AsReadOnly();
 
         public float Value { get; private set; }

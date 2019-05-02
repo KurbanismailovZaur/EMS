@@ -5,25 +5,40 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using Vectrosity;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Management.Wires
 {
 	public class Wire : MonoBehaviour 
 	{
+        public struct Point
+        {
+            public Vector3 position;
+
+            public float? metallization1;
+
+            public float? metallization2;
+
+            public Point(Vector3 position, float? metallization1, float? metallization2)
+            {
+                this.position = position;
+                this.metallization1 = metallization1;
+                this.metallization2 = metallization2;
+            }
+        }
+
         public static class Factory
         {
-            public static Wire Create(string name, float amplitude, float frequency, float amperage, List<Vector3> points)
+            public static Wire Create(string name, List<Point> points)
             {
-                var line = VectorLine.SetLine3D(Color.yellow, points.ToArray());
+                var line = VectorLine.SetLine3D(Color.yellow, points.Select(p => p.position).ToArray());
                 line.Draw3DAuto();
 
                 var wire = line.rectTransform.gameObject.AddComponent<Wire>();
                 wire._line = line;
 
                 wire.name = wire.Name = name;
-                wire.Amplitude = amplitude;
-                wire.Frequency = frequency;
-                wire.Amperage = amperage;
+                wire._points = points;
 
                 return wire;
             }
@@ -33,12 +48,8 @@ namespace Management.Wires
 
         public string Name { get; protected set; }
 
-        public float Amplitude { get; protected set; }
+        protected List<Point> _points;
 
-        public float Frequency { get; protected set; }
-
-        public float Amperage { get; protected set; }
-
-        public ReadOnlyCollection<Vector3> Points { get => _line.points3.AsReadOnly(); }
+        public ReadOnlyCollection<Point> Points => new ReadOnlyCollection<Point>(_points);
     }
 }

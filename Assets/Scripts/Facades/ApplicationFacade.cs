@@ -80,7 +80,7 @@ namespace Facades
         #endregion
 
         #region Wiring
-        private void ImportWiring() => StartCoroutine(ImportWiringRoutine());
+        private void Edit3KVID() => StartCoroutine(ImportWiringRoutine());
 
         private IEnumerator ImportWiringRoutine()
         {
@@ -235,8 +235,20 @@ namespace Facades
         {
             switch (action)
             {
-                case WiringContext.Action.Import:
-                    ImportWiring();
+                case WiringContext.Action.Edit2KVID:
+                    //ImportWiring();
+                    break;
+                case WiringContext.Action.Edit3KVID:
+                    Edit3KVID();
+                    break;
+                case WiringContext.Action.Edit5KVID:
+                    //ImportWiring();
+                    break;
+                case WiringContext.Action.Edit7KVID:
+                    //ImportWiring();
+                    break;
+                case WiringContext.Action.Edit8KVID:
+                    //ImportWiring();
                     break;
                 case WiringContext.Action.Visibility:
                     WiringManager.Instance.ToggleVisibility();
