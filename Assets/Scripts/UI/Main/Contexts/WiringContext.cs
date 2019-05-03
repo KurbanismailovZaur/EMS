@@ -88,12 +88,12 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void ProjectManager_Created()
         {
-            _3KVIDButton.interactable = true;
+            _2KVIDButton.interactable = _3KVIDButton.interactable = true;
         }
 
         public void ProjectManager_Closed()
         {
-            _3KVIDButton.interactable = false;
+            _2KVIDButton.interactable = _3KVIDButton.interactable = false;
         }
 
         public void WiringManager_Imported()

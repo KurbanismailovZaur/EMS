@@ -41,6 +41,9 @@ namespace Facades
         private FileExplorer _explorer;
 
         [SerializeField]
+        private KVID2View _kvid2View;
+
+        [SerializeField]
         private KVID3View _kvid3View;
 
         [SerializeField]
@@ -228,7 +231,7 @@ namespace Facades
             switch (action)
             {
                 case WiringContext.Action.Edit2KVID:
-                    //ImportWiring();
+                    _kvid2View.Open();
                     break;
                 case WiringContext.Action.Edit3KVID:
                     Edit3KVID();
