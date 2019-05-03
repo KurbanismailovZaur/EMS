@@ -47,7 +47,16 @@ namespace Facades
         private KVID3View _kvid3View;
 
         [SerializeField]
+        private KVID5View _kvid5View;
+
+        [SerializeField]
         private KVID6View _kvid6View;
+
+        [SerializeField]
+        private KVID7View _kvid7View;
+
+        [SerializeField]
+        private KVID8View _kvid8View;
 
         [SerializeField]
         private ReferencesView _referencesView;
@@ -237,13 +246,13 @@ namespace Facades
                     Edit3KVID();
                     break;
                 case WiringContext.Action.Edit5KVID:
-                    //ImportWiring();
+                    _kvid5View.Open();
                     break;
                 case WiringContext.Action.Edit7KVID:
-                    //ImportWiring();
+                    _kvid7View.Open();
                     break;
                 case WiringContext.Action.Edit8KVID:
-                    //ImportWiring();
+                    _kvid8View.Open();
                     break;
                 case WiringContext.Action.Visibility:
                     WiringManager.Instance.KVID3Visibility();
