@@ -137,7 +137,7 @@ namespace UI.Tables.Concrete
                 Add(material.Code, material.Name, material.Conductivity, material.MagneticPermeability, material.DielectricConstant, cellClickHandler);
         }
 
-        private void Add(int code, string name, float? conductivity, float? magneticPermeability, float? dielectricConstant, Action<Cell> cellClickHandler)
+        private MaterialPanel Add(int code, string name, float? conductivity, float? magneticPermeability, float? dielectricConstant, Action<Cell> cellClickHandler)
         {
             var codeCell = Cell.Factory.CreateUnique(_cellPrefab, code, _codes, cellClickHandler);
             var nameCell = Cell.Factory.Create(_cellPrefab, name, true, _names, cellClickHandler);
@@ -151,11 +151,13 @@ namespace UI.Tables.Concrete
             AddPanelToColumns(panel);
 
             Added.Invoke(panel);
+
+            return panel;
         }
 
-        public override void AddEmpty(Action<Cell> cellClickHandler)
+        public override Panel AddEmpty(Action<Cell> cellClickHandler)
         {
-            Add(GetNextCode(), null, null, null, null, cellClickHandler);
+            return Add(GetNextCode(), null, null, null, null, cellClickHandler);
         }
 
         private int GetNextCode() => _materialPanels.Max(p => p.Code.IntValue) + 1;
@@ -198,7 +200,7 @@ namespace UI.Tables.Concrete
 
         public override void Remove(Panel panel)
         {
-            if (!_materialPanels.Contains(panel)) return;
+            if (!_materialPanels.Contains((MaterialPanel)panel)) return;
             
             _materialPanels.Remove((MaterialPanel)panel);
             RemovePanelFromColumns(panel);

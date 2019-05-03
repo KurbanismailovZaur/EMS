@@ -11,27 +11,24 @@ namespace UI.TableViews.IO
 {
     public static class KVID3DataReader
     {
-        public static Wiring ReadFromFile(string pathToXLS)
+        public static List<(string name, List<Wire.Point> points)> ReadFromFile(string pathToXLS)
         {
+            var tabs = new List<(string name, List<Wire.Point> points)>();
+
             HSSFWorkbook workbook;
 
             using (FileStream stream = new FileStream(pathToXLS, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 workbook = new HSSFWorkbook(stream);
             }
-
-            List<Wire> wires = new List<Wire>();
-
+            
             for (int i = 0; i < workbook.NumberOfSheets; i++)
             {
-                ISheet sheet = workbook.GetSheetAt(i);
-
-                var points = ReadPoints(sheet);
-
-                wires.Add(Wire.Factory.Create(sheet.SheetName, points));
+                ISheet sheet = workbook.GetSheetAt(i); 
+                tabs.Add((sheet.SheetName, ReadPoints(sheet)));
             }
 
-            return Wiring.Factory.Create(wires);
+            return tabs;
         }
 
         private static List<Wire.Point> ReadPoints(ISheet sheet)
@@ -61,8 +58,8 @@ namespace UI.TableViews.IO
             var metallization1Cell = row.GetCell(3);
             var metallization2Cell = row.GetCell(4);
 
-            point.metallization1 = metallization1Cell.CellType == CellType.Blank ? null : (float?)metallization1Cell.NumericCellValue;
-            point.metallization2 = metallization1Cell.CellType == CellType.Blank ? null : (float?)metallization2Cell.NumericCellValue;
+            point.metallization1 = GetNullableFloat(metallization1Cell);
+            point.metallization2 = GetNullableFloat(metallization2Cell);
 
             return point;
         }
@@ -70,26 +67,30 @@ namespace UI.TableViews.IO
         private static bool IsCorrectNodeRow(IRow row)
         {
             for (int i = 0; i < 3; i++)
-                if (row.GetCell(i).CellType != CellType.Numeric)
+                if (!IsFloat(row.GetCell(i)))
                     return false;
 
             for (int i = 3; i < 5; i++)
             {
                 var cell = row.GetCell(i);
 
-                if (cell.CellType != CellType.Blank && cell.CellType != CellType.Numeric)
+                if (!IsNullableFloat(cell))
                     return false;
             }
-
 
             return true;
         }
 
-        private static bool IsNumericCell(IRow row, int columnIndex)
-        {
-            ICell cell = row.GetCell(columnIndex);
+        private static bool IsFloat(ICell cell) => cell.CellType == CellType.Numeric;
 
-            return cell.CellType == CellType.Numeric;
+        private static bool IsNullableFloat(ICell cell)
+        {
+            return cell.CellType == CellType.Blank || cell.CellType == CellType.Numeric;
+        }
+
+        private static float? GetNullableFloat(ICell cell)
+        {
+            return cell.CellType == CellType.Blank ? null : (float?)cell.NumericCellValue;
         }
     }
 }

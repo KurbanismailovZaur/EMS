@@ -19,11 +19,11 @@ namespace Management.Wires
 
         public Wiring Wiring { get => _wiring; }
 
-        public void Import(string path)
+        public void Import(Wiring wiring)
         {
             Remove();
 
-            //_wiring = KVID3DataReader.ReadFromFile(path);
+            _wiring = wiring;
             _wiring.transform.SetParent(transform);
 
             Imported.Invoke();

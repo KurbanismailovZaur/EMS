@@ -85,15 +85,6 @@ namespace Facades
 
         #region KVIDS
         private void Edit3KVID() => _kvid3View.Open();
-
-        private IEnumerator ImportWiringRoutine()
-        {
-            yield return _explorer.OpenFile("Импорт Проводки", null, "xls");
-
-            if (_explorer.LastResult == null) yield break;
-
-            WiringManager.Instance.Import(_explorer.LastResult);
-        }
         #endregion
 
         #region Calculations
@@ -235,7 +226,7 @@ namespace Facades
         #endregion
 
         #region Wiring
-        public void ModelContext_Selected(WiringContext.Action action)
+        public void WiringContext_Selected(WiringContext.Action action)
         {
             switch (action)
             {

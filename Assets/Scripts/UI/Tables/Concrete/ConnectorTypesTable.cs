@@ -78,7 +78,7 @@ namespace UI.Tables.Concrete
                 Add(connectorType.Code, connectorType.Type, cellClickHandler);
         }
 
-        private void Add(string code, string type, Action<Cell> cellClickHandler)
+        private ConnectorTypePanel Add(string code, string type, Action<Cell> cellClickHandler)
         {
             var codeCell = Cell.Factory.CreateUnique(_cellPrefab, code, _codes, cellClickHandler);
             var typeCell = Cell.Factory.Create(_cellPrefab, type, true, _types, cellClickHandler);
@@ -89,11 +89,13 @@ namespace UI.Tables.Concrete
             AddPanelToColumns(panel);
 
             Added.Invoke(panel);
+
+            return panel;
         }
 
-        public override void AddEmpty(Action<Cell> cellClickHandler)
+        public override Panel AddEmpty(Action<Cell> cellClickHandler)
         {
-            Add(GetNextCode(), null, cellClickHandler);
+            return Add(GetNextCode(), null, cellClickHandler);
         }
 
         private string GetNextCode() => $"Р{_connectorTypePanels.Max(p => int.Parse(p.Code.StringValue.Substring(1))) + 1}";

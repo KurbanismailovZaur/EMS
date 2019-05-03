@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using System;
 using UnityEngine.Events;
+using Management.Wires;
 
 namespace UI.Tables
 {
@@ -31,7 +32,7 @@ namespace UI.Tables
 
         public abstract void Clear();
 
-        public abstract void AddEmpty(Action<Cell> cellClickHandler);
+        public abstract Panel AddEmpty(Action<Cell> cellClickHandler);
 
         public abstract List<Panel> GetSafeRemovingPanels();
 

@@ -129,10 +129,13 @@ namespace UI.TableViews
 
         protected void Close()
         {
+            Clear();
             Hide();
 
             IsOpen = false;
         }
+
+        protected virtual void Clear() { }
 
         public abstract void Save();
 

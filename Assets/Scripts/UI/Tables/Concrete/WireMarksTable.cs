@@ -215,16 +215,16 @@ namespace UI.Tables.Concrete
                 Add(wireMark.Code, wireMark.Type, wireMark.CoreMaterial, wireMark.CoreDiameter, wireMark.Screen1.Material, wireMark.Screen1.InnerRadius, wireMark.Screen1.Thresold, wireMark.Screen1.IsolationMaterial, wireMark.Screen2.Material, wireMark.Screen2.InnerRadius, wireMark.Screen2.Thresold, wireMark.Screen2.IsolationMaterial, wireMark.CrossSectionDiameter, cellClickHandler);
         }
 
-        public override void AddEmpty(Action<Cell> cellClickHandler)
+        public override Panel AddEmpty(Action<Cell> cellClickHandler)
         {
             var materialPanels = _materialsTable.MaterialPanels;
 
-            Add(GetNextCode(), null, null, null, null, null, null, null, null, null, null, null, null, cellClickHandler);
+            return Add(GetNextCode(), null, null, null, null, null, null, null, null, null, null, null, null, cellClickHandler);
         }
 
         private string GetNextCode() => $"м{_wireMarksPanels.Max(p => int.Parse(p.Code.StringValue.Substring(1))) + 1}";
 
-        private void Add(string code, string type, Material coreMaterial, float? coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, string screen1isolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, string screen2isolationMaterial, float? crossSectionDiameter, Action<Cell> cellClickHandler)
+        private WireMarkPanel Add(string code, string type, Material coreMaterial, float? coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, string screen1isolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, string screen2isolationMaterial, float? crossSectionDiameter, Action<Cell> cellClickHandler)
         {
             var materialPanels = _materialsTable.MaterialPanels;
             var nullableMaterialPanels = Enumerable.Repeat((MaterialsTable.MaterialPanel)null, 1).Concat(materialPanels).ToList();
@@ -259,6 +259,8 @@ namespace UI.Tables.Concrete
             AddPanelToColumns(panel);
 
             Added.Invoke(panel);
+
+            return panel;
         }
 
         public override void Clear()
