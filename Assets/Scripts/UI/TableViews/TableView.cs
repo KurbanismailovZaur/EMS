@@ -39,6 +39,9 @@ namespace UI.TableViews
         protected Transform _content;
 
         [SerializeField]
+        protected UnityButton _addButton;
+
+        [SerializeField]
         protected UnityButton _saveButton;
 
         [SerializeField]
@@ -62,6 +65,7 @@ namespace UI.TableViews
 
         protected virtual void Start()
         {
+            _addButton.onClick.AddListener(AddButton_OnClick);
             _saveButton.onClick.AddListener(SaveButton_OnClick);
             _cancelButton.onClick.AddListener(CancelButton_OnClick);
         }
@@ -139,10 +143,19 @@ namespace UI.TableViews
 
         public abstract void Save();
 
+        protected Table GetCurrentTable() => GetTable(_currentTab);
+
+        protected Panel AddRowToCurrentTable()
+        {
+            return GetCurrentTable()?.AddEmpty(Cell_Clicked);
+        }
+
         #region Event handlers
         protected virtual void Tab_Clicked(Tab tab) => SelectTab(tab);
 
         protected void Cell_Clicked(Cell cell) => _inputController.Edit(cell);
+
+        private void AddButton_OnClick() => AddRowToCurrentTable();
 
         private void SaveButton_OnClick() => Save();
 

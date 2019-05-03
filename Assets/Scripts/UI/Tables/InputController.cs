@@ -24,8 +24,7 @@ namespace UI.Tables
         private Cell _targetCell;
 
         private Action<string> _setFunction;
-
-        [SerializeField]
+        
         private ScrollRect _scrollRect;
 
         [SerializeField]
@@ -37,6 +36,8 @@ namespace UI.Tables
 
         public void Edit(Cell cell)
         {
+            _scrollRect = cell.GetComponentInParent<ScrollRect>();
+
             _targetCell = cell;
             transform.SetParent(_targetCell.GetComponentInParent<ScrollRect>().content);
 
@@ -58,11 +59,13 @@ namespace UI.Tables
 
         private IEnumerator HoldScrollsRoutine()
         {
-            var positions = _scrollRect.normalizedPosition;
+            var position = _scrollRect.normalizedPosition;
 
-            yield return null;
-
-            _scrollRect.normalizedPosition = positions;
+            while (true)
+            {
+                _scrollRect.normalizedPosition = position;
+                yield return null;
+            }
         }
 
         private void SetEditType(Cell.Type cellType)
@@ -164,12 +167,21 @@ namespace UI.Tables
         }
         #endregion
 
+        private IEnumerator StopHoldScrollsRoutine(Vector2 position)
+        {
+            yield return null;
+
+            while (_scrollRect.normalizedPosition != position) yield return null;
+
+            RoutineHelper.Instance.StopCoroutine(nameof(HoldScrollsRoutine));
+        }
+
         #region Event handlers
         public void InputField_OnEndEdit(string text)
         {
             _setFunction(text);
 
-            RoutineHelper.Instance.StartCoroutine(nameof(HoldScrollsRoutine), HoldScrollsRoutine());
+            RoutineHelper.Instance.StartCoroutine(nameof(StopHoldScrollsRoutine), StopHoldScrollsRoutine(_scrollRect.normalizedPosition));
 
             transform.SetParent(GetComponentInParent<Canvas>().transform);
             gameObject.SetActive(false);

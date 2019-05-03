@@ -38,7 +38,7 @@ namespace Management.Wires
             VisibilityChanged.Invoke();
         }
 
-        public void ToggleVisibility() => SetVisibility(!_wiring.gameObject.activeSelf);
+        public void KVID3Visibility() => SetVisibility(!_wiring.gameObject.activeSelf);
 
         public void Edit() { }
 

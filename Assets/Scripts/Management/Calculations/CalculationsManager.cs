@@ -24,7 +24,7 @@ namespace Management.Calculations
             _electricFieldStrenght.Calculate(pointsByAxis, bounds);
         }
 
-        public void CalculateElectricFieldStrenght(List<Vector3> positions, float radius) => _electricFieldStrenght.Calculate(positions, radius);
+        public void CalculateElectricFieldStrenght(List<(string code, Vector3 position)> points, float radius) => _electricFieldStrenght.Calculate(points, radius);
 
         public void CalculateMutualActionOfBCSAndBA(Wiring wiring) => _mutualActionOfBCSAndBA.Calculate(wiring);
 

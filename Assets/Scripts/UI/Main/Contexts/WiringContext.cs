@@ -57,13 +57,13 @@ namespace UI.Main.Contexts
 
         public SelectedEvent Selected;
 
-        public bool VisibilityState
+        public bool KVID3VisibilityState
         {
             get => _3KVIDVisibilityToggle.State;
             set => _3KVIDVisibilityToggle.State = value;
         }
 
-        public void SetWiringButtonsinteractibility(bool state)
+        public void SetKVIDButtonsinteractibility(bool state)
         {
             _3KVIDVisibilityButton.interactable = state;
             _removeButton.interactable = state;
@@ -88,29 +88,29 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void ProjectManager_Created()
         {
-            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _7KVIDButton.interactable = _8KVIDButton.interactable = true;
+            _3KVIDButton.interactable = true;
         }
 
         public void ProjectManager_Closed()
         {
-            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _7KVIDButton.interactable = _8KVIDButton.interactable = false;
+            _3KVIDButton.interactable = false;
         }
 
         public void WiringManager_Imported()
         {
-            SetWiringButtonsinteractibility(true);
-            VisibilityState = true;
+            SetKVIDButtonsinteractibility(true);
+            KVID3VisibilityState = true;
         }
 
         public void WiringManager_VisibilityChanged()
         {
-            VisibilityState = WiringManager.Instance.Wiring.gameObject.activeSelf;
+            KVID3VisibilityState = WiringManager.Instance.Wiring.gameObject.activeSelf;
         }
 
         public void WiringManager_Removed()
         {
-            SetWiringButtonsinteractibility(false);
-            VisibilityState = false;
+            SetKVIDButtonsinteractibility(false);
+            KVID3VisibilityState = false;
         }
         #endregion
     }

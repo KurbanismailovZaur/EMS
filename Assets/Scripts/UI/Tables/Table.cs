@@ -23,7 +23,7 @@ namespace UI.Tables
         [SerializeField]
         protected ReferenceCell _referenceCellPrefab;
 
-        public abstract string RemoveCellName { get; }
+        public virtual string RemoveCellName => string.Empty;
 
         [Header("Events")]
         public AddedEvent Added;
@@ -34,7 +34,7 @@ namespace UI.Tables
 
         public abstract Panel AddEmpty(Action<Cell> cellClickHandler);
 
-        public abstract List<Panel> GetSafeRemovingPanels();
+        public virtual List<Panel> GetSafeRemovingPanels() => null;
 
         public abstract void Remove(Panel panel);
 

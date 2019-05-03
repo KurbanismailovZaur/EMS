@@ -56,9 +56,6 @@ namespace UI.TableViews
         private Button _removeTabButton;
 
         [SerializeField]
-        private Button _addRowButton;
-
-        [SerializeField]
         private Button _importButton;
 
         [SerializeField]
@@ -77,7 +74,6 @@ namespace UI.TableViews
             _addTabButton.onClick.AddListener(AddTabButton_OnClick);
             _removeTabButton.onClick.AddListener(RemoveTabButton_OnClick);
             _importButton.onClick.AddListener(Import_OnClick);
-            _addRowButton.onClick.AddListener(AddRowButton_OnClick);
         }
 
         protected override void LoadData()
@@ -100,16 +96,7 @@ namespace UI.TableViews
         {
             AddAssociationAndSelect(wire.Name);
 
-            foreach (var point in wire.Points)
-            {
-                var panel = AddRowToCurrentTable();
-
-                panel.X.FloatValue = point.position.x;
-                panel.Y.FloatValue = point.position.y;
-                panel.Z.FloatValue = point.position.z;
-                panel.Metallization1.NullableFloatValue = point.metallization1;
-                panel.Metallization2.NullableFloatValue = point.metallization2;
-            }
+            AddPanelByPoints(wire.Points);
         }
 
         private void Add(List<(string name, List<Wire.Point> points)> tabs)
@@ -125,9 +112,14 @@ namespace UI.TableViews
         {
             AddAssociationAndSelect(name);
 
+            AddPanelByPoints(points);
+        }
+
+        private void AddPanelByPoints(IList<Wire.Point> points)
+        {
             foreach (var point in points)
             {
-                var panel = AddRowToCurrentTable();
+                var panel = (KVID3Table.KVID3Panel)AddRowToCurrentTable();
 
                 panel.X.FloatValue = point.position.x;
                 panel.Y.FloatValue = point.position.y;
@@ -182,8 +174,6 @@ namespace UI.TableViews
             var tab = Instantiate(_tabPrefab, _tabsContainer);
             tab.Name = tab.name = name ?? GetTabNextName();
             tab.Clicked.AddListener(Tab_Clicked);
-
-            //RoutineHelper.Instance.StartCoroutine(nameof(UpdateScrollrectHorizontalRoutine), UpdateScrollrectHorizontalRoutine());
 
             return tab;
         }
@@ -272,8 +262,6 @@ namespace UI.TableViews
             Destroy(table.gameObject);
         }
 
-        private Table GetCurrentTable() => GetTable(_currentTab);
-
         protected override void SelectTab(Tab tab)
         {
             UnsubscribeObservers();
@@ -316,11 +304,6 @@ namespace UI.TableViews
             _zObserver.Column_RectTransformChanged(((RectTransform)currentTable.Zs.transform).sizeDelta);
             _metallization1Observer.Column_RectTransformChanged(((RectTransform)currentTable.Metallizations1.transform).sizeDelta);
             _metallization2Observer.Column_RectTransformChanged(((RectTransform)currentTable.Metallizations2.transform).sizeDelta);
-        }
-
-        private KVID3Table.KVID3Panel AddRowToCurrentTable()
-        {
-            return (KVID3Table.KVID3Panel)GetCurrentTable()?.AddEmpty(Cell_Clicked);
         }
 
         #region Event handlers

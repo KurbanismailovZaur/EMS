@@ -44,6 +44,9 @@ namespace Facades
         private KVID3View _kvid3View;
 
         [SerializeField]
+        private KVID6View _kvid6View;
+
+        [SerializeField]
         private ReferencesView _referencesView;
 
         [SerializeField]
@@ -103,13 +106,7 @@ namespace Facades
                     CalculationsManager.Instance.CalculateElectricFieldStrenght(_pointCalculationOptions.PointsByAxis, WiringManager.Instance.Wiring.Bounds);
                     break;
                 case PointCalculationOptions.CalculationType.Import:
-                    yield return _explorer.OpenFile("Импорт точек", null, "xls");
-
-                    var positions = new List<Vector3>(1000);
-                    for (int i = 0; i < positions.Capacity; i++)
-                        positions.Add(new Vector3(Random.Range(-20f, 20f), Random.Range(-20f, 20f), Random.Range(-20f, 20f)));
-
-                    CalculationsManager.Instance.CalculateElectricFieldStrenght(positions, 1f);
+                    _kvid6View.Open();
                     break;
                 default:
                     yield break;
@@ -246,7 +243,7 @@ namespace Facades
                     //ImportWiring();
                     break;
                 case WiringContext.Action.Visibility:
-                    WiringManager.Instance.ToggleVisibility();
+                    WiringManager.Instance.KVID3Visibility();
                     break;
                 case WiringContext.Action.Edit:
                     WiringManager.Instance.Edit();

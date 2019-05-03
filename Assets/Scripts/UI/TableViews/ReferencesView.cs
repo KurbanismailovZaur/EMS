@@ -11,9 +11,6 @@ namespace UI.TableViews
     {
         #region Fields
         [SerializeField]
-        private UnityButton _addButton;
-
-        [SerializeField]
         private UnityButton _removeButton;
 
         [SerializeField]
@@ -28,7 +25,6 @@ namespace UI.TableViews
             foreach (var association in _tabsAssociations)
                 association.tab.Clicked.AddListener(Tab_Clicked);
 
-            _addButton.onClick.AddListener(AddButton_OnClick);
             _removeButton.onClick.AddListener(RemoveButton_OnClick);
         }
 
@@ -55,11 +51,6 @@ namespace UI.TableViews
             connectorTypesTable.AddConnectorTypes(Cell_Clicked);
         }
 
-        public void Add()
-        {
-            GetTable(_currentTab).AddEmpty(Cell_Clicked);
-        }
-
         public override void Save()
         {
             var materials = ((MaterialsTable)GetTable("Materials")).MaterialPanels.Select(p => p.ToMaterial()).ToList();
@@ -78,8 +69,6 @@ namespace UI.TableViews
         }
 
         #region Event handlers
-        private void AddButton_OnClick() => Add();
-
         private void RemoveButton_OnClick() => OpenRemoveDialog();
         #endregion
         #endregion

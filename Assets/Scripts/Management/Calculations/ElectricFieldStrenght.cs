@@ -7,6 +7,7 @@ using System;
 using UnityEngine.Events;
 using UnityRandom = UnityEngine.Random;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace Management.Calculations
 {
@@ -16,6 +17,8 @@ namespace Management.Calculations
         private Point _pointPrefab;
         
         private List<Point> _points;
+
+        public ReadOnlyCollection<Point> Points => new ReadOnlyCollection<Point>(_points);
 
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
@@ -31,7 +34,9 @@ namespace Management.Calculations
             var distanceBetween = maxSize / (pointsByAxis - 1);
             var halfCount = (pointsByAxis - 1) * distanceBetween / 2f;
 
-            List<Vector3> positions = new List<Vector3>();
+            List<(string code, Vector3 position)> points = new List<(string code, Vector3 position)>();
+
+            int codeIndex = 0;
 
             for (int i = 0; i < pointsByAxis; i++)
             {
@@ -42,24 +47,25 @@ namespace Management.Calculations
                         var position = new Vector3(i * distanceBetween - halfCount, j * distanceBetween - halfCount, k * distanceBetween - halfCount);
 
                         if (position.magnitude <= sphereRadius)
-                            positions.Add(position);
+                            points.Add(($"Т{codeIndex++}", position));
                     }
                 }
             }
 
-            Calculate(positions, distanceBetween);
+            Calculate(points, distanceBetween);
         }
 
-        public void Calculate(List<Vector3> positions, float radius)
+        public void Calculate(List<(string code, Vector3 position)> points, float radius)
         {
             Remove();
 
             _points = new List<Point>();
 
-            for (int i = 0; i < positions.Count; i++)
+            for (int i = 0; i < points.Count; i++)
             {
                 var value = UnityRandom.value;
-                _points.Add(Point.Factory.Create(_pointPrefab, transform, positions[i], radius, _gradient.Evaluate(value), value));
+
+                _points.Add(Point.Factory.Create(_pointPrefab, transform, points[i], radius, _gradient.Evaluate(value), value));
             }
 
             IsCalculated = true;
