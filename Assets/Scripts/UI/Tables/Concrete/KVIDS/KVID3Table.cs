@@ -175,7 +175,7 @@ namespace UI.Tables.Concrete.KVIDS
             _metallizations2.RemoveCell(kvid3Panel.Metallization2);
         }
 
-        public Wire GetWireFromPanels()
+        public (string name, List<Wire.Point> points) GetWireDataFromPanels()
         {
             var points = new List<Wire.Point>();
 
@@ -185,7 +185,7 @@ namespace UI.Tables.Concrete.KVIDS
                 points.Add(new Wire.Point(position, panel.Metallization1.NullableFloatValue, panel.Metallization2.NullableFloatValue));
             }
 
-            return Wire.Factory.Create(name, points);
+            return (name, points);
         }
 
         #region Event handlers

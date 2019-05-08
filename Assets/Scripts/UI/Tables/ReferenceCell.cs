@@ -74,6 +74,16 @@ namespace UI.Tables
 
         public void SelectOption(string value)
         {
+            if(_dropdown.options.Count == 0 || (_dropdown.options.Count == 1 && (_dropdown.options[0].text == "-" || string.IsNullOrWhiteSpace(_dropdown.options[0].text) || string.IsNullOrEmpty(_dropdown.options[0].text) )))
+            {
+                ClearDropdownOptions();
+
+                _dropdown.AddOptions(new List<string>() { value });
+                _dropdown.value = 0;
+
+                return;
+            }
+
             for (int i = 0; i < _dropdown.options.Count; ++i)
             {
                 if (_dropdown.options[i].text == value)

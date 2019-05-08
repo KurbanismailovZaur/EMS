@@ -268,6 +268,14 @@ namespace UI.TableViews
         #region Event handlers
         private void Import_OnClick() => Import();
 
+        protected override void Tab_Clicked(Tab tab)
+        {
+            if (!tab.Selected)
+                SelectTab(tab);
+            else
+                tab.Edit();
+        }
+
         private void AddTabButton_OnClick()
         {
             AddAssociationAndSelect();

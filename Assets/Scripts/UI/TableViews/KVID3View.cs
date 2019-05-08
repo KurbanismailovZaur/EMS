@@ -21,6 +21,9 @@ namespace UI.TableViews
         [SerializeField]
         private Header _header;
 
+        [SerializeField]
+        private GameObject _headersParent;
+
         [Header("Observers")]
         [SerializeField]
         private ColumnObserver _removeObserver;
@@ -47,6 +50,9 @@ namespace UI.TableViews
 
         [SerializeField]
         private KVID3Table _tablePrefab;
+
+        [SerializeField]
+        private GameObject _headerPrefab;
 
         [Header("UI")]
         [SerializeField]
@@ -94,23 +100,33 @@ namespace UI.TableViews
 
         private void Add(Wire wire)
         {
-            AddAssociationAndSelect(wire.Name);
+            var headersGroup = AddAssociationAndSelect(wire.Name);
+
+            headersGroup.head0.Panel.WireLenght.FloatValue = wire.Lenght;
+            headersGroup.head1.Panel.WireID.SelectOption(wire.WireType);
+            headersGroup.head4.Panel.I.SelectOption(wire.ESID_I);
+            headersGroup.head4.Panel.P.SelectOption(wire.ESID_P);
 
             AddPanelByPoints(wire.Points);
         }
 
-        private void Add(List<(string name, List<Wire.Point> points)> tabs)
+        private void Add(List<(string name, float wireLenght, string wireType, string iEsID, string pEsID, List<Wire.Point> points)> tabs)
         {
             foreach (var tab in tabs)
-                Add(tab.name, tab.points);
+                Add(tab.name, tab.wireLenght, tab.wireType, tab.iEsID, tab.pEsID, tab.points);
 
             if (_tabsAssociations.Count > 0)
                 SelectTab(_tabsAssociations[0].tab);
         }
 
-        private void Add(string name, List<Wire.Point> points)
+        private void Add(string name, float wireLenght, string wireType, string iEsID, string pEsID, List<Wire.Point> points)
         {
-            AddAssociationAndSelect(name);
+            var headersGroup = AddAssociationAndSelect(name);
+
+            headersGroup.head0.Panel.WireLenght.FloatValue = wireLenght;
+            headersGroup.head1.Panel.WireID.SelectOption(wireType);
+            headersGroup.head4.Panel.I.SelectOption(iEsID);
+            headersGroup.head4.Panel.P.SelectOption(pEsID);
 
             AddPanelByPoints(points);
         }
@@ -143,7 +159,16 @@ namespace UI.TableViews
             var wires = new List<Wire>();
 
             foreach (var association in _tabsAssociations)
-                wires.Add(((KVID3Table)association.table).GetWireFromPanels());
+            {
+                var data = ((KVID3Table)association.table).GetWireDataFromPanels();
+                var lenght = association.header.GetComponentInChildren<KVID3TableHeader0>().Panel.WireLenght.FloatValue;
+                var type = association.header.GetComponentInChildren<KVID3TableHeader1>().Panel.WireID.GetSelectedOptionName();
+                var i = association.header.GetComponentInChildren<KVID3TableHeader4>().Panel.I.GetSelectedOptionName();
+                var p = association.header.GetComponentInChildren<KVID3TableHeader4>().Panel.P.GetSelectedOptionName();
+
+                wires.Add(Wire.Factory.Create(data.name, lenght, type, i, p, data.points));
+            }
+
 
             var wiring = Wiring.Factory.Create(wires);
 
@@ -225,16 +250,34 @@ namespace UI.TableViews
             return table;
         }
 
-        private void AddAssociationAndSelect(string name = null)
+        private GameObject AddHeader()
+        {
+            return Instantiate(_headerPrefab, _headersParent.transform);
+        }
+
+        private (KVID3TableHeader0 head0, KVID3TableHeader1 head1, KVID3TableHeader4 head4) AddAssociationAndSelect(string name = null)
         {
             var tab = AddTab(name);
             var table = AddTable(tab.Name);
+            var header = AddHeader();
 
-            _tabsAssociations.Add(new Association(tab.Name, tab, null, table));
+            var header0Component = header.GetComponentInChildren<KVID3TableHeader0>();
+            header0Component.InputController = _inputController;
+
+            var header1Component = header.GetComponentInChildren<KVID3TableHeader1>();
+            header1Component.InputController = _inputController;
+
+            var header4Component = header.GetComponentInChildren<KVID3TableHeader4>();
+            header4Component.InputController = _inputController;
+
+
+            _tabsAssociations.Add(new Association(tab.Name, tab, header, table));
 
             SelectTab(tab);
 
             _header.gameObject.SetActive(true);
+
+            return (header0Component, header1Component, header4Component);
         }
 
         private void RemoveCurrentAssociation()
@@ -250,6 +293,7 @@ namespace UI.TableViews
         {
             RemoveTab(association.tab);
             RemoveTable(association.table);
+            RemoveHeader(association.header);
 
             _tabsAssociations.Remove(association);
 
@@ -260,6 +304,11 @@ namespace UI.TableViews
         private void RemoveTable(Table table)
         {
             Destroy(table.gameObject);
+        }
+
+        private void RemoveHeader(GameObject header)
+        {
+            Destroy(header);
         }
 
         protected override void SelectTab(Tab tab)
