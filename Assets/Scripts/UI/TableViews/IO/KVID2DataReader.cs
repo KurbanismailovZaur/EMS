@@ -1,0 +1,112 @@
+﻿using Management.Wires;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+
+namespace UI.TableViews.IO
+{
+    public static class KVID2DataReader
+    {
+        public static List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> ReadFromFile(string pathToXLS)
+        {
+            HSSFWorkbook workbook;
+
+            using (FileStream stream = new FileStream(pathToXLS, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                workbook = new HSSFWorkbook(stream);
+            }
+
+            var result = new List<(string tabName, Vector3 center, List<(float?, float?, float?)> voltage)>();
+
+            for (int i = 0; i < workbook.NumberOfSheets; ++i)
+            {
+                ISheet sheet = workbook.GetSheetAt(i);
+
+                var sheetData = ReadSheetData(sheet);
+
+                result.Add((sheet.SheetName, sheetData.center, sheetData.voltage));
+            }
+
+            return result;
+        }
+
+        private static (Vector3 center, List<(float?, float?, float?)> voltage) ReadSheetData(ISheet sheet)
+        {
+            var voltages = new List<(float?, float?, float?)>();
+
+            IRow row = sheet.GetRow(4);
+            if (!IsCorrectPointNodeRow(row)) throw new ApplicationException("Incorrect table data");
+
+            var center = ReadPoint(row);
+
+
+            for (int j = 6; j <= sheet.LastRowNum; j++)
+            {
+                IRow vRow = sheet.GetRow(j);
+
+                if (!IsCorrectVoltageNodeRow(vRow)) break;
+
+                voltages.Add(ReadVoltage(vRow));
+            }
+
+            return (center, voltages);
+        }
+
+        private static Vector3 ReadPoint(IRow row)
+        {
+            var point = new Vector3
+            {
+                x = (float)row.GetCell(0).NumericCellValue,
+                y = (float)row.GetCell(1).NumericCellValue,
+                z = (float)row.GetCell(2).NumericCellValue
+            };
+
+            return point;
+        }
+
+        private static (float?, float?, float?) ReadVoltage(IRow row)
+        {
+
+            var x = GetNullableFloat(row.GetCell(0));
+            var y = GetNullableFloat(row.GetCell(1));
+            var z = GetNullableFloat(row.GetCell(2));
+
+
+            return (x, y, z);
+        }
+
+        private static bool IsCorrectPointNodeRow(IRow row)
+        {
+            for (int i = 0; i < 3; i++)
+                if (!IsFloat(row.GetCell(i)))
+                    return false;
+
+            return true;
+        }
+
+        private static bool IsCorrectVoltageNodeRow(IRow row)
+        {
+            for (int i = 0; i < 3; i++)
+                if (!IsNullableFloat(row.GetCell(i)))
+                    return false;
+
+            return true;
+        }
+
+        private static bool IsFloat(ICell cell) => cell.CellType == CellType.Numeric;
+
+        private static bool IsNullableFloat(ICell cell)
+        {
+            return cell.CellType == CellType.Blank || cell.CellType == CellType.Numeric;
+        }
+
+        private static float? GetNullableFloat(ICell cell)
+        {
+            return cell.CellType == CellType.Blank ? null : (float?)cell.NumericCellValue;
+        }
+    }
+}

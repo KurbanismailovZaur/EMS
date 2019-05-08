@@ -4,10 +4,12 @@ using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using Management.Calculations;
 
 namespace UI.Panels.Wire
 {
-    public class Influence : MonoBehaviour
+    public class Influence : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {
         public static class Factory
         {
@@ -42,6 +44,40 @@ namespace UI.Panels.Wire
             {
                 _value = value;
                 _valueText.text = value.ToString();
+            }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {        
+            string clickedWireName = GameObject.FindGameObjectWithTag("WirePanel_wireName").GetComponent<Text>().text;
+
+            foreach (var wire in CalculationsManager.Instance.MutualActionOfBCSAndBA.transform.GetChildren())
+            {
+                if(wire.name != Name && wire.name != clickedWireName)
+                {
+                    var renderer = wire.GetComponent<Renderer>();
+                    var baseColor = renderer.material.GetColor("_TintColor");
+                    baseColor.a = 0;
+
+                    renderer.material.SetColor("_TintColor", baseColor);
+                }
+            }
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            string clickedWireName = GameObject.FindGameObjectWithTag("WirePanel_wireName").GetComponent<Text>().text;
+
+            foreach (var wire in CalculationsManager.Instance.MutualActionOfBCSAndBA.transform.GetChildren())
+            {
+                if (wire.name != Name && wire.name != clickedWireName)
+                {
+                    var renderer = wire.GetComponent<Renderer>();
+                    var baseColor = renderer.material.GetColor("_TintColor");
+                    baseColor.a = 0.5f;
+
+                    renderer.material.SetColor("_TintColor", baseColor);
+                }
             }
         }
     }

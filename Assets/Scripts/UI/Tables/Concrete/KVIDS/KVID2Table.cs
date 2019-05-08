@@ -11,13 +11,11 @@ using Management.Wires;
 
 namespace UI.Tables.Concrete.KVIDS
 {
-    public class KVID6Table : Table
+    public class KVID2Table : Table
     {
-        public class KVID6Panel : Panel
+        public class KVID2Panel : Panel
         {
             public RemoveButton RemoveButton { get; private set; }
-
-            public Cell Code { get; private set; }
 
             public Cell X { get; private set; }
 
@@ -25,10 +23,9 @@ namespace UI.Tables.Concrete.KVIDS
 
             public Cell Z { get; private set; }
 
-            public KVID6Panel(RemoveButton removeButton, Cell code, Cell x, Cell y, Cell z)
+            public KVID2Panel(RemoveButton removeButton, Cell x, Cell y, Cell z)
             {
                 RemoveButton = removeButton;
-                Code = code;
                 X = x;
                 Y = y;
                 Z = z;
@@ -37,7 +34,6 @@ namespace UI.Tables.Concrete.KVIDS
             public override void Destroy()
             {
                 UnityObject.Destroy(RemoveButton.gameObject);
-                UnityObject.Destroy(Code.gameObject);
                 UnityObject.Destroy(X.gameObject);
                 UnityObject.Destroy(Y.gameObject);
                 UnityObject.Destroy(Z.gameObject);
@@ -47,8 +43,6 @@ namespace UI.Tables.Concrete.KVIDS
             {
                 switch (name)
                 {
-                    case "Code":
-                        return Code;
                     case "X":
                         return X;
                     case "Y":
@@ -75,9 +69,6 @@ namespace UI.Tables.Concrete.KVIDS
         private Column _removes;
 
         [SerializeField]
-        private Column _codes;
-
-        [SerializeField]
         private Column _xs;
 
         [SerializeField]
@@ -87,14 +78,12 @@ namespace UI.Tables.Concrete.KVIDS
         private Column _zs;
         #endregion
 
-        private List<KVID6Panel> _kvid6Panels = new List<KVID6Panel>();
+        private List<KVID2Panel> _kvid2Panels = new List<KVID2Panel>();
 
         private int _nextCodeIndex;
 
         #region Columns
         public Column Removes => _removes;
-
-        public Column Codes => _codes;
 
         public Column Xs => _xs;
 
@@ -103,18 +92,17 @@ namespace UI.Tables.Concrete.KVIDS
         public Column Zs => _zs;
         #endregion
 
-        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add(GetNextCode(), 0f, 0f, 0f, cellClickHandler);
+        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add(null, null, null, cellClickHandler);
 
-        private KVID6Panel Add(string code, float x, float y, float z, Action<Cell> cellClickHandler)
+        private KVID2Panel Add(float? x, float? y, float? z, Action<Cell> cellClickHandler)
         {
             var removeButton = RemoveButton.Factory.Create(_removeButtonPrefab, _removes.transform, RemoveButton_Clicked);
-            var codeCell = Cell.Factory.CreateUnique(_cellPrefab, code, _codes, cellClickHandler);
             var xCell = Cell.Factory.Create(_cellPrefab, x, _xs, cellClickHandler);
             var yCell = Cell.Factory.Create(_cellPrefab, y, _ys, cellClickHandler);
             var zCell = Cell.Factory.Create(_cellPrefab, z, _zs, cellClickHandler);
 
-            var panel = new KVID6Panel(removeButton, codeCell, xCell, yCell, zCell);
-            _kvid6Panels.Add(panel);
+            var panel = new KVID2Panel(removeButton, xCell, yCell, zCell);
+            _kvid2Panels.Add(panel);
 
             removeButton.Panel = panel;
             AddPanelToColumns(panel);
@@ -124,26 +112,19 @@ namespace UI.Tables.Concrete.KVIDS
             return panel;
         }
 
-        private string GetNextCode()
-        {
-            while (_kvid6Panels.Find(p => p.Code.StringValue == $"Т{_nextCodeIndex}") != null) _nextCodeIndex += 1;
-
-            return $"Т{_nextCodeIndex}";
-        }
-
         public override void Clear()
         {
-            foreach (var panel in _kvid6Panels)
+            foreach (var panel in _kvid2Panels)
                 panel.Destroy();
 
-            _kvid6Panels.Clear();
+            _kvid2Panels.Clear();
         }
 
         public override void Remove(Panel panel)
         {
-            if (!_kvid6Panels.Contains((KVID6Panel)panel)) return;
+            if (!_kvid2Panels.Contains((KVID2Panel)panel)) return;
 
-            _kvid6Panels.Remove((KVID6Panel)panel);
+            _kvid2Panels.Remove((KVID2Panel)panel);
             RemovePanelFromColumns(panel);
             panel.Destroy();
 
@@ -152,33 +133,32 @@ namespace UI.Tables.Concrete.KVIDS
 
         protected override void AddPanelToColumns(Panel panel)
         {
-            var kvid3Panel = (KVID6Panel)panel;
+            var kvid2Panel = (KVID2Panel)panel;
 
-            _codes.AddCell(kvid3Panel.Code);
-            _xs.AddCell(kvid3Panel.X);
-            _ys.AddCell(kvid3Panel.Y);
-            _zs.AddCell(kvid3Panel.Z);
+            _xs.AddCell(kvid2Panel.X);
+            _ys.AddCell(kvid2Panel.Y);
+            _zs.AddCell(kvid2Panel.Z);
         }
 
         protected override void RemovePanelFromColumns(Panel panel)
         {
-            var kvid3Panel = (KVID6Panel)panel;
+            var kvid2Panel = (KVID2Panel)panel;
 
-            _codes.RemoveCell(kvid3Panel.Code);
-            _xs.RemoveCell(kvid3Panel.X);
-            _ys.RemoveCell(kvid3Panel.Y);
-            _zs.RemoveCell(kvid3Panel.Z);
+            _xs.RemoveCell(kvid2Panel.X);
+            _ys.RemoveCell(kvid2Panel.Y);
+            _zs.RemoveCell(kvid2Panel.Z);
         }
 
-        public List<(string code, Vector3 position)> GetPoints()
+        public List<(float? x, float? y, float? z)> GetVoltages()
         {
-            var points = new List<(string code, Vector3 position)>();
+            var result = new List<(float? x, float? y, float? z)>();
 
-            foreach (var panel in _kvid6Panels)
-                points.Add((panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue)));
+            foreach (var panel in _kvid2Panels)
+                result.Add((panel.X.NullableFloatValue, panel.Y.NullableFloatValue, panel.Z.NullableFloatValue));
 
-            return points;
+            return result;
         }
+
 
         #region Event handlers
         private void RemoveButton_Clicked(RemoveButton removeButton, Panel panel)

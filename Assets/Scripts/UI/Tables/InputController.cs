@@ -39,6 +39,7 @@ namespace UI.Tables
             _scrollRect = cell.GetComponentInParent<ScrollRect>();
 
             _targetCell = cell;
+
             transform.SetParent(_targetCell.GetComponentInParent<ScrollRect>().content);
 
             var position = ((RectTransform)_targetCell.RectTransform.parent).anchoredPosition + _targetCell.RectTransform.anchoredPosition;

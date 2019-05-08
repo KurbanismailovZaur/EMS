@@ -108,7 +108,7 @@ namespace UI.Tables
         public int? NullableIntValue
         {
             get => string.IsNullOrWhiteSpace(_text.text) ? null : (int?)IntValue;
-            set => SetText(value.ToString());
+            set => SetText(value == null ? null : value.ToString());
         }
 
         public string StringValue

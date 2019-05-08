@@ -40,6 +40,23 @@ namespace UI.Tables
 
                 return cell;
             }
+
+            public static ReferenceCell Create(ReferenceCell referenceCellPrefab, List<string> options, string displayedCellName, Column column)
+            {
+                var cell = Instantiate(referenceCellPrefab, column.transform);
+
+
+                cell._displayedCellName = displayedCellName;
+
+                cell.UpdateDropdownOptions(options);
+                cell.SelectOption(displayedCellName);
+
+                cell.Column = column;
+
+                cell._dropdown.onValueChanged.AddListener(cell.Dropdown_OnValueChanged);
+
+                return cell;
+            }
         }
 
         [SerializeField]
@@ -55,6 +72,23 @@ namespace UI.Tables
 
         public Column Column { get; private set; }
 
+        public void SelectOption(string value)
+        {
+            for (int i = 0; i < _dropdown.options.Count; ++i)
+            {
+                if (_dropdown.options[i].text == value)
+                {
+                    _dropdown.value = i;
+                    return;
+                }
+            }
+        }
+
+        public string GetSelectedOptionName()
+        {
+            return _dropdown.options[_selectedIndex].text;
+        }
+
         private void ClearDropdownOptions() => _dropdown.ClearOptions();
 
         private void UpdateDropdownOptions()
@@ -63,11 +97,19 @@ namespace UI.Tables
             _dropdown.AddOptions(_panels.Select(p => p?.GetCell(_displayedCellName).NullableStringValue ?? "-").ToList());
         }
 
+        private void UpdateDropdownOptions(List<string> options)
+        {
+            ClearDropdownOptions();
+            _dropdown.AddOptions(options.Select(s => s ?? "-").ToList());
+        }
+
         private void SubscribeOnSelectedChanged()
         {
             if (SelectedPanel != null)
                 SelectedPanel.Changed += Panel_Changed;
         }
+
+
 
         #region Event handlers
         private void Table_Added(Panel panel)
