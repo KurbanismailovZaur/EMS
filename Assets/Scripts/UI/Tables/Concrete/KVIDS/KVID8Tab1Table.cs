@@ -137,7 +137,8 @@ namespace UI.Tables.Concrete.KVIDS
             var list = TableDataManager.Instance.KVID5Data.Select(d => d.code).ToList();
             var idCell = ReferenceCell.Factory.Create(_referenceCellPrefab, list, id, _ids);
 
-            var list1 = WiringManager.Instance.Wiring.Wires.Select(w => w.Name).ToList();
+
+            var list1 = (WiringManager.Instance.Wiring == null) ? new List<string>() : WiringManager.Instance.Wiring.Wires.Select(w => w.Name).ToList();
             var wireIdCell = ReferenceCell.Factory.Create(_referenceCellPrefab, list1, wireId, _wireIds);
 
 

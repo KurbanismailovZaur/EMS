@@ -29,7 +29,7 @@ namespace Management.Wires
         }
         #endregion
 
-        private List<Wire> _wires;
+        private List<Wire> _wires = new List<Wire>();
 
         public ReadOnlyCollection<Wire> Wires { get => _wires.AsReadOnly(); }
 

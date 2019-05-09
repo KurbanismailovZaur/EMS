@@ -9,6 +9,7 @@ using UI.TableViews.IO;
 using UI.Tables.Concrete.KVIDS;
 using Management.Calculations;
 using Management.Tables;
+using UI.Tables;
 
 namespace UI.TableViews
 {
@@ -16,6 +17,40 @@ namespace UI.TableViews
     {
         [SerializeField]
         private Button _importButton;
+
+        [Header("Observers")]
+        [SerializeField]
+        private ColumnObserver _removesObserver;
+
+        [SerializeField]
+        private ColumnObserver _codesObserver;
+
+        [SerializeField]
+        private ColumnObserver _xObserver;
+
+        [SerializeField]
+        private ColumnObserver _yObserver;
+
+        [SerializeField]
+        private ColumnObserver _zObserver;
+
+        [SerializeField]
+        private ColumnObserver _typeObserver;
+
+        [SerializeField]
+        private ColumnObserver _innerResistObserver;
+
+        [SerializeField]
+        private ColumnObserver _operatingVoltageObserver;
+
+        [SerializeField]
+        private ColumnObserver _operatingFrequencyObserver;
+
+        [SerializeField]
+        private ColumnObserver _blockBAObserver;
+
+        [SerializeField]
+        private ColumnObserver _connectorTypeObserver;
 
         [Header("Other")]
         [SerializeField]
@@ -31,6 +66,8 @@ namespace UI.TableViews
             _importButton.onClick.AddListener(Import_OnClick);
 
             SelectFirstTab();
+
+            SubsribeObservers();
         }
 
         public override void Open()
@@ -107,9 +144,38 @@ namespace UI.TableViews
                 // reference cells
                 panel.BlockBA.SelectOption(bBA);
             }
-
         }
 
+        private void SubsribeObservers()
+        {
+            var currentTable = (KVID5Table)GetTable(_currentTab);
+
+            if (!currentTable) return;
+            currentTable.Removes.RectTransformChanged.AddListener(_removesObserver.Column_RectTransformChanged);
+            currentTable.Codes.RectTransformChanged.AddListener(_codesObserver.Column_RectTransformChanged);
+            currentTable.Xs.RectTransformChanged.AddListener(_xObserver.Column_RectTransformChanged);
+            currentTable.Ys.RectTransformChanged.AddListener(_yObserver.Column_RectTransformChanged);
+            currentTable.Zs.RectTransformChanged.AddListener(_zObserver.Column_RectTransformChanged);
+            currentTable.Types.RectTransformChanged.AddListener(_typeObserver.Column_RectTransformChanged);
+            currentTable.InnerResists.RectTransformChanged.AddListener(_innerResistObserver.Column_RectTransformChanged);
+            currentTable.OperatingVoltages.RectTransformChanged.AddListener(_operatingVoltageObserver.Column_RectTransformChanged);
+            currentTable.OperatingFrequensies.RectTransformChanged.AddListener(_operatingFrequencyObserver.Column_RectTransformChanged);
+            currentTable.BlockBAs.RectTransformChanged.AddListener(_blockBAObserver.Column_RectTransformChanged);
+            currentTable.ConnectorTypes.RectTransformChanged.AddListener(_connectorTypeObserver.Column_RectTransformChanged);
+
+
+            _removesObserver.Column_RectTransformChanged(((RectTransform)currentTable.Removes.transform).sizeDelta);
+            _codesObserver.Column_RectTransformChanged(((RectTransform)currentTable.Codes.transform).sizeDelta);
+            _xObserver.Column_RectTransformChanged(((RectTransform)currentTable.Xs.transform).sizeDelta);
+            _yObserver.Column_RectTransformChanged(((RectTransform)currentTable.Ys.transform).sizeDelta);
+            _zObserver.Column_RectTransformChanged(((RectTransform)currentTable.Zs.transform).sizeDelta);
+            _typeObserver.Column_RectTransformChanged(((RectTransform)currentTable.Types.transform).sizeDelta);
+            _innerResistObserver.Column_RectTransformChanged(((RectTransform)currentTable.InnerResists.transform).sizeDelta);
+            _operatingVoltageObserver.Column_RectTransformChanged(((RectTransform)currentTable.OperatingVoltages.transform).sizeDelta);
+            _operatingFrequencyObserver.Column_RectTransformChanged(((RectTransform)currentTable.OperatingFrequensies.transform).sizeDelta);
+            _blockBAObserver.Column_RectTransformChanged(((RectTransform)currentTable.BlockBAs.transform).sizeDelta);
+            _connectorTypeObserver.Column_RectTransformChanged(((RectTransform)currentTable.ConnectorTypes.transform).sizeDelta);
+        }
         #region Event handlers
         private void Import_OnClick() => Import();
         #endregion

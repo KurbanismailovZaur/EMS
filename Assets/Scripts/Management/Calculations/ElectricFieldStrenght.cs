@@ -15,8 +15,8 @@ namespace Management.Calculations
     {
         [SerializeField]
         private Point _pointPrefab;
-        
-        private List<Point> _points;
+
+        private List<Point> _points = new List<Point>();
 
         public ReadOnlyCollection<Point> Points => new ReadOnlyCollection<Point>(_points);
 

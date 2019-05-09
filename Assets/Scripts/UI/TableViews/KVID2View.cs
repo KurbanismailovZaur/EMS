@@ -45,7 +45,6 @@ namespace UI.TableViews
         [SerializeField]
         private GameObject _headerPrefab;
 
-
         [Header("Other")]
         [SerializeField]
         private FileExplorer _explorer;
@@ -264,6 +263,9 @@ namespace UI.TableViews
             yield return null;
             _scrollrect.horizontalNormalizedPosition = 1f;
         }
+
+
+        
 
         #region Event handlers
         private void Import_OnClick() => Import();
