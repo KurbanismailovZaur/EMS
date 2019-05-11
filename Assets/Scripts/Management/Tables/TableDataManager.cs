@@ -18,9 +18,6 @@ namespace Management.Tables
 
         private List<WireMark> _wireMarks;
 
-        private List<ConnectorType> _connectorTypes;
-
-
         private List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> _kvid2Data =
             new List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)>();
 
@@ -38,8 +35,6 @@ namespace Management.Tables
 
         public ReadOnlyCollection<WireMark> WireMarks => new ReadOnlyCollection<WireMark>(_wireMarks);
 
-        public ReadOnlyCollection<ConnectorType> ConnectorTypes => new ReadOnlyCollection<ConnectorType>(_connectorTypes);
-
         public ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> KVID2Data => 
             new ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)>(_kvid2Data);
 
@@ -55,12 +50,12 @@ namespace Management.Tables
 
         public void LoadDefaultData()
         {
-            (_materials, _wireMarks, _connectorTypes) = ReferencesDataReader.ReadFromFile(Path.Combine(Application.streamingAssetsPath, _referencesDataPath));
+            (_materials, _wireMarks) = ReferencesDataReader.ReadFromFile(Path.Combine(Application.streamingAssetsPath, _referencesDataPath));
         }
 
-        public void SetData(List<Material> materials, List<WireMark> wireMarks, List<ConnectorType> connectorTypes)
+        public void SetData(List<Material> materials, List<WireMark> wireMarks)
         {
-            (_materials, _wireMarks, _connectorTypes) = (materials, wireMarks, connectorTypes);
+            (_materials, _wireMarks) = (materials, wireMarks);
         }
 
         public void SetKVID2Data(List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> data)
@@ -81,7 +76,7 @@ namespace Management.Tables
 
         public void Remove()
         {
-            (_materials, _wireMarks, _connectorTypes) = (null, null, null);
+            (_materials, _wireMarks) = (null, null);
         }
     }
 }

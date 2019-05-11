@@ -7,6 +7,8 @@ using System;
 using UnityEngine.Events;
 using UnityButton = UnityEngine.UI.Button;
 using Management.Calculations;
+using Management.Models;
+using Management.Wires;
 
 namespace UI.Main.Contexts
 {
@@ -126,10 +128,22 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void WiringManager_Imported()
         {
-            SetCalcBtnsInteractable(true);
+            if (ModelManager.Instance.Planes != null)
+                SetCalcBtnsInteractable(true);
         }
 
         public void WiringManager_Removed()
+        {
+            SetCalcBtnsInteractable(false);
+        }
+
+        public void ModelManager_PlanesImported()
+        {
+            if (WiringManager.Instance.Wiring != null)
+                SetCalcBtnsInteractable(true);
+        }
+
+        public void ModelManager_PlanesRemoved()
         {
             SetCalcBtnsInteractable(false);
         }

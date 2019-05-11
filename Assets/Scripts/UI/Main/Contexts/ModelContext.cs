@@ -15,10 +15,12 @@ namespace UI.Main.Contexts
         #region Enums
         public enum Action
         {
-            Import,
+            ImportView,
+            ImportPlanes,
             Visibility,
             Fade,
-            Remove
+            RemoveView,
+            RemovePlanes
         }
         #endregion
 
@@ -28,7 +30,10 @@ namespace UI.Main.Contexts
         #endregion
 
         [SerializeField]
-        private UnityButton _importButton;
+        private UnityButton _importViewButton;
+
+        [SerializeField]
+        private UnityButton _importPlanesButton;
 
         [SerializeField]
         private UnityButton _visibilityButton;
@@ -43,76 +48,77 @@ namespace UI.Main.Contexts
         private Toggle _fadeToggle;
 
         [SerializeField]
-        private UnityButton _removeButton;
+        private UnityButton _removeViewButton;
+
+        [SerializeField]
+        private UnityButton _removePlanesButton;
 
         public SelectedEvent Selected;
 
-        public bool ImportInteractable
-        {
-            get => _importButton.interactable;
-            set => _importButton.interactable = value;
-        }
+        public void ImportView() => Selected.Invoke(Action.ImportView);
 
-        public bool VisibilityState
-        {
-            get => _visibilityToggle.State;
-            set => _visibilityToggle.State = value;
-        }
-
-        public bool FadeState
-        {
-            get => _fadeToggle.State;
-            set => _fadeToggle.State = value;
-        }
-
-        public void Import() => Selected.Invoke(Action.Import);
+        public void ImportPlanes() => Selected.Invoke(Action.ImportPlanes);
 
         public void Visibility() => Selected.Invoke(Action.Visibility);
 
         public void Fade() => Selected.Invoke(Action.Fade);
 
-        public void Remove() => Selected.Invoke(Action.Remove);
+        public void RemoveView() => Selected.Invoke(Action.RemoveView);
 
-        public void SetModelButtonsInteractibility(bool state)
+        public void RemovePlanes() => Selected.Invoke(Action.RemovePlanes);
+
+        public void SetViewModelButtonsInteractibility(bool state)
         {
             _visibilityButton.interactable = state;
             _fadeButton.interactable = state;
-            _removeButton.interactable = state;
+            _removeViewButton.interactable = state;
         }
 
         #region Event handles
         public void ProjectManager_Created()
         {
-            ImportInteractable = true;
+            _importViewButton.interactable = true;
+            _importPlanesButton.interactable = true;
         }
 
         public void ProjectManager_Closed()
         {
-            ImportInteractable = false;
+            _importViewButton.interactable = false;
+            _importPlanesButton.interactable = false;
         }
 
-        public void ModelManager_Imported()
+        public void ModelManager_ModelImported()
         {
-            SetModelButtonsInteractibility(true);
-            VisibilityState = true;
-            FadeState = false;
+            SetViewModelButtonsInteractibility(true);
+            _visibilityToggle.State = true;
+            _fadeToggle.State = false;
         }
 
         public void ModelManager_VisibilityChanged()
         {
-            VisibilityState = ModelManager.Instance.Model.gameObject.activeSelf;
+            _visibilityToggle.State = ModelManager.Instance.Model.gameObject.activeSelf;
         }
 
         public void ModelManager_FadeChanged()
         {
-            FadeState = ModelManager.Instance.Model.IsFaded;
+            _fadeToggle.State = ModelManager.Instance.Model.IsFaded;
         }
 
-        public void ModelManager_Removed()
+        public void ModelManager_ModelRemoved()
         {
-            SetModelButtonsInteractibility(false);
-            VisibilityState = false;
-            FadeState = false;
+            SetViewModelButtonsInteractibility(false);
+            _visibilityToggle.State = false;
+            _fadeToggle.State = false;
+        }
+
+        public void ModelManager_PlanesImported()
+        {
+            _removePlanesButton.interactable = true;
+        }
+
+        public void ModelManager_PlanesRemoved()
+        {
+            _removePlanesButton.interactable = false;
         }
         #endregion
     }

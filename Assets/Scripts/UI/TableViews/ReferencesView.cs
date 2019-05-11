@@ -39,25 +39,20 @@ namespace UI.TableViews
         {
             var materialsTable = ((MaterialsTable)GetTable("Materials"));
             var wireMarksTable = ((WireMarksTable)GetTable("WireMarks"));
-            var connectorTypesTable = ((ConnectorTypesTable)GetTable("ConnectorTypes"));
 
             materialsTable.Clear();
             materialsTable.AddMaterials(Cell_Clicked);
 
             wireMarksTable.Clear();
             wireMarksTable.AddWireMarks(Cell_Clicked);
-
-            connectorTypesTable.Clear();
-            connectorTypesTable.AddConnectorTypes(Cell_Clicked);
         }
 
         public override void Save()
         {
             var materials = ((MaterialsTable)GetTable("Materials")).MaterialPanels.Select(p => p.ToMaterial()).ToList();
             var wireMarks = ((WireMarksTable)GetTable("WireMarks")).WireMarkPanels.Select(p => p.ToWireMark(materials)).ToList();
-            var connectorTypes = ((ConnectorTypesTable)GetTable("ConnectorTypes")).ConnectorTypePanels.Select(p => p.ToConnectorType()).ToList();
 
-            TableDataManager.Instance.SetData(materials, wireMarks, connectorTypes);
+            TableDataManager.Instance.SetData(materials, wireMarks);
             
             Close();
         }

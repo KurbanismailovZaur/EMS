@@ -13,7 +13,7 @@ namespace Management.Tables.IO
 {
     public static class ReferencesDataReader
     {
-        public static (List<Material> materials, List<WireMark> wireMarks, List<ConnectorType> connectorTypes) ReadFromFile(string pathToXLS)
+        public static (List<Material> materials, List<WireMark> wireMarks) ReadFromFile(string pathToXLS)
         {
             HSSFWorkbook workbook;
 
@@ -24,9 +24,8 @@ namespace Management.Tables.IO
 
             List<Material> materials = ReadMaterials(workbook.GetSheetAt(0));
             List<WireMark> wireMarks = ReadWireMarks(workbook.GetSheetAt(1), materials);
-            List<ConnectorType> connectorTypes = ReadConnectorTypes(workbook.GetSheetAt(2));
 
-            return (materials, wireMarks, connectorTypes);
+            return (materials, wireMarks);
         }
 
         private static List<Material> ReadMaterials(ISheet sheet)
@@ -113,34 +112,7 @@ namespace Management.Tables.IO
                 && IsMaterialCode(row, 4, materials) && IsFloatCells(row, 5, 6) && IsNotEmptyStringCell(row, 7) && IsMaterialCodeOrNull(row, 8, materials)
                 && IsNullableFloatCells(row, 9, 10) && IsStringCell(row, 11) && IsFloatCell(row, 12);
         }
-
-        private static List<ConnectorType> ReadConnectorTypes(ISheet sheet)
-        {
-            var connectorTypes = new List<ConnectorType>();
-
-            for (int i = 1; i <= sheet.LastRowNum; i++)
-            {
-                IRow row = sheet.GetRow(i);
-
-                if (!IsCorrectConnectorType(row)) break;
-
-                connectorTypes.Add(ReadConnectorType(row));
-            }
-
-            return connectorTypes;
-        }
-
-        private static ConnectorType ReadConnectorType(IRow row)
-        {
-            return new ConnectorType
-            {
-                Code = GetString(row, 0),
-                Type = GetString(row, 1)
-            };
-        }
-
-        private static bool IsCorrectConnectorType(IRow row) => IsNotEmptyStringCell(row, 0) && IsNotEmptyStringCell(row, 1);
-
+        
         #region Cell type checkers
         private static bool IsIntCell(IRow row, int cellIndex)
         {
