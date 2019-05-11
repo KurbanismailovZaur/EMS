@@ -45,6 +45,16 @@ namespace UI.TableViews
         [SerializeField]
         private GameObject _headerPrefab;
 
+        [Header("Observers")]
+        [SerializeField]
+        private ColumnObserver _removeObserver;
+
+        [SerializeField]
+        private ColumnObserver _xObserver;
+
+        [SerializeField]
+        private ColumnObserver _yObserver;
+
         [Header("Other")]
         [SerializeField]
         private FileExplorer _explorer;
@@ -82,13 +92,12 @@ namespace UI.TableViews
                 header.Panel.Y.FloatValue = center.y;
                 header.Panel.Z.FloatValue = center.z;
 
-                foreach (var (x, y, z) in voltages)
+                foreach (var (x, y) in voltages)
                 {
                     var panel = (KVID2Table.KVID2Panel)AddRowToCurrentTable();
 
                     panel.X.NullableFloatValue = x;
                     panel.Y.NullableFloatValue = y;
-                    panel.Z.NullableFloatValue = z;
                 }
             }
 
@@ -111,7 +120,7 @@ namespace UI.TableViews
 
         public override void Save()
         {
-            var result = new List<(string tabName, Vector3 center, List<(float?, float?, float?)> voltage)>();
+            var result = new List<(string tabName, Vector3 center, List<(float?, float?)> voltage)>();
 
             for (int i = 0; i < _tabsAssociations.Count; ++i)
             {
@@ -150,13 +159,12 @@ namespace UI.TableViews
                 header.Panel.Y.FloatValue = center.y;
                 header.Panel.Z.FloatValue = center.z;
 
-                foreach (var (x,y,z) in voltages)
+                foreach (var (x,y) in voltages)
                 {
                     var panel = (KVID2Table.KVID2Panel)AddRowToCurrentTable();
 
                     panel.X.NullableFloatValue = x;
                     panel.Y.NullableFloatValue = y;
-                    panel.Z.NullableFloatValue = z;
                 }
             }
 
@@ -210,10 +218,10 @@ namespace UI.TableViews
         {
             var tabNames = _tabsAssociations.Select(a => a.tab.Name).ToList();
 
-            while (tabNames.Find(n => n == $"П{_tabNextIndex}") != null)
+            while (tabNames.Find(n => (n == $"ВА{_tabNextIndex}") || (n == $"BA{_tabNextIndex}") ) != null) // rus,eng
                 _tabNextIndex += 1;
 
-            return $"П{_tabNextIndex++}";
+            return $"ВА{_tabNextIndex++}";
         }
 
         private void RemoveCurrentAssociation()
@@ -265,7 +273,40 @@ namespace UI.TableViews
         }
 
 
-        
+        protected override void SelectTab(Tab tab)
+        {
+            UnsubscribeObservers();
+
+            base.SelectTab(tab);
+
+            SubsribeObservers();
+        }
+
+        private void UnsubscribeObservers()
+        {
+            var currentTable = (KVID2Table)GetTable(_currentTab);
+
+            if (!currentTable) return;
+
+            currentTable.Removes.RectTransformChanged.RemoveListener(_removeObserver.Column_RectTransformChanged);
+            currentTable.Xs.RectTransformChanged.RemoveListener(_xObserver.Column_RectTransformChanged);
+            currentTable.Ys.RectTransformChanged.RemoveListener(_yObserver.Column_RectTransformChanged);
+        }
+
+        private void SubsribeObservers()
+        {
+            var currentTable = (KVID2Table)GetTable(_currentTab);
+
+            if (!currentTable) return;
+
+            currentTable.Removes.RectTransformChanged.AddListener(_removeObserver.Column_RectTransformChanged);
+            currentTable.Xs.RectTransformChanged.AddListener(_xObserver.Column_RectTransformChanged);
+            currentTable.Ys.RectTransformChanged.AddListener(_yObserver.Column_RectTransformChanged);
+
+            _removeObserver.Column_RectTransformChanged(((RectTransform)currentTable.Removes.transform).sizeDelta);
+            _xObserver.Column_RectTransformChanged(((RectTransform)currentTable.Xs.transform).sizeDelta);
+            _yObserver.Column_RectTransformChanged(((RectTransform)currentTable.Ys.transform).sizeDelta);
+        }
 
         #region Event handlers
         private void Import_OnClick() => Import();

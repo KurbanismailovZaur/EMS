@@ -11,7 +11,7 @@ namespace UI.TableViews.IO
 {
     public static class KVID2DataReader
     {
-        public static List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> ReadFromFile(string pathToXLS)
+        public static List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> ReadFromFile(string pathToXLS)
         {
             HSSFWorkbook workbook;
 
@@ -20,7 +20,7 @@ namespace UI.TableViews.IO
                 workbook = new HSSFWorkbook(stream);
             }
 
-            var result = new List<(string tabName, Vector3 center, List<(float?, float?, float?)> voltage)>();
+            var result = new List<(string tabName, Vector3 center, List<(float?, float?)> voltage)>();
 
             for (int i = 0; i < workbook.NumberOfSheets; ++i)
             {
@@ -34,9 +34,9 @@ namespace UI.TableViews.IO
             return result;
         }
 
-        private static (Vector3 center, List<(float?, float?, float?)> voltage) ReadSheetData(ISheet sheet)
+        private static (Vector3 center, List<(float?, float?)> voltage) ReadSheetData(ISheet sheet)
         {
-            var voltages = new List<(float?, float?, float?)>();
+            var voltages = new List<(float?, float?)>();
 
             IRow row = sheet.GetRow(4);
             if (!IsCorrectPointNodeRow(row)) throw new ApplicationException("Incorrect table data");
@@ -68,15 +68,14 @@ namespace UI.TableViews.IO
             return point;
         }
 
-        private static (float?, float?, float?) ReadVoltage(IRow row)
+        private static (float?, float?) ReadVoltage(IRow row)
         {
 
             var x = GetNullableFloat(row.GetCell(0));
             var y = GetNullableFloat(row.GetCell(1));
-            var z = GetNullableFloat(row.GetCell(2));
 
 
-            return (x, y, z);
+            return (x, y);
         }
 
         private static bool IsCorrectPointNodeRow(IRow row)
@@ -90,7 +89,7 @@ namespace UI.TableViews.IO
 
         private static bool IsCorrectVoltageNodeRow(IRow row)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
                 if (!IsNullableFloat(row.GetCell(i)))
                     return false;
 

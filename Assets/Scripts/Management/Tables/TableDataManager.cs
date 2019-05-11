@@ -21,8 +21,8 @@ namespace Management.Tables
         private List<ConnectorType> _connectorTypes;
 
 
-        private List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> _kvid2Data =
-            new List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)>();
+        private List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> _kvid2Data =
+            new List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)>();
 
         private List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> _kvid5Data =
             new List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)>();
@@ -40,8 +40,8 @@ namespace Management.Tables
 
         public ReadOnlyCollection<ConnectorType> ConnectorTypes => new ReadOnlyCollection<ConnectorType>(_connectorTypes);
 
-        public ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> KVID2Data => 
-            new ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)>(_kvid2Data);
+        public ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> KVID2Data => 
+            new ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)>(_kvid2Data);
 
         public ReadOnlyCollection<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> KVID5Data => 
             new ReadOnlyCollection<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)>(_kvid5Data);
@@ -63,7 +63,7 @@ namespace Management.Tables
             (_materials, _wireMarks, _connectorTypes) = (materials, wireMarks, connectorTypes);
         }
 
-        public void SetKVID2Data(List<(string tabName, Vector3 center, List<(float? x, float? y, float? z)> voltage)> data)
+        public void SetKVID2Data(List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> data)
         {
             _kvid2Data = data;
         }
