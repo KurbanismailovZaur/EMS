@@ -19,9 +19,6 @@ namespace UI.TableViews
     {
         #region Observers
         [SerializeField]
-        private Header _header;
-
-        [SerializeField]
         private GameObject _headersParent;
 
         [Header("Observers")]
@@ -275,7 +272,7 @@ namespace UI.TableViews
 
             SelectTab(tab);
 
-            _header.gameObject.SetActive(true);
+            _headersParent.SetActive(true);
 
             return (header0Component, header1Component, header4Component);
         }
@@ -298,7 +295,7 @@ namespace UI.TableViews
             _tabsAssociations.Remove(association);
 
             if (_tabsAssociations.Count == 0)
-                _header.gameObject.SetActive(false);
+                _headersParent.SetActive(false);
         }
 
         private void RemoveTable(Table table)
