@@ -180,7 +180,7 @@ namespace UI.Tables.Concrete.KVIDS
         public Column ConnectorTypes => _connectorTypes;
         #endregion
 
-        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add(GetNextCode(), 0f, 0f, 0f, "-", null, null, null, "-", "-", cellClickHandler);
+        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add(GetNextCode(), 0f, 0f, 0f, "И", null, null, null, "", "", cellClickHandler);
 
         private KVID5Panel Add(string code, float x, float y, float z, string type, int? iR, int? oV, int? oF, string blockBA, string connectorType, Action<Cell> cellClickHandler)
         {
@@ -216,9 +216,9 @@ namespace UI.Tables.Concrete.KVIDS
 
         private string GetNextCode()
         {
-            while (_kvid5Panels.Find(p => p.Code.StringValue == $"Т{_nextCodeIndex}") != null) _nextCodeIndex += 1;
+            while (_kvid5Panels.Find(p => p.Code.StringValue == $"Пт{_nextCodeIndex}") != null) _nextCodeIndex += 1;
 
-            return $"Т{_nextCodeIndex}";
+            return $"Пт{_nextCodeIndex}";
         }
 
         public override void Clear()
