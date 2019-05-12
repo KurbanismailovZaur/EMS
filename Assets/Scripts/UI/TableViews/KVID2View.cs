@@ -24,6 +24,9 @@ namespace UI.TableViews
 
         [Header("UI")]
         [SerializeField]
+        private Image _contentscrollrectImage;
+
+        [SerializeField]
         private Button _addTabButton;
 
         [SerializeField]
@@ -77,6 +80,7 @@ namespace UI.TableViews
 
         public override void Open()
         {
+            _contentscrollrectImage.color = Color.white;
             base.Open();
         }
 
@@ -102,6 +106,8 @@ namespace UI.TableViews
             }
 
             SelectFirstTab();
+
+            _contentscrollrectImage.color = _defaultColor;
         }
 
         protected override void Clear()
@@ -172,6 +178,8 @@ namespace UI.TableViews
             {
                 Tab_Clicked(_tabsAssociations[0].tab);
             }
+
+            _contentscrollrectImage.color = _defaultColor;
         }
 
 

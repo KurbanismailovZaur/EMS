@@ -18,6 +18,9 @@ namespace UI.TableViews
         [SerializeField]
         private Button _importButton;
 
+        [SerializeField]
+        private Image _contentscrollrectImage;
+
         [Header("Observers")]
         [SerializeField]
         private ColumnObserver _removesObserverTab0;
@@ -75,6 +78,7 @@ namespace UI.TableViews
         public override void Open()
         {
             base.Open();
+            _contentscrollrectImage.color = Color.white;
         }
 
         protected override void LoadData()
@@ -110,6 +114,7 @@ namespace UI.TableViews
             }
 
             SelectFirstTab();
+            _contentscrollrectImage.color = _defaultColor;
         }
 
         protected override void Clear()
@@ -167,6 +172,7 @@ namespace UI.TableViews
                 panel.FrequencyMax.IntValue = fMax;
             }
 
+            _contentscrollrectImage.color = _defaultColor;
         }
 
 

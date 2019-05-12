@@ -1800,11 +1800,11 @@ RectTransform:
   m_Father: {fileID: 7285430008824663156}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -184.16}
-  m_SizeDelta: {x: 0, y: 242.84}
-  m_Pivot: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -92.08}
+  m_SizeDelta: {x: 0, y: -184.16}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1882165484030459669
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1826,7 +1826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.89411765, g: 0.89411765, b: 0.89411765, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -5508,7 +5508,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7285430009462079505}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5559,6 +5559,7 @@ MonoBehaviour:
   _selectedColor: {r: 1, g: 1, b: 1, a: 1}
   _defaultColor: {r: 0.89411765, g: 0.89411765, b: 0.89411765, a: 1}
   _header: {fileID: 6546312451304675115}
+  _contentscrollrectImage: {fileID: 1882165484030459668}
   _addTabButton: {fileID: 369627427881924273}
   _removeTabButton: {fileID: 369627426336401351}
   _scrollrect: {fileID: 369627426414464100}
