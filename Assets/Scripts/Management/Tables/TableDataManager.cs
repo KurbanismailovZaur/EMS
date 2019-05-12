@@ -14,13 +14,10 @@ namespace Management.Tables
         [SerializeField]
         private string _referencesDataPath;
 
+        #region Data
         private List<Material> _materials;
 
         private List<WireMark> _wireMarks;
-
-
-        private List<ConnectorType> _connectorTypes;
-
 
         private List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> _kvid2Data =
             new List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)>();
@@ -39,8 +36,6 @@ namespace Management.Tables
 
         public ReadOnlyCollection<WireMark> WireMarks => new ReadOnlyCollection<WireMark>(_wireMarks);
 
-        public ReadOnlyCollection<ConnectorType> ConnectorTypes => new ReadOnlyCollection<ConnectorType>(_connectorTypes);
-
         public ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> KVID2Data => 
             new ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)>(_kvid2Data);
 
@@ -52,7 +47,7 @@ namespace Management.Tables
 
         public ReadOnlyCollection<(string idES, string wireID, float maxVoltage, int fMin, int fMax)> KVID8Tab1Data =>
            new ReadOnlyCollection<(string idES, string wireID, float maxVoltage, int fMin, int fMax)>(_kvid8Tab1Data);
-
+        #endregion
 
         public void LoadDefaultData()
         {
@@ -67,6 +62,7 @@ namespace Management.Tables
         public void SetKVID2Data(List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> data)
         {
             _kvid2Data = data;
+            DatabaseManager.Instance.UpdateKVID2(_kvid2Data);
         }
 
         public void SetKVID5Data(List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> data)

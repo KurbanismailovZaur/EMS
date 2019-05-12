@@ -128,7 +128,7 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void WiringManager_Imported()
         {
-            if (ModelManager.Instance.Planes != null)
+            if (ModelManager.Instance.MaterialPlanesPairs != null)
                 SetCalcBtnsInteractable(true);
         }
 

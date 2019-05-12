@@ -19,6 +19,7 @@ using UI;
 using UI.Panels.Wire;
 using Management.Tables;
 using UI.TableViews;
+using Management;
 
 namespace Facades
 {
@@ -206,6 +207,8 @@ namespace Facades
             _axes.AxesVisibility = _axes.GridVisibility = true;
 
             _cameraController.IsActive = true;
+
+            DatabaseManager.Instance.ClearAllTalbes();
         }
 
         public void ProjectManager_Closed()
@@ -248,6 +251,16 @@ namespace Facades
                     ModelManager.Instance.RemovePlanes();
                     break;
             }
+        }
+
+        public void ModelManager_PlanesImported()
+        {
+            DatabaseManager.Instance.UpdatePlanes(ModelManager.Instance.MaterialPlanesPairs);
+        }
+
+        public void ModelManager_PlanesRemoved()
+        {
+            DatabaseManager.Instance.RemovePlanes();
         }
         #endregion
 

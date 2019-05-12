@@ -9,25 +9,30 @@ using Dummiesman;
 using UI.Exploring.FileSystem;
 using System;
 using UI;
+using SimpleSQL;
+using UnityEngine.UI;
 
 public class Test : MonoBehaviour
 {
-    private IEnumerator Start()
+    [SerializeField]
+    private SimpleSQLManager _dbManager;
+
+    [SerializeField]
+    private Text _text;
+
+    private void Start()
     {
-        var line = VectorLine.SetLine3D(Color.yellow, Vector3.zero, Vector3.one);
-        line.lineWidth = 2f;
-        var mesh = line.rectTransform.GetComponent<MeshFilter>().sharedMesh;
-        var collider = line.rectTransform.gameObject.AddComponent<MeshCollider>();
-        
-        while (true)
-        {
-            yield return null;
-            collider.sharedMesh = mesh;
-        }
+        var figures = _dbManager.Query<ModelFigure>("SELECT * FROM ModelFigure");
+        _text.text = figures.Count.ToString();
     }
 
-    public void OnClick()
+
+    class ModelFigure
     {
-        Log("Clicked");
+        public float x { get; set; }
+        public float y { get; set; }
+        public float z { get; set; }
+        public float r { get; set; }
+        public float material_id { get; set; }
     }
 }

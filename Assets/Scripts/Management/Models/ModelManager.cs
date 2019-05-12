@@ -29,7 +29,7 @@ namespace Management.Models
         [Range(0f, 100f)]
         private float _allowedMaxSize;
 
-        private List<(int materialID, List<Plane>)> _materialsPlanes;
+        private List<(int materialID, List<Plane>)> _materialsPlanesPairs;
 
         public UnityEvent ModelImported;
 
@@ -45,7 +45,7 @@ namespace Management.Models
 
         public Model Model { get; private set; }
 
-        public ReadOnlyCollection<(int materialID, List<Plane>)> Planes => _materialsPlanes == null ? null : new ReadOnlyCollection<(int materialID, List<Plane>)>(_materialsPlanes);
+        public ReadOnlyCollection<(int materialID, List<Plane> planes)> MaterialPlanesPairs => _materialsPlanesPairs == null ? null : new ReadOnlyCollection<(int materialID, List<Plane>)>(_materialsPlanesPairs);
 
         public void ImportModel(string path)
         {
@@ -115,11 +115,11 @@ namespace Management.Models
         {
             var info = GetVerticesInfoFromOBJ(path);
 
-            _materialsPlanes = new List<(int materialID, List<Plane>)>(info.Count);
+            _materialsPlanesPairs = new List<(int materialID, List<Plane>)>(info.Count);
 
             int index = 0;
             foreach (var pair in info)
-                _materialsPlanes.Add((index++, pair.Value));
+                _materialsPlanesPairs.Add((index++, pair.Value));
 
             PlanesImported.Invoke();
         }
@@ -250,7 +250,7 @@ namespace Management.Models
 
         public void RemovePlanes()
         {
-            _materialsPlanes = null;
+            _materialsPlanesPairs = null;
 
             PlanesRemoved.Invoke();
         }
