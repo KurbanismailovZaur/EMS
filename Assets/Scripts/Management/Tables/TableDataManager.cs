@@ -18,6 +18,7 @@ namespace Management.Tables
 
         private List<WireMark> _wireMarks;
 
+
         private List<ConnectorType> _connectorTypes;
 
 
@@ -55,12 +56,12 @@ namespace Management.Tables
 
         public void LoadDefaultData()
         {
-            (_materials, _wireMarks, _connectorTypes) = ReferencesDataReader.ReadFromFile(Path.Combine(Application.streamingAssetsPath, _referencesDataPath));
+            (_materials, _wireMarks) = ReferencesDataReader.ReadFromFile(Path.Combine(Application.streamingAssetsPath, _referencesDataPath));
         }
 
-        public void SetData(List<Material> materials, List<WireMark> wireMarks, List<ConnectorType> connectorTypes)
+        public void SetData(List<Material> materials, List<WireMark> wireMarks)
         {
-            (_materials, _wireMarks, _connectorTypes) = (materials, wireMarks, connectorTypes);
+            (_materials, _wireMarks) = (materials, wireMarks);
         }
 
         public void SetKVID2Data(List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> data)
@@ -81,7 +82,7 @@ namespace Management.Tables
 
         public void Remove()
         {
-            (_materials, _wireMarks, _connectorTypes) = (null, null, null);
+            (_materials, _wireMarks) = (null, null);
         }
     }
 }

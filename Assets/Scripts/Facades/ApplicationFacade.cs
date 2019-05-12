@@ -94,7 +94,18 @@ namespace Facades
 
             if (_explorer.LastResult == null) yield break;
 
-            ModelManager.Instance.Import(_explorer.LastResult);
+            ModelManager.Instance.ImportModel(_explorer.LastResult);
+        }
+
+        private void ImportPlanes() => StartCoroutine(ImportPlanesRoutine());
+
+        private IEnumerator ImportPlanesRoutine()
+        {
+            yield return _explorer.OpenFile("Импорт Плоскостей", null, "obj");
+
+            if (_explorer.LastResult == null) yield break;
+
+            ModelManager.Instance.ImportPlanes(_explorer.LastResult);
         }
         #endregion
 
@@ -205,7 +216,7 @@ namespace Facades
 
             _cameraController.IsActive = false;
 
-            ModelManager.Instance.Remove();
+            ModelManager.Instance.RemoveModel();
             WiringManager.Instance.Remove();
             CalculationsManager.Instance.RemoveElectricFieldStrenght();
             CalculationsManager.Instance.RemoveMutualActionOfBCSAndBA();
@@ -218,8 +229,11 @@ namespace Facades
         {
             switch (action)
             {
-                case ModelContext.Action.Import:
+                case ModelContext.Action.ImportView:
                     ImportModel();
+                    break;
+                case ModelContext.Action.ImportPlanes:
+                    ImportPlanes();
                     break;
                 case ModelContext.Action.Visibility:
                     ModelManager.Instance.ToggleVisibility();
@@ -227,8 +241,11 @@ namespace Facades
                 case ModelContext.Action.Fade:
                     ModelManager.Instance.ToggleFade();
                     break;
-                case ModelContext.Action.Remove:
-                    ModelManager.Instance.Remove();
+                case ModelContext.Action.RemoveView:
+                    ModelManager.Instance.RemoveModel();
+                    break;
+                case ModelContext.Action.RemovePlanes:
+                    ModelManager.Instance.RemovePlanes();
                     break;
             }
         }
