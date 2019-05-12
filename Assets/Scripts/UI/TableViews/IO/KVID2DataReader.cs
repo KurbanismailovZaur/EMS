@@ -11,7 +11,7 @@ namespace UI.TableViews.IO
 {
     public static class KVID2DataReader
     {
-        public static List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> ReadFromFile(string pathToXLS)
+        public static List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> ReadFromFile(string pathToXLS)
         {
             HSSFWorkbook workbook;
 
@@ -20,7 +20,7 @@ namespace UI.TableViews.IO
                 workbook = new HSSFWorkbook(stream);
             }
 
-            var result = new List<(string tabName, Vector3 center, List<(float?, float?)> voltage)>();
+            var result = new List<(string tabName, string productName, Vector3 center, List<(float?, float?)> voltage)>();
 
             for (int i = 0; i < workbook.NumberOfSheets; ++i)
             {
@@ -28,20 +28,25 @@ namespace UI.TableViews.IO
 
                 var sheetData = ReadSheetData(sheet);
 
-                result.Add((sheet.SheetName, sheetData.center, sheetData.voltage));
+                result.Add((sheet.SheetName, sheetData.productName, sheetData.center, sheetData.voltage));
             }
 
             return result;
         }
 
-        private static (Vector3 center, List<(float?, float?)> voltage) ReadSheetData(ISheet sheet)
+        private static (Vector3 center, string productName, List<(float?, float?)> voltage) ReadSheetData(ISheet sheet)
         {
             var voltages = new List<(float?, float?)>();
 
-            IRow row = sheet.GetRow(4);
-            if (!IsCorrectPointNodeRow(row)) throw new ApplicationException("Incorrect table data");
+            IRow pNameRow = sheet.GetRow(0);
+            if (pNameRow.GetCell(1).CellType != CellType.String) throw new ApplicationException("Incorrect table data");
+            var pName = pNameRow.GetCell(1).StringCellValue;
 
-            var center = ReadPoint(row);
+            IRow pointRow = sheet.GetRow(4);
+            if (!IsCorrectPointNodeRow(pointRow)) throw new ApplicationException("Incorrect table data");
+
+
+            var center = ReadPoint(pointRow);
 
 
             for (int j = 6; j <= sheet.LastRowNum; j++)
@@ -53,7 +58,7 @@ namespace UI.TableViews.IO
                 voltages.Add(ReadVoltage(vRow));
             }
 
-            return (center, voltages);
+            return (center, pName, voltages);
         }
 
         private static Vector3 ReadPoint(IRow row)

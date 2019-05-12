@@ -19,8 +19,8 @@ namespace Management.Tables
 
         private List<WireMark> _wireMarks;
 
-        private List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> _kvid2Data =
-            new List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)>();
+        private List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> _kvid2Data =
+            new List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)>();
 
         private List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> _kvid5Data =
             new List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)>();
@@ -36,8 +36,8 @@ namespace Management.Tables
 
         public ReadOnlyCollection<WireMark> WireMarks => new ReadOnlyCollection<WireMark>(_wireMarks);
 
-        public ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> KVID2Data => 
-            new ReadOnlyCollection<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)>(_kvid2Data);
+        public ReadOnlyCollection<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> KVID2Data => 
+            new ReadOnlyCollection<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)>(_kvid2Data);
 
         public ReadOnlyCollection<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> KVID5Data => 
             new ReadOnlyCollection<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)>(_kvid5Data);
@@ -59,10 +59,10 @@ namespace Management.Tables
             (_materials, _wireMarks) = (materials, wireMarks);
         }
 
-        public void SetKVID2Data(List<(string tabName, Vector3 center, List<(float? x, float? y)> voltage)> data)
+        public void SetKVID2Data(List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> data)
         {
             _kvid2Data = data;
-            DatabaseManager.Instance.UpdateKVID2(_kvid2Data);
+            //DatabaseManager.Instance.UpdateKVID2(_kvid2Data);
         }
 
         public void SetKVID5Data(List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> data)

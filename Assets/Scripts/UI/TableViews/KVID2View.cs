@@ -88,13 +88,15 @@ namespace UI.TableViews
         {
             if (TableDataManager.Instance.KVID2Data.Count == 0) return;
 
-            foreach (var (tab, center, voltages) in TableDataManager.Instance.KVID2Data)
+            foreach (var (tab, productName, center, voltages) in TableDataManager.Instance.KVID2Data)
             {
-                var header = AddAssociationAndSelect(tab);
+                var headerGroup = AddAssociationAndSelect(tab);
 
-                header.Panel.X.FloatValue = center.x;
-                header.Panel.Y.FloatValue = center.y;
-                header.Panel.Z.FloatValue = center.z;
+                headerGroup.header.Panel.X.FloatValue = center.x;
+                headerGroup.header.Panel.Y.FloatValue = center.y;
+                headerGroup.header.Panel.Z.FloatValue = center.z;
+
+                headerGroup.header0.Panel.ProductName.StringValue = productName;
 
                 foreach (var (x, y) in voltages)
                 {
@@ -126,15 +128,16 @@ namespace UI.TableViews
 
         public override void Save()
         {
-            var result = new List<(string tabName, Vector3 center, List<(float?, float?)> voltage)>();
+            var result = new List<(string tabName, string productName, Vector3 center, List<(float?, float?)> voltage)>();
 
             for (int i = 0; i < _tabsAssociations.Count; ++i)
             {
                 var name = _tabsAssociations[i].tab.Name;
-                var center = _tabsAssociations[i].header.GetComponent<KVID2TableHeader>().GetCenterPoint();
+                var center = _tabsAssociations[i].header.GetComponentInChildren<KVID2TableHeader>().GetCenterPoint();
+                var productName = _tabsAssociations[i].header.GetComponentInChildren<KVID2TableHeader0>().GetProductName();
                 var voltages = ((KVID2Table)_tabsAssociations[i].table).GetVoltages();
 
-                result.Add((name, center, voltages));
+                result.Add((name, productName, center, voltages));
             }
 
             TableDataManager.Instance.SetKVID2Data(result);
@@ -157,13 +160,15 @@ namespace UI.TableViews
 
             
 
-            foreach (var (tab, center, voltages) in tabs)
+            foreach (var (tab, productName, center, voltages) in tabs)
             {
-                var header = AddAssociationAndSelect(tab);
+                var headerGroup = AddAssociationAndSelect(tab);
 
-                header.Panel.X.FloatValue = center.x;
-                header.Panel.Y.FloatValue = center.y;
-                header.Panel.Z.FloatValue = center.z;
+                headerGroup.header.Panel.X.FloatValue = center.x;
+                headerGroup.header.Panel.Y.FloatValue = center.y;
+                headerGroup.header.Panel.Z.FloatValue = center.z;
+
+                headerGroup.header0.Panel.ProductName.StringValue = productName;
 
                 foreach (var (x,y) in voltages)
                 {
@@ -183,7 +188,7 @@ namespace UI.TableViews
         }
 
 
-        private KVID2TableHeader AddAssociationAndSelect(string name = null)
+        private (KVID2TableHeader header, KVID2TableHeader0 header0) AddAssociationAndSelect(string name = null)
         {
             var tab = AddTab(name);
             var table = AddTable(tab.Name);
@@ -192,12 +197,17 @@ namespace UI.TableViews
             var headerComponent = header.GetComponentInChildren<KVID2TableHeader>();
             headerComponent.InputController = _inputController;
 
+            var header0Component = header.GetComponentInChildren<KVID2TableHeader0>();
+            header0Component.InputController = _inputController;
+
+
+
             _tabsAssociations.Add(new Association(tab.Name, tab, header, table));
             SelectTab(tab);
 
             _header.SetActive(true);
 
-            return headerComponent;
+            return (headerComponent, header0Component);
         }
 
         private Tab AddTab(string name)
@@ -219,7 +229,10 @@ namespace UI.TableViews
 
         private GameObject AddHeader()
         {
-            return Instantiate(_headerPrefab, _header.transform);
+            var go = Instantiate(_headerPrefab, _header.transform);
+            go.transform.SetAsFirstSibling();
+
+            return go;
         }
 
         private string GetTabNextName()
