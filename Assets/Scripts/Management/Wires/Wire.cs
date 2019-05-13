@@ -60,8 +60,6 @@ namespace Management.Wires
 
         public string ESID_P { get; protected set; }
 
-
-
         protected List<Point> _points;
 
         public ReadOnlyCollection<Point> Points => new ReadOnlyCollection<Point>(_points);

@@ -92,7 +92,7 @@ namespace UI.Calculations
         #region Event handlers
         private void PointsCountInput_OnEndEdit(string text)
         {           
-            var value = text == string.Empty || !int.TryParse(text, out int parsedValue)? 125 : Mathf.Clamp(parsedValue, 125, 1000);
+            var value = text == string.Empty || !int.TryParse(text, out int parsedValue)? 125 : Mathf.Clamp(parsedValue, 125, 103823);
             PointsByAxis = (int)Mathf.Round(Mathf.Pow(value, 1f / 3f));
 
             _pointsCountInput.text = ((int)Mathf.Pow(PointsByAxis, 3f)).ToString();

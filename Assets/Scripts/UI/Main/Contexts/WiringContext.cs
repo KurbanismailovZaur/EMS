@@ -52,21 +52,12 @@ namespace UI.Main.Contexts
         [SerializeField]
         private Toggle _3KVIDVisibilityToggle;
 
-        [SerializeField]
-        private UnityButton _removeButton;
-
         public SelectedEvent Selected;
 
         public bool KVID3VisibilityState
         {
             get => _3KVIDVisibilityToggle.State;
             set => _3KVIDVisibilityToggle.State = value;
-        }
-
-        public void SetKVIDButtonsinteractibility(bool state)
-        {
-            _3KVIDVisibilityButton.interactable = state;
-            _removeButton.interactable = state;
         }
 
         public void Edit2KVID() => Selected.Invoke(Action.Edit2KVID);
@@ -98,7 +89,7 @@ namespace UI.Main.Contexts
 
         public void WiringManager_Imported()
         {
-            SetKVIDButtonsinteractibility(true);
+            _3KVIDVisibilityButton.interactable = true;
             KVID3VisibilityState = true;
         }
 
@@ -109,7 +100,7 @@ namespace UI.Main.Contexts
 
         public void WiringManager_Removed()
         {
-            SetKVIDButtonsinteractibility(false);
+            _3KVIDVisibilityButton.interactable = false;
             KVID3VisibilityState = false;
         }
         #endregion

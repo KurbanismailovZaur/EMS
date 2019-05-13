@@ -52,7 +52,7 @@ namespace UI.TableViews
             var materials = ((MaterialsTable)GetTable("Materials")).MaterialPanels.Select(p => p.ToMaterial()).ToList();
             var wireMarks = ((WireMarksTable)GetTable("WireMarks")).WireMarkPanels.Select(p => p.ToWireMark(materials)).ToList();
 
-            TableDataManager.Instance.SetData(materials, wireMarks);
+            TableDataManager.Instance.SetReferenceData(materials, wireMarks);
             
             Close();
         }

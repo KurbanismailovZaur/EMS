@@ -220,10 +220,11 @@ namespace Facades
             _cameraController.IsActive = false;
 
             ModelManager.Instance.RemoveModel();
+            ModelManager.Instance.RemovePlanes();
             WiringManager.Instance.Remove();
             CalculationsManager.Instance.RemoveElectricFieldStrenght();
             CalculationsManager.Instance.RemoveMutualActionOfBCSAndBA();
-            TableDataManager.Instance.Remove();
+            TableDataManager.Instance.RemoveAll();
         }
         #endregion
 
@@ -296,10 +297,20 @@ namespace Facades
             }
         }
         
+        public void WiringManager_Imported()
+        {
+            DatabaseManager.Instance.UpdateKVID3(WiringManager.Instance.Wiring);
+        }
+
         public void WiringManager_VisibilityChanged()
         {
             if (WiringManager.Instance.Wiring.IsVisible && CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible)
                 CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible = false;
+        }
+
+        public void WiringManager_Removed()
+        {
+            DatabaseManager.Instance.RemoveKVID3();
         }
         #endregion
 
@@ -338,6 +349,8 @@ namespace Facades
         {
             _filter.SetRanges(0f, 1f);
             _filter.ResetValues();
+
+            DatabaseManager.Instance.UpdateKVID6(CalculationsManager.Instance.ElectricFieldStrenght.Points);
         }
 
         public void ElectricFieldStrenght_VisibilityChanged()
@@ -346,6 +359,11 @@ namespace Facades
                 SetCurrentCalculationsAndPrepareOther(CalculationsManager.Instance.ElectricFieldStrenght);
             else
                 HandleNoCalculations();
+        }
+
+        public void ElectricFieldStrenght_Removed()
+        {
+            DatabaseManager.Instance.RemoveKVID6();
         }
         #endregion
 

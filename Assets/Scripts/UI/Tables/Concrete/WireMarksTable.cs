@@ -33,7 +33,7 @@ namespace UI.Tables.Concrete
 
             public Cell Screen1Thresold { get; set; }
 
-            public Cell Screen1IsolationMaterial { get; set; }
+            public ReferenceCell Screen1IsolationMaterial { get; set; }
 
             public ReferenceCell Screen2Material { get; set; }
 
@@ -41,11 +41,11 @@ namespace UI.Tables.Concrete
 
             public Cell Screen2Thresold { get; set; }
 
-            public Cell Screen2IsolationMaterial { get; set; }
+            public ReferenceCell Screen2IsolationMaterial { get; set; }
 
             public Cell CrossSectionDiameter { get; set; }
 
-            public WireMarkPanel(Cell code, Cell type, ReferenceCell coreMaterial, Cell coreDiameter, ReferenceCell screen1Material, Cell screen1InnerRadius, Cell screen1Thresold, Cell screen1IsolationMaterial, ReferenceCell screen2Material, Cell screen2InnerRadius, Cell screen2Thresold, Cell screen2IsolationMaterial, Cell crossSectionDiameter)
+            public WireMarkPanel(Cell code, Cell type, ReferenceCell coreMaterial, Cell coreDiameter, ReferenceCell screen1Material, Cell screen1InnerRadius, Cell screen1Thresold, ReferenceCell screen1IsolationMaterial, ReferenceCell screen2Material, Cell screen2InnerRadius, Cell screen2Thresold, ReferenceCell screen2IsolationMaterial, Cell crossSectionDiameter)
             {
                 Code = code;
                 Type = type;
@@ -93,14 +93,10 @@ namespace UI.Tables.Concrete
                         return Screen1InnerRadius;
                     case "Screen1Thresold":
                         return Screen1Thresold;
-                    case "Screen1IsolationMaterial":
-                        return Screen1IsolationMaterial;
                     case "Screen2InnerRadius":
                         return Screen2InnerRadius;
                     case "Screen2Thresold":
                         return Screen2Thresold;
-                    case "Screen2IsolationMaterial":
-                        return Screen2IsolationMaterial;
                     case "CrossSectionDiameter":
                         return CrossSectionDiameter;
                     default:
@@ -116,8 +112,12 @@ namespace UI.Tables.Concrete
                         return CoreMaterial;
                     case "Screen1Material":
                         return Screen1Material;
+                    case "Screen1IsolationMaterial":
+                        return Screen1IsolationMaterial;
                     case "Screen2Material":
                         return Screen2Material;
+                    case "Screen2IsolationMaterial":
+                        return Screen2IsolationMaterial;
                     default:
                         throw new ArgumentException($"No reference cell with name \"{ name }\"");
                 }
@@ -127,29 +127,31 @@ namespace UI.Tables.Concrete
             {
                 var coreMaterial = materials.Find(m => m.Code == CoreMaterial.SelectedPanel?.GetCell("Code").IntValue);
                 var screen1Material = materials.Find(m => m.Code == Screen1Material.SelectedPanel?.GetCell("Code").IntValue);
+                var screen1IsolationMaterial = materials.Find(m => m.Code == Screen1IsolationMaterial.SelectedPanel?.GetCell("Code").IntValue);
                 var screen2Material = materials.Find(m => m.Code == Screen2Material.SelectedPanel?.GetCell("Code").IntValue);
+                var screen2IsolationMaterial = materials.Find(m => m.Code == Screen2IsolationMaterial.SelectedPanel?.GetCell("Code").IntValue);
 
                 return new WireMark
                 {
                     Code = Code.StringValue,
                     Type = Type.NullableStringValue,
                     CoreMaterial = coreMaterial,
-                    CoreDiameter = CoreDiameter.NullableFloatValue,
+                    CoreDiameter = CoreDiameter.FloatValue,
                     Screen1 = new WireMark.Screen
                     {
                         Material = screen1Material,
                         InnerRadius = Screen1InnerRadius.NullableFloatValue,
                         Thresold = Screen1Thresold.NullableFloatValue,
-                        IsolationMaterial = Screen1IsolationMaterial.NullableStringValue
+                        IsolationMaterial = screen1IsolationMaterial
                     },
                     Screen2 = new WireMark.Screen
                     {
                         Material = screen2Material,
                         InnerRadius = Screen2InnerRadius.NullableFloatValue,
                         Thresold = Screen2Thresold.NullableFloatValue,
-                        IsolationMaterial = Screen2IsolationMaterial.NullableStringValue
+                        IsolationMaterial = screen2IsolationMaterial
                     },
-                    CrossSectionDiameter = CrossSectionDiameter.NullableFloatValue
+                    CrossSectionDiameter = CrossSectionDiameter.FloatValue
                 };
             }
         }
@@ -212,29 +214,29 @@ namespace UI.Tables.Concrete
             var materialPanels = _materialsTable.MaterialPanels;
 
             foreach (var wireMark in TableDataManager.Instance.WireMarks)
-                Add(wireMark.Code, wireMark.Type, wireMark.CoreMaterial, wireMark.CoreDiameter, wireMark.Screen1.Material, wireMark.Screen1.InnerRadius, wireMark.Screen1.Thresold, wireMark.Screen1.IsolationMaterial, wireMark.Screen2.Material, wireMark.Screen2.InnerRadius, wireMark.Screen2.Thresold, wireMark.Screen2.IsolationMaterial, wireMark.CrossSectionDiameter, cellClickHandler);
+                Add(wireMark.Code, string.IsNullOrWhiteSpace(wireMark.Type) ? "-" : wireMark.Type, wireMark.CoreMaterial, wireMark.CoreDiameter, wireMark.Screen1.Material, wireMark.Screen1.InnerRadius, wireMark.Screen1.Thresold, wireMark.Screen1.IsolationMaterial, wireMark.Screen2.Material, wireMark.Screen2.InnerRadius, wireMark.Screen2.Thresold, wireMark.Screen2.IsolationMaterial, wireMark.CrossSectionDiameter, cellClickHandler);
         }
 
         public override Panel AddEmpty(Action<Cell> cellClickHandler)
         {
             var materialPanels = _materialsTable.MaterialPanels;
 
-            return Add(GetNextCode(), null, null, null, null, null, null, null, null, null, null, null, null, cellClickHandler);
+            return Add(GetNextCode(), "-", TableDataManager.Instance.Materials[0], 0f, null, null, null, null, null, null, null, null, 0f, cellClickHandler);
         }
 
         private string GetNextCode() => $"м{_wireMarksPanels.Max(p => int.Parse(p.Code.StringValue.Substring(1))) + 1}";
 
-        private WireMarkPanel Add(string code, string type, Material coreMaterial, float? coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, string screen1isolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, string screen2isolationMaterial, float? crossSectionDiameter, Action<Cell> cellClickHandler)
+        private WireMarkPanel Add(string code, string type, Material coreMaterial, float coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, Material screen1isolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, Material screen2isolationMaterial, float crossSectionDiameter, Action<Cell> cellClickHandler)
         {
             var materialPanels = _materialsTable.MaterialPanels;
             var nullableMaterialPanels = Enumerable.Repeat((MaterialsTable.MaterialPanel)null, 1).Concat(materialPanels).ToList();
 
             var codeCell = Cell.Factory.CreateUnique(_cellPrefab, code, _codes, cellClickHandler);
-            var typeCell = Cell.Factory.Create(_cellPrefab, type, true, _types, cellClickHandler);
+            var typeCell = Cell.Factory.Create(_cellPrefab, type, false, _types, cellClickHandler);
 
             var selected = nullableMaterialPanels.IndexOf(nullableMaterialPanels.First(p => p?.Code.IntValue == coreMaterial?.Code));
 
-            var coreMaterialCell = ReferenceCell.Factory.Create(_referenceCellPrefab, _materialsTable, nullableMaterialPanels, selected, "Name", _coreMaterials);
+            var coreMaterialCell = ReferenceCell.Factory.Create(_referenceCellPrefab, _materialsTable, materialPanels, selected, "Name", _coreMaterials);
             var coreDiameterCell = Cell.Factory.Create(_cellPrefab, coreDiameter, _coreDiameters, cellClickHandler);
 
             selected = nullableMaterialPanels.IndexOf(nullableMaterialPanels.First(p => p?.Code.IntValue == screen1Material?.Code));
@@ -242,14 +244,18 @@ namespace UI.Tables.Concrete
             var screen1MaterialCell = ReferenceCell.Factory.Create(_referenceCellPrefab, _materialsTable, nullableMaterialPanels, selected, "Name", _screen1Materials);
             var screen1InnerRadiusCell = Cell.Factory.Create(_cellPrefab, screen1InnerRadius, _screen1InnerRadii, cellClickHandler);
             var screen1ThresoldCell = Cell.Factory.Create(_cellPrefab, screen1Thresold, _screen1Thresolds, cellClickHandler);
-            var screen1IsolationMaterialCell = Cell.Factory.Create(_cellPrefab, screen1isolationMaterial, true, _screen1isolationMaterials, cellClickHandler);
+
+            selected = nullableMaterialPanels.IndexOf(nullableMaterialPanels.First(p => p?.Code.IntValue == screen1isolationMaterial?.Code));
+            var screen1IsolationMaterialCell = ReferenceCell.Factory.Create(_referenceCellPrefab, _materialsTable, nullableMaterialPanels, selected, "Name", _screen1isolationMaterials);
 
             selected = nullableMaterialPanels.IndexOf(nullableMaterialPanels.First(p => p?.Code.IntValue == screen2Material?.Code));
 
             var screen2MaterialCell = ReferenceCell.Factory.Create(_referenceCellPrefab, _materialsTable, nullableMaterialPanels, selected, "Name", _screen2Materials);
             var screen2InnerRadiusCell = Cell.Factory.Create(_cellPrefab, screen2InnerRadius, _screen2InnerRadii, cellClickHandler);
             var screen2ThresoldCell = Cell.Factory.Create(_cellPrefab, screen2Thresold, _screen2Thresolds, cellClickHandler);
-            var screen2IsolationMaterialCell = Cell.Factory.Create(_cellPrefab, screen2isolationMaterial, true, _screen2isolationMaterials, cellClickHandler);
+
+            selected = nullableMaterialPanels.IndexOf(nullableMaterialPanels.First(p => p?.Code.IntValue == screen2isolationMaterial?.Code));
+            var screen2IsolationMaterialCell = ReferenceCell.Factory.Create(_referenceCellPrefab, _materialsTable, nullableMaterialPanels, selected, "Name", _screen2isolationMaterials);
 
             var crossSectionDiameterCell = Cell.Factory.Create(_cellPrefab, crossSectionDiameter, _crossSectionDiameters, cellClickHandler);
 

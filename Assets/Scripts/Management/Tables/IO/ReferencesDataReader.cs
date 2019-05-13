@@ -91,7 +91,7 @@ namespace Management.Tables.IO
                     Material = GetMaterial(row, 4, materials),
                     InnerRadius = GetFloat(row, 5),
                     Thresold = GetFloat(row, 6),
-                    IsolationMaterial = GetString(row, 7)
+                    IsolationMaterial = GetMaterial(row, 7, materials)
                 },
 
                 Screen2 = new WireMark.Screen
@@ -99,7 +99,7 @@ namespace Management.Tables.IO
                     Material = GetMaterial(row, 8, materials),
                     InnerRadius = GetNullableFloat(row, 9),
                     Thresold = GetNullableFloat(row, 10),
-                    IsolationMaterial = GetString(row, 11)
+                    IsolationMaterial = GetMaterial(row, 11, materials)
                 },
 
                 CrossSectionDiameter = GetFloat(row, 12)
@@ -109,8 +109,8 @@ namespace Management.Tables.IO
         private static bool IsCorrectWireMark(IRow row, List<Material> materials)
         {
             return IsNotEmptyStringCell(row, 0) && IsStringCell(row, 1) && IsMaterialCode(row, 2, materials) && IsFloatCell(row, 3)
-                && IsMaterialCode(row, 4, materials) && IsFloatCells(row, 5, 6) && IsNotEmptyStringCell(row, 7) && IsMaterialCodeOrNull(row, 8, materials)
-                && IsNullableFloatCells(row, 9, 10) && IsStringCell(row, 11) && IsFloatCell(row, 12);
+                && IsMaterialCode(row, 4, materials) && IsFloatCells(row, 5, 6) && IsMaterialCodeOrNull(row, 7, materials) && IsMaterialCodeOrNull(row, 8, materials)
+                && IsNullableFloatCells(row, 9, 10) && IsMaterialCodeOrNull(row, 11, materials) && IsFloatCell(row, 12);
         }
         
         #region Cell type checkers

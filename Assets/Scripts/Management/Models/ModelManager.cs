@@ -113,6 +113,8 @@ namespace Management.Models
 
         public void ImportPlanes(string path)
         {
+            RemovePlanes();
+
             var info = GetVerticesInfoFromOBJ(path);
 
             _materialsPlanesPairs = new List<(int materialID, List<Plane>)>(info.Count);
