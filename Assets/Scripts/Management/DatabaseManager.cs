@@ -11,6 +11,8 @@ using System.Globalization;
 using Management.Wires;
 using Management.Tables;
 using Management.Calculations;
+using System.IO;
+using Management.Interop;
 
 namespace Management
 {
@@ -30,6 +32,8 @@ namespace Management
         private const string kvid82 = "KVID8_2";
         private const string modelPoint = "ModelPoint";
         #endregion
+
+        public string DatabasePath => Path.Combine(Application.persistentDataPath, "emsdb.bytes");
 
         public void ClearAllTalbes()
         {
@@ -56,6 +60,8 @@ namespace Management
                     _dbManager.Execute($"INSERT INTO {modelPoint} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", plane.a.x, plane.a.y, plane.a.z, plane.b.x, plane.b.y, plane.b.z, plane.c.x, plane.c.y, plane.c.z, materialID);
 
             _dbManager.Commit();
+            
+            PythonManager.Instance.HandlePlanes();
         }
 
         public void RemovePlanes()
