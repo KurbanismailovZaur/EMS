@@ -36,10 +36,11 @@ namespace Management.Interop
             _pathToMainScript = Path.Combine(Application.streamingAssetsPath, _pathToMainScript);
         }
 
-        public void HandlePlanes()
-        {
-            RunPythonScript(_pathToMainScript, "--create_figures");
-        }
+        public void HandlePlanes() => RunPythonScript(_pathToMainScript, "--create_figures");
+
+        public void CalculateElectricFieldStrenght() => RunPythonScript(_pathToMainScript, "--script_m3");
+
+        public void CalculateMutualActionOfBCSAndBA() => RunPythonScript(_pathToMainScript, "--script_m2");
 
         private string RunPythonScript(string script, string action)
         {
@@ -61,6 +62,7 @@ namespace Management.Interop
                 using (StreamReader reader = process.StandardOutput)
                 {
                     var error = process.StandardError.ReadToEnd();
+                    Log(error);
 
                     return reader.ReadToEnd();
                 }

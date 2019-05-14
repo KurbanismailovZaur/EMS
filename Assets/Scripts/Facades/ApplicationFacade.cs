@@ -20,6 +20,7 @@ using UI.Panels.Wire;
 using Management.Tables;
 using UI.TableViews;
 using Management;
+using Management.Interop;
 
 namespace Facades
 {
@@ -265,6 +266,55 @@ namespace Facades
         }
         #endregion
 
+        #region Wiring
+        public void WiringContext_Selected(WiringContext.Action action)
+        {
+            switch (action)
+            {
+                case WiringContext.Action.Edit2KVID:
+                    _kvid2View.Open();
+                    break;
+                case WiringContext.Action.Edit3KVID:
+                    Edit3KVID();
+                    break;
+                case WiringContext.Action.Edit5KVID:
+                    _kvid5View.Open();
+                    break;
+                case WiringContext.Action.Edit7KVID:
+                    _kvid7View.Open();
+                    break;
+                case WiringContext.Action.Edit8KVID:
+                    _kvid8View.Open();
+                    break;
+                case WiringContext.Action.Visibility:
+                    WiringManager.Instance.KVID3Visibility();
+                    break;
+                case WiringContext.Action.Edit:
+                    WiringManager.Instance.Edit();
+                    break;
+                case WiringContext.Action.Remove:
+                    WiringManager.Instance.Remove();
+                    break;
+            }
+        }
+
+        public void WiringManager_Imported()
+        {
+            DatabaseManager.Instance.UpdateKVID3(WiringManager.Instance.Wiring);
+        }
+
+        public void WiringManager_VisibilityChanged()
+        {
+            if (WiringManager.Instance.Wiring.IsVisible && CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible)
+                CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible = false;
+        }
+
+        public void WiringManager_Removed()
+        {
+            DatabaseManager.Instance.RemoveKVID3();
+        }
+        #endregion
+
         #region Calculations
         public void CalculationsContext_Selected(CalculationsContext.Action action)
         {
@@ -302,6 +352,8 @@ namespace Facades
             _filter.ResetValues();
 
             DatabaseManager.Instance.UpdateKVID6(CalculationsManager.Instance.ElectricFieldStrenght.Points);
+
+            PythonManager.Instance.CalculateElectricFieldStrenght();
         }
 
         public void ElectricFieldStrenght_VisibilityChanged()

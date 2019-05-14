@@ -116,6 +116,21 @@ class Storage:
 
         return res
 
+    def get_BAs(self):
+        """
+        Загрузка блоков аппаратуры (2КВИД)
+        :return: итерационнай объект list
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM KVID2")
+        res = map(lambda x: [*x[:2], Point(np.array(x[2:-1])), json.loads(x[-1])], cursor.fetchall())
+
+        conn.close()
+
+        return res
+
     def get_set_points(self):
         """
         Загрузка заданных точек (6КВИД)
@@ -130,6 +145,24 @@ class Storage:
         conn.close()
 
         return res
+
+    def get_limits(self):
+        """
+        Загрузка пределов (8КВИД)
+        :return: ({}, {})
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM KVID8_1")
+        data_8_1 = {row[0]: row[1:] for row in cursor.fetchall()}
+
+        cursor.execute("SELECT * FROM KVID8_2")
+        data_8_2 = {row[0]: row[1:] for row in cursor.fetchall()}
+
+        conn.close()
+
+        return data_8_1, data_8_2
 
     def get_figures(self):
         """
@@ -208,6 +241,30 @@ class Storage:
 
         return count
 
+    def set_result_m3(self, data):
+        """
+        Запись результата работы m3 для отчета
+        :param data: lst
+        :return: кол-во записанных строк
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM ResultM3")  # удаление данных из БД
+        conn.commit()
+
+        count = sum(1 for _ in
+                    map(lambda item:
+                        cursor.execute(f"INSERT into ResultM3 values ({', '.join('?' * 6)})",
+                                       [*item[:-1], json.dumps(item[-1])]),
+                        data))
+
+        conn.commit()
+
+        conn.close()
+
+        return count
+
     def set_result_m2(self, data):
         """
         Запись результата работы m2
@@ -222,8 +279,8 @@ class Storage:
 
         count = sum(1 for _ in
                     map(lambda item:
-                        cursor.execute(f"INSERT into ResultM2 values ({', '.join('?' * 2)})",
-                                       [item[0], json.dumps(item[1])]),
+                        cursor.execute(f"INSERT into ResultM2 values ({', '.join('?' * 3)})",
+                                       [item[0], json.dumps(item[1]), item[2]]),
                         data))
 
         conn.commit()
@@ -234,4 +291,5 @@ class Storage:
 
 
 if __name__ == "__main__":
-    print(Storage.get_wires())
+    storage = Storage('../db/ems.bytes')
+    print(list(storage.get_BAs()))

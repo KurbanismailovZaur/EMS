@@ -43,7 +43,7 @@ class Import:
         # Цикл по листам
         for sh_i in range(book.nsheets):
             sh = book.sheet_by_index(sh_i)
-            data = json.dumps({int(sh.row_values(rx)[0]): sh.row_values(rx)[1] for rx in range(6, sh.nrows)})
+            data = json.dumps([[int(sh.row_values(rx)[0]), sh.row_values(rx)[1]] for rx in range(6, sh.nrows)])
 
             cursor.execute(f"INSERT into {table_name} values ({', '.join('?' * 6)})",  # генерация 6-ти колонок
                            [sh.name, sh.row_values(0)[1], *[str(x) for x in sh.row_values(4)], data])

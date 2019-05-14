@@ -63,9 +63,10 @@ namespace Management.Calculations
 
             for (int i = 0; i < points.Count; i++)
             {
-                var value = UnityRandom.value;
+                var values = Enumerable.Repeat(0f, 37).ToArray();
+                var gradients = Enumerable.Range(0, 37).Select(_ => _gradient.Evaluate(0f)).ToArray();
 
-                _points.Add(Point.Factory.Create(_pointPrefab, transform, points[i], radius, _gradient.Evaluate(value), value));
+                _points.Add(Point.Factory.Create(_pointPrefab, transform, points[i], radius, gradients, values));
             }
 
             IsCalculated = true;
@@ -92,7 +93,7 @@ namespace Management.Calculations
         public override void Filter(float min, float max)
         {
             foreach (var point in _points)
-                point.gameObject.SetActive(point.Value >= min && point.Value <= max);
+                point.gameObject.SetActive(point.CurrentValue >= min && point.CurrentValue <= max);
         }
     }
 }

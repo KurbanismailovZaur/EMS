@@ -5,11 +5,13 @@ from m4 import Math4
 from m4_create_figures import Math4Figure
 
 import numpy as np
+import itertools
 
 # TODO добавить емкостное взаимоедйствие проводов в m2
-# TODO разобраться со временем
+# TODO добавить БА
 # TODO привести в порядок каталог проекта
 # TODO генерация отчетов
+# TODO проверить зависимост ИД в скрипах
 
 
 def default(*args):  # функция заглушка для аргументов вызывающих функции
@@ -33,15 +35,24 @@ def script_m3(db_path):
     storage = Storage(db_path)
     materials = storage.get_materials()
     wires = storage.get_wires()
+    BAs = storage.get_BAs()
     set_points = storage.get_set_points()
+    set_points_limits, ba_limits = storage.get_limits()
     figures = storage.get_figures()
+
+    # Найдем минимальную частоту для вычислении 36 шагов времени
+    f_min = min(*[w.f for w in wires], *[f[0] for ba in BAs for f in ba[-1]])
+    t_step = (1 / f_min) / 36  # шаг времени
 
     m3 = Math3()
     m4 = Math4(figures, materials)
+
     res = []
+    res_report = []
     for point in set_points:
+        # Блок кода получения значений для шкалы времени
         time_values = []
-        for t in [1 / x for x in range(36, 0, -1)]:  # шкала времени
+        for t in itertools.accumulate([t_step] * 36):  # шкала времени
             m3.set_t(t)
 
             E = np.zeros(3)  #  напряженность электрического поля в заданной точке
@@ -65,10 +76,50 @@ def script_m3(db_path):
 
                     Ew += ec
                 E += Ew
-                # print(point.id, wire.id, '<', *Ew, '>', (Ew ** 2).sum() ** 0.5)
+
             time_values.append((E ** 2).sum() ** 0.5)
         res.append([point.id, time_values])
-    print(storage.set_result_m3_times(res))
+
+        # Блок кода получения значений для отчета
+        data_wires = []
+        E = np.zeros(3)  #  напряженность электрического поля в заданной точке
+        for wire in wires:  # цикл по кабелям
+            m3.set_wire(wire)
+            m3.set_c(point)
+            m3.set_t((1 / wire.f) / 36 * 9)
+
+            m4.set_f(wire.f)
+            m4.set_c(point)
+
+            limit_a = 0
+            Ew = np.zeros(3)  #  напряженность электрического поля по проводам
+            for p1, p2 in wire.get_fragment():  # цикл по фрагментам кабеля
+                m3.set_fragment(p1, p2)
+                ec, limit_a = m3.do(limit_a)
+
+                if not wire.get_is_metallization():
+                    m4.set_u((p1 + p2) / 2)
+                    SEf = m4.do()
+                    ec = ec * SEf
+
+                Ew += ec
+
+            Ew_sum = (Ew ** 2).sum() ** 0.5
+
+            # Проверяем на превышения значения
+            is_excessive = False
+            point_limit = set_points_limits.get(point.id)
+            if point_limit:
+                if (point_limit[1] <= wire.f <= point_limit[2]) and (Ew_sum > point_limit[0]):
+                    is_excessive = True
+
+            data_wires.append([wire.id, *Ew, Ew_sum, wire.f, wire.f, is_excessive])
+
+            E += Ew
+        res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires])
+    storage.set_result_m3_times(res)
+    storage.set_result_m3(res_report)
+    print('ok')
 
 
 def script_m2(db_path):
@@ -116,13 +167,7 @@ def script_m2(db_path):
     for wire_id, values in dct_wires.items():
         res.append([wire_id, values, sum([x[-1] for x in values])])
 
-    print(storage.set_result_m2(res))
-
-
-def verify():
-    import time
-    print('start time')
-    time.sleep(5)
+    storage.set_result_m2(res)
     print('ok')
 
 
@@ -139,11 +184,8 @@ if __name__ == "__main__":
                         help='Расчет напряженности электрического поля в заданных точках')
     parser.add_argument('--script_m2', action='store_const', const=script_m2, default=default,
                         help='Расчет взаимного воздействия кабелей БКС и БА на БКС')
-    parser.add_argument('--verify', action='store_const', const=verify, default=default,
-                        help='Проверка работы')
 
     results = parser.parse_args()
     results.create_figures(results.db_path)
     results.script_m3(results.db_path)
     results.script_m2(results.db_path)
-    results.verify()

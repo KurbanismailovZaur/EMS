@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine.Events;
 using System;
 using UnityRandom = UnityEngine.Random;
+using Management.Interop;
 
 namespace Management.Calculations
 {
@@ -27,6 +28,8 @@ namespace Management.Calculations
             var wires = wiring.Wires;
 
             var influences = new List<(int a, int b, float value)>();
+
+            PythonManager.Instance.CalculateMutualActionOfBCSAndBA();
 
             for (int i = 0; i < wires.Count - 1; i++)
             {

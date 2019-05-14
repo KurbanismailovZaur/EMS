@@ -20,10 +20,10 @@ namespace Management.Calculations
 
                 for (int i = 0; i < wiresArray.Length; i++)
                 {
-                    var filteredInfluences = influences.Where(inf => inf.a == i || inf.b == i).Select(inf => (wire: inf.a == i ? inf.b : inf.a, inf.value)).ToArray();
+                    var oppositeInfluences = influences.Where(inf => inf.a == i || inf.b == i).Select(inf => (wire: inf.a == i ? inf.b : inf.a, inf.value)).ToArray();
 
-                    for (int j = 0; j < filteredInfluences.Length; j++)
-                        wiresArray[i]._influences.Add(new Influence(wiresArray[filteredInfluences[j].wire], filteredInfluences[j].value));
+                    for (int j = 0; j < oppositeInfluences.Length; j++)
+                        wiresArray[i]._influences.Add(new Influence(wiresArray[oppositeInfluences[j].wire], oppositeInfluences[j].value));
 
                     wiresArray[i].Value = values[i];
                     wiresArray[i]._line.color = colors[i];
