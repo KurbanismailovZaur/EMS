@@ -20,6 +20,10 @@ namespace Management.Calculations
 
         public ReadOnlyCollection<Point> Points => new ReadOnlyCollection<Point>(_points);
 
+        public override float FilterMinValue { get; protected set; } = 0;
+
+        public override float FilterMaxValue { get; protected set; }
+
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
             // make sphere bounds all points.
@@ -70,11 +74,22 @@ namespace Management.Calculations
             }
 
             IsCalculated = true;
-            IsVisible = true;
-
             Calculated.Invoke();
+
+            IsVisible = true;
         }
-        
+
+        public void SetStrenghts(List<(string name, float[] values)> strenghts)
+        {
+            for (int i = 0; i < strenghts.Count; i++)
+                _points[i].Values = strenghts[i].values;
+
+            FilterMaxValue = _points.Max(p => p.Values.Max());
+
+            for (int i = 0; i < strenghts.Count; i++)
+                _points[i].Gradients = _points[i].Values.Select(v => _gradient.Evaluate(v / FilterMaxValue)).ToArray();
+        }
+
         public override void Remove()
         {
             if (!IsCalculated) return;
@@ -94,6 +109,12 @@ namespace Management.Calculations
         {
             foreach (var point in _points)
                 point.gameObject.SetActive(point.CurrentValue >= min && point.CurrentValue <= max);
+        }
+
+        public void SetCurrentIndexToPoints(int index)
+        {
+            foreach (var point in _points)
+                point.SetCurrentTimeIndex(index);
         }
     }
 }

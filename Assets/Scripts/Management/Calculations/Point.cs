@@ -33,10 +33,16 @@ namespace Management.Calculations
 
         public string Code { get; private set; }
 
-        public float[] Values { get; private set; }
+        public float[] Values { get; set; }
 
-        private Color[] Gradients { get; set; }
+        public Color[] Gradients { get; set; }
 
         public float CurrentValue => Values[_currentTimeIndex];
+
+        public void SetCurrentTimeIndex(int index)
+        {
+            _currentTimeIndex = index;
+            _renderer.sharedMaterial.color = Gradients[_currentTimeIndex];
+        }
     }
 }

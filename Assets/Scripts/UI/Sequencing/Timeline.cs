@@ -97,10 +97,12 @@ namespace UI.Sequencing
             _pauseImage.SetActive(!state);
         }
 
+        public void ResetState() => _slider.value = 0;
+
         #region Event handlers
         private void Slider_OnValueChanged(float value)
         {
-            _timeText.text = $"{(_timeDelta * value).ToString(_nfi)} sec.";
+            _timeText.text = $"{value}/36";
 
             Changed.Invoke((int)value);
         }

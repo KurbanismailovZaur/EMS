@@ -13,11 +13,21 @@ using Management.Tables;
 using Management.Calculations;
 using System.IO;
 using Management.Interop;
+using System.Linq;
 
 namespace Management
 {
     public class DatabaseManager : MonoSingleton<DatabaseManager>
     {
+        #region Classes
+        public class ElectricFieldStrenghtInfo
+        {
+            public string id { get; set; }
+
+            public string val { get; set; }
+        }
+        #endregion
+
         [SerializeField]
         private SimpleSQLManager _dbManager;
 
@@ -69,6 +79,7 @@ namespace Management
             _dbManager.Execute($"DELETE FROM {modelPoint}");
         }
 
+        #region KVIDs
         public void UpdateKVID1(ICollection<Management.Tables.Material> materials)
         {
             _dbManager.BeginTransaction();
@@ -207,6 +218,23 @@ namespace Management
         {
             _dbManager.Execute($"DELETE FROM {kvid81}");
             _dbManager.Execute($"DELETE FROM {kvid82}");
+        }
+        #endregion
+
+        public List<(string name, float[] values)> GetCalculatedElectricFieldStrengts()
+        {
+            var sourceInfos = _dbManager.Query<ElectricFieldStrenghtInfo>("SELECT * FROM ResultM3Times");
+
+            var infos = new List<(string name, float[] values)>();
+
+            foreach (var info in sourceInfos)
+            {
+                var jArray = new JsonArray(info.val);
+                var values = Enumerable.Repeat(0f, 1).Concat(jArray.Select(el => (float)(((JsonNumber)el).ToFloat()))).ToArray();
+                infos.Add((info.id, values));
+            }
+
+            return infos;
         }
     }
 }

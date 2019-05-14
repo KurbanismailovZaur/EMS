@@ -33,6 +33,10 @@ namespace Management.Calculations
             }
         }
 
+        public abstract float FilterMinValue { get; protected set; }
+
+        public abstract float FilterMaxValue { get; protected set; }
+
         public abstract void Remove();
 
         public void ToggleVisibility() => IsVisible = !IsVisible;

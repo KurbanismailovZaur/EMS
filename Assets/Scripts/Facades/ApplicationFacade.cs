@@ -21,6 +21,7 @@ using Management.Tables;
 using UI.TableViews;
 using Management;
 using Management.Interop;
+using UI.Sequencing;
 
 namespace Facades
 {
@@ -42,6 +43,7 @@ namespace Facades
         [SerializeField]
         private FileExplorer _explorer;
 
+        #region KVIDs
         [SerializeField]
         private KVID2View _kvid2View;
 
@@ -59,6 +61,7 @@ namespace Facades
 
         [SerializeField]
         private KVID8View _kvid8View;
+        #endregion
 
         [SerializeField]
         private ReferencesView _referencesView;
@@ -133,15 +136,18 @@ namespace Facades
                 case PointCalculationOptions.CalculationType.Import:
                     _kvid6View.Open();
                     break;
-                default:
-                    yield break;
             }
         }
 
         private void SetCurrentCalculations(CalculationBase calculation)
         {
             if (_currentCalculations)
+            {
                 _currentCalculations.IsVisible = false;
+
+                if (_currentCalculations is ElectricFieldStrenght)
+                    Timeline.Instance.Changed.RemoveListener(Timeline_Changed);
+            }
 
             _currentCalculations = calculation;
         }
@@ -149,7 +155,7 @@ namespace Facades
 
         #region Reports
         private void Generate() => StartCoroutine(GenerateRoutine());
-        
+
         private IEnumerator GenerateRoutine()
         {
             yield return _reports.Open();
@@ -158,18 +164,28 @@ namespace Facades
 
         private void FilterCurrentCalculations(float min, float max) => _currentCalculations.Filter(min, max);
 
-        private void ResetAndShowCurrentCalculationsFilter()
+        private void FilterCurrentCalculationsWithCurrentRanges() => FilterCurrentCalculations(_filter.RangeSlider.MinValue, _filter.RangeSlider.MaxValue);
+
+        private void HandleAdditionalCalculationInstuments()
         {
+            _filter.SetRanges(_currentCalculations.FilterMinValue, _currentCalculations.FilterMaxValue);
             _filter.ResetValues();
             _filter.Show();
 
-            FilterCurrentCalculations(_filter.RangeSlider.MinValue, _filter.RangeSlider.MaxValue);
+            if (_currentCalculations is ElectricFieldStrenght)
+            {
+                Timeline.Instance.ResetState();
+                Timeline.Instance.Show();
+                Timeline.Instance.Changed.AddListener(Timeline_Changed);
+            }
+
+            FilterCurrentCalculationsWithCurrentRanges();
         }
 
-        private void SetCurrentCalculationsAndPrepareOther(CalculationBase calculation)
+        private void SetCurrentCalculationsAndPrepare(CalculationBase calculation)
         {
             SetCurrentCalculations(calculation);
-            ResetAndShowCurrentCalculationsFilter();
+            HandleAdditionalCalculationInstuments();
         }
 
         private void HandleNoCalculations()
@@ -348,18 +364,15 @@ namespace Facades
         #region Electric
         public void ElectricFieldStrenght_Calculated()
         {
-            _filter.SetRanges(0f, 1f);
-            _filter.ResetValues();
-
             DatabaseManager.Instance.UpdateKVID6(CalculationsManager.Instance.ElectricFieldStrenght.Points);
-
             PythonManager.Instance.CalculateElectricFieldStrenght();
+            CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
         }
 
         public void ElectricFieldStrenght_VisibilityChanged()
         {
             if (CalculationsManager.Instance.ElectricFieldStrenght.IsVisible)
-                SetCurrentCalculationsAndPrepareOther(CalculationsManager.Instance.ElectricFieldStrenght);
+                SetCurrentCalculationsAndPrepare(CalculationsManager.Instance.ElectricFieldStrenght);
             else
                 HandleNoCalculations();
         }
@@ -386,7 +399,7 @@ namespace Facades
                 if (WiringManager.Instance.Wiring.IsVisible)
                     WiringManager.Instance.SetVisibility(false);
 
-                SetCurrentCalculationsAndPrepareOther(CalculationsManager.Instance.MutualActionOfBCSAndBA);
+                SetCurrentCalculationsAndPrepare(CalculationsManager.Instance.MutualActionOfBCSAndBA);
             }
             else
             {
@@ -434,6 +447,12 @@ namespace Facades
         public void CameraViewport_EmptyClick()
         {
             _wirePanel.Close();
+        }
+
+        private void Timeline_Changed(int index)
+        {
+            CalculationsManager.Instance.ElectricFieldStrenght.SetCurrentIndexToPoints(index);
+            FilterCurrentCalculationsWithCurrentRanges();
         }
         #endregion
     }

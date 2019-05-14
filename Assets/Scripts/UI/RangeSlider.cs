@@ -55,6 +55,8 @@ namespace UI
                 if (currentMaxValue != MaxValue)
                     CallEvent();
 
+                UpdateTexts();
+
                 _eatEvents = false;
             }
         }
@@ -77,6 +79,8 @@ namespace UI
 
                 if (currentMaxValue != MaxValue)
                     CallEvent();
+
+                UpdateTexts();
 
                 _eatEvents = false;
             }

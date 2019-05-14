@@ -21,6 +21,10 @@ namespace Management.Calculations
 
         public ClickedEvent Clicked;
 
+        public override float FilterMinValue { get; protected set; } = 0f;
+
+        public override float FilterMaxValue { get; protected set; }
+
         public void Calculate(Wiring wiring)
         {
             Remove();
@@ -48,9 +52,9 @@ namespace Management.Calculations
                 wire.Clicked += Wire_Clicked;
 
             IsCalculated = true;
-            IsVisible = true;
-
             Calculated.Invoke();
+
+            IsVisible = true;
         }
 
         private float Calculate(Wires.Wire a, Wires.Wire b) => UnityRandom.value;
