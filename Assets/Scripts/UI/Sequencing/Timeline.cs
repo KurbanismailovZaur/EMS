@@ -85,6 +85,8 @@ namespace UI.Sequencing
 
         public void Pause()
         {
+            if (_playRoutine == null) return;
+
             StopCoroutine(_playRoutine);
             _playRoutine = null;
 

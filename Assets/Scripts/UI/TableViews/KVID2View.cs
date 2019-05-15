@@ -14,7 +14,6 @@ using Management.Tables;
 using System;
 using UnityScrollRect = UnityEngine.UI.ScrollRect;
 
-
 namespace UI.TableViews
 {
 	public class KVID2View : TableView
@@ -292,7 +291,6 @@ namespace UI.TableViews
             yield return null;
             _scrollrect.horizontalNormalizedPosition = 1f;
         }
-
 
         protected override void SelectTab(Tab tab)
         {

@@ -57,9 +57,6 @@ namespace Facades
         private KVID6View _kvid6View;
 
         [SerializeField]
-        private KVID7View _kvid7View;
-
-        [SerializeField]
         private KVID8View _kvid8View;
         #endregion
 
@@ -296,9 +293,6 @@ namespace Facades
                 case WiringContext.Action.Edit5KVID:
                     _kvid5View.Open();
                     break;
-                case WiringContext.Action.Edit7KVID:
-                    _kvid7View.Open();
-                    break;
                 case WiringContext.Action.Edit8KVID:
                     _kvid8View.Open();
                     break;
@@ -374,11 +368,17 @@ namespace Facades
             if (CalculationsManager.Instance.ElectricFieldStrenght.IsVisible)
                 SetCurrentCalculationsAndPrepare(CalculationsManager.Instance.ElectricFieldStrenght);
             else
+            {
                 HandleNoCalculations();
+                Timeline.Instance.Pause();
+                Timeline.Instance.Hide();
+            }
         }
 
         public void ElectricFieldStrenght_Removed()
         {
+            Timeline.Instance.Pause();
+            Timeline.Instance.Hide();
             DatabaseManager.Instance.RemoveKVID6();
         }
         #endregion

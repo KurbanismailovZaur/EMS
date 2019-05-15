@@ -9,6 +9,7 @@ using UnityButton = UnityEngine.UI.Button;
 using Management.Calculations;
 using Management.Models;
 using Management.Wires;
+using Management.Tables;
 
 namespace UI.Main.Contexts
 {
@@ -125,28 +126,45 @@ namespace UI.Main.Contexts
 
         public void RemoveMutualActionOfBCSAndBA() => Selected.Invoke(Action.RemoveMutualActionOfBCSAndBA);
 
+        private void CheckAndSetCalcBtnsInteractable()
+        {
+            bool planesExist = ModelManager.Instance.MaterialPlanesPairs != null;
+            bool kvid1Exist = TableDataManager.Instance.IsKVID1Imported;
+            bool kvid2Exist = TableDataManager.Instance.IsKVID2Imported;
+            bool wiringExist = WiringManager.Instance.Wiring != null;
+            bool kvid4Exist = TableDataManager.Instance.IsKVID4Imported;
+            bool kvid5Exist = TableDataManager.Instance.IsKVID5Imported;
+
+            if (planesExist && kvid1Exist && kvid2Exist && wiringExist && kvid4Exist && kvid5Exist)
+                SetCalcBtnsInteractable(true);
+        }
+
         #region Event handlers
-        public void WiringManager_Imported()
-        {
-            if (ModelManager.Instance.MaterialPlanesPairs != null)
-                SetCalcBtnsInteractable(true);
-        }
+        public void WiringManager_Imported() => CheckAndSetCalcBtnsInteractable();
 
-        public void WiringManager_Removed()
-        {
-            SetCalcBtnsInteractable(false);
-        }
+        public void WiringManager_Removed() => SetCalcBtnsInteractable(false);
 
-        public void ModelManager_PlanesImported()
-        {
-            if (WiringManager.Instance.Wiring != null)
-                SetCalcBtnsInteractable(true);
-        }
+        public void ModelManager_PlanesImported() => CheckAndSetCalcBtnsInteractable();
 
-        public void ModelManager_PlanesRemoved()
-        {
-            SetCalcBtnsInteractable(false);
-        }
+        public void ModelManager_PlanesRemoved() => SetCalcBtnsInteractable(false);
+
+        #region TableDataManager
+        public void TableDataManager_KVID1Imported() => CheckAndSetCalcBtnsInteractable();
+
+        public void TableDataManager_KVID1Removed() => SetCalcBtnsInteractable(false);
+
+        public void TableDataManager_KVID2Imported() => CheckAndSetCalcBtnsInteractable();
+
+        public void TableDataManager_KVID2Removed() => SetCalcBtnsInteractable(false);
+
+        public void TableDataManager_KVID4Imported() => CheckAndSetCalcBtnsInteractable();
+
+        public void TableDataManager_KVID4Removed() => SetCalcBtnsInteractable(false);
+
+        public void TableDataManager_KVID5Imported() => CheckAndSetCalcBtnsInteractable();
+
+        public void TableDataManager_KVID5Removed() => SetCalcBtnsInteractable(false);
+        #endregion
 
         public void ElectricFieldStrenght_Calculated()
         {

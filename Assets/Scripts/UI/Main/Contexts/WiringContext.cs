@@ -18,7 +18,6 @@ namespace UI.Main.Contexts
             Edit2KVID,
             Edit3KVID,
             Edit5KVID,
-            Edit7KVID,
             Edit8KVID,
             Visibility,
             Edit,
@@ -39,9 +38,6 @@ namespace UI.Main.Contexts
 
         [SerializeField]
         private UnityButton _5KVIDButton;
-
-        [SerializeField]
-        private UnityButton _7KVIDButton;
 
         [SerializeField]
         private UnityButton _8KVIDButton;
@@ -66,8 +62,6 @@ namespace UI.Main.Contexts
 
         public void Edit5KVID() => Selected.Invoke(Action.Edit5KVID);
 
-        public void Edit7KVID() => Selected.Invoke(Action.Edit7KVID);
-
         public void Edit8KVID() => Selected.Invoke(Action.Edit8KVID);
 
         public void Visibility() => Selected.Invoke(Action.Visibility);
@@ -79,12 +73,12 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void ProjectManager_Created()
         {
-            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _7KVIDButton.interactable = _8KVIDButton.interactable = true;
+            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _8KVIDButton.interactable = true;
         }
 
         public void ProjectManager_Closed()
         {
-            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _7KVIDButton.interactable = _8KVIDButton.interactable = false;
+            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _8KVIDButton.interactable = false;
         }
 
         public void WiringManager_Imported()
