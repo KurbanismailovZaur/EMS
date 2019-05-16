@@ -14,65 +14,62 @@ namespace Management.Calculations
     {
         public static new class Factory
         {
-            public static Wire[] Create(IEnumerable<Wires.Wire> wires, List<(int a, int b, float value)> influences, float[] values, Color[] colors, Transform parent)
+            public static Wire[] Create(List<(Wires.Wire wire, List<(Wires.Wire wire, int frequency, float value)> influences, float value, Color color)> mutuals, Transform parent)
             {
-                var wiresArray = wires.Select(w => Create(w.Name, w.Points, parent)).ToArray();
-
-                for (int i = 0; i < wiresArray.Length; i++)
+                var wires = mutuals.Select(mutual =>
                 {
-                    var oppositeInfluences = influences.Where(inf => inf.a == i || inf.b == i).Select(inf => (wire: inf.a == i ? inf.b : inf.a, inf.value)).ToArray();
+                    var line = VectorLine.SetLine3D(Color.yellow, mutual.wire.Points.Select(p => p.position).ToArray());
+                    line.Draw3DAuto();
 
-                    for (int j = 0; j < oppositeInfluences.Length; j++)
-                        wiresArray[i]._influences.Add(new Influence(wiresArray[oppositeInfluences[j].wire], oppositeInfluences[j].value));
+                    var wire = line.rectTransform.gameObject.AddComponent<Wire>();
+                    wire.transform.SetParent(parent);
 
-                    wiresArray[i].Value = values[i];
-                    wiresArray[i]._line.color = colors[i];
-                }
+                    wire._line = line;
+                    wire._line.lineWidth = 2f;
 
-                return wiresArray;
-            }
+                    wire.name = wire.Name = mutual.wire.Name;
+                    wire._points = mutual.wire.Points.ToList();
 
-            private static Wire Create(string name, IList<Point> points, Transform parent)
-            {
-                var line = VectorLine.SetLine3D(Color.yellow, points.Select(p => p.position).ToArray());
-                line.Draw3DAuto();
+                    #region Collider line
+                    var colliderLine = VectorLine.SetLine3D(new Color(0f, 0f, 0f, 0f), mutual.wire.Points.Select(p => p.position).ToArray());
+                    colliderLine.Draw3DAuto();
 
-                var wire = line.rectTransform.gameObject.AddComponent<Wire>();
-                wire.transform.SetParent(parent);
+                    colliderLine.name = "Collider";
 
-                wire._line = line;
-                wire._line.lineWidth = 2f;
+                    colliderLine.lineWidth = 8f;
 
-                wire.name = wire.Name = name;
-                wire._points = points.ToList();
-                
-                #region Collider line
-                var colliderLine = VectorLine.SetLine3D(new Color(0f, 0f, 0f, 0f), points.Select(p => p.position).ToArray());
-                colliderLine.Draw3DAuto();
+                    colliderLine.rectTransform.SetParent(wire.transform);
 
-                colliderLine.name = "Collider";
+                    var collider = colliderLine.rectTransform.gameObject.AddComponent<LineCollider>();
+                    collider.SetClickHandler(wire.LineCollider_ClickHandler);
+                    #endregion
 
-                colliderLine.lineWidth = 8f;
+                    wire.Value = mutual.value;
+                    wire._line.color = mutual.color;
 
-                colliderLine.rectTransform.SetParent(wire.transform);
+                    return wire;
+                }).ToArray();
 
-                var collider = colliderLine.rectTransform.gameObject.AddComponent<LineCollider>();
-                collider.SetClickHandler(wire.LineCollider_ClickHandler);
-                #endregion
+                foreach (var wire in wires)
+                    wire._influences.AddRange(mutuals.First(m => m.wire.Name == wire.Name).influences.Select(i => new Influence(wires.First(w => w.Name == i.wire.name), i.frequency, i.value)));
 
-                return wire;
+                return wires;
             }
         }
 
+        [Serializable]
         public struct Influence
         {
             public Wire Wire { get; private set; }
 
+            public int Frequency { get; set; }
+
             public float Value { get; private set; }
 
-            public Influence(Wire wire, float value)
+            public Influence(Wire wire, int frequency, float value)
             {
                 Wire = wire;
+                Frequency = frequency;
                 Value = value;
             }
         }

@@ -34,19 +34,12 @@ namespace Management.Calculations
             var influences = new List<(int a, int b, float value)>();
 
             PythonManager.Instance.CalculateMutualActionOfBCSAndBA();
+            var sourceMutuals = DatabaseManager.Instance.GetCalculatedMutualActionOfBCSAndBA();
 
-            for (int i = 0; i < wires.Count - 1; i++)
-            {
-                for (int j = i + 1; j < wires.Count; j++)
-                {
-                    influences.Add((i, j, Calculate(wires[i], wires[j])));
-                }
-            }
-
-            var values = wires.Select((w, i) => influences.Where(inf => inf.a == i || inf.b == i).Average(inf => inf.value)).ToArray();
-            var colors = values.Select(v => _gradient.Evaluate(v)).ToArray();
-
-            _wires = Wire.Factory.Create(wires, influences, values, colors, transform);
+            var maxValue = sourceMutuals.Max(m => m.value);
+            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), influences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.value, _gradient.Evaluate(m.value / maxValue))).ToList();
+            
+            _wires = Wire.Factory.Create(mutuals, transform);
 
             foreach (var wire in _wires)
                 wire.Clicked += Wire_Clicked;
@@ -54,10 +47,10 @@ namespace Management.Calculations
             IsCalculated = true;
             Calculated.Invoke();
 
+            FilterMaxValue = maxValue;
+
             IsVisible = true;
         }
-
-        private float Calculate(Wires.Wire a, Wires.Wire b) => UnityRandom.value;
 
         public override void Remove()
         {

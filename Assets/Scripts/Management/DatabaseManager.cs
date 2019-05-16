@@ -14,17 +14,28 @@ using Management.Calculations;
 using System.IO;
 using Management.Interop;
 using System.Linq;
+using System;
+using UnityEngine.Networking;
 
 namespace Management
 {
     public class DatabaseManager : MonoSingleton<DatabaseManager>
     {
         #region Classes
-        public class ElectricFieldStrenghtInfo
+        private class ElectricFieldStrenghtInfo
         {
             public string id { get; set; }
 
             public string val { get; set; }
+        }
+
+        private class MutualActionOfBCSAndBAInfo
+        {
+            public string id { get; set; }
+
+            public string data { get; set; }
+
+            public float result { get; set; }
         }
         #endregion
 
@@ -70,7 +81,7 @@ namespace Management
                     _dbManager.Execute($"INSERT INTO {modelPoint} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", plane.a.x, plane.a.y, plane.a.z, plane.b.x, plane.b.y, plane.b.z, plane.c.x, plane.c.y, plane.c.z, materialID);
 
             _dbManager.Commit();
-            
+
             PythonManager.Instance.HandlePlanes();
         }
 
@@ -152,10 +163,10 @@ namespace Management
             _dbManager.BeginTransaction();
 
             RemoveKVID4();
-            
+
             foreach (var wireMark in wireMarks)
                 _dbManager.Execute($"INSERT INTO {kvid4} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", wireMark.Code, wireMark.CoreMaterial.Code, wireMark.CoreDiameter, wireMark.Screen1.Material?.Code, wireMark.Screen1.InnerRadius, wireMark.Screen1.Thresold, wireMark.Screen1.IsolationMaterial?.Code, wireMark.Screen2.Material?.Code, wireMark.Screen2.InnerRadius, wireMark.Screen2.Thresold, wireMark.Screen2.IsolationMaterial?.Code, wireMark.CrossSectionDiameter);                //_dbManager.Execute($"INSERT INTO {kvid4} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", wireMark.Code, wireMark.CoreMaterial.Code, wireMark.CoreDiameter, wireMark.Screen1.Material?.Code, wireMark.Screen1.InnerRadius, wireMark.Screen1.Thresold, wireMark.Screen1.IsolationMaterial?.Code, wireMark.Screen2.Material?.Code, wireMark.Screen2.InnerRadius, wireMark.Screen2.Thresold, wireMark.Screen2.IsolationMaterial?.Code, wireMark.CrossSectionDiameter);
-            
+
 
             _dbManager.Commit();
         }
@@ -173,7 +184,7 @@ namespace Management
 
             foreach (var (code, point, type, iR, oV, oF, bBA, conType) in data)
                 _dbManager.Execute($"INSERT INTO {kvid5} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", code, point.x, point.y, point.z, type, iR, oV, oF, bBA, conType);
-            
+
             _dbManager.Commit();
         }
 
@@ -190,7 +201,7 @@ namespace Management
 
             foreach (var point in points)
                 _dbManager.Execute($"INSERT INTO {kvid6} VALUES (?, ?, ?, ?)", point.Code, point.transform.position.x, point.transform.position.y, point.transform.position.z);
-            
+
             _dbManager.Commit();
         }
 
@@ -235,6 +246,29 @@ namespace Management
             }
 
             return infos;
+        }
+
+        public List<(string name, List<(string name, int frequency, float value)> influences, float value)> GetCalculatedMutualActionOfBCSAndBA()
+        {
+            var sourceInfos = _dbManager.Query<MutualActionOfBCSAndBAInfo>("SELECT * FROM ResultM2");
+
+            var mutuals = new List<(string name, List<(string name, int frequency, float value)> influences, float value)>();
+
+            foreach (var info in sourceInfos)
+            {
+                var influences = new List<(string name, int frequency, float value)>();
+
+                foreach (JsonArray jInfluenceInfo in new JsonArray(info.data))
+                {
+                    ((JsonString)jInfluenceInfo[0]).UnEscape();
+                    var influence = (jInfluenceInfo.GetString(0), jInfluenceInfo.GetNumber(1).ToInt(), jInfluenceInfo.GetNumber(2).ToFloat());
+                    influences.Add(influence);
+                }
+
+                mutuals.Add((info.id, influences, info.result));
+            }
+
+            return mutuals;
         }
     }
 }

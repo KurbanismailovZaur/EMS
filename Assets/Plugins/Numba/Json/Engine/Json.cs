@@ -213,8 +213,9 @@ namespace Numba.Json.Engine
                     }
 
                     currentIndex += 1;
+                    var endIndex = currentIndex + 4;
 
-                    for (; currentIndex < currentIndex + 3; currentIndex++)
+                    for (; currentIndex < endIndex; currentIndex++)
                     {
                         if (!IsHexodecimalSymbol(data[currentIndex + 1]))
                         {
@@ -229,7 +230,7 @@ namespace Numba.Json.Engine
 
         private static bool IsHexodecimalSymbol(char symbol)
         {
-            return symbol >= '0' && symbol < '9' || symbol >= 'a' && symbol < 'f' || symbol > 'A' && symbol < 'F';
+            return symbol >= '0' && symbol < '9' || symbol >= 'a' && symbol <= 'f' || symbol >= 'A' && symbol <= 'F';
         }
 
         private static JsonNumber ParseNumber(string data, ref int currentIndex)

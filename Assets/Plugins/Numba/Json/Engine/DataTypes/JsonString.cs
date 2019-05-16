@@ -1,6 +1,7 @@
 ﻿using Numba.Json.Engine.DataTypes.Exceptions;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using UnityEngine;
 
@@ -227,6 +228,23 @@ namespace Numba.Json.Engine.DataTypes
         public override int GetHashCode()
         {
             return Value.GetHashCode();
+        }
+
+        public void UnEscape()
+        {
+            StringBuilder builder = new StringBuilder(Value);
+
+            for (int i = 0; i < builder.Length - 1; i++)
+            {
+                if (builder[i] == '\\' && builder[i + 1] == 'u')
+                {
+                    string code = builder.ToString(i + 2, 4);
+                    char symbol = (char)int.Parse(code, NumberStyles.HexNumber);
+                    builder.Replace($"\\u{code}", $"{symbol}", i, 6);
+                }
+            }
+
+            Value = builder.ToString();
         }
         #endregion
 

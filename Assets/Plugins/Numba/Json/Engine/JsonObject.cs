@@ -998,12 +998,12 @@ namespace Numba.Json.Engine
         }
         #endregion
 
-        #region Indexers
-        /// <summary>
-        /// Get or set value by field index.
-        /// </summary>
-        /// <param name="index">Field index to get or set.</param>
-        /// <returns>Field value.</returns>
+            #region Indexers
+            /// <summary>
+            /// Get or set value by field index.
+            /// </summary>
+            /// <param name="index">Field index to get or set.</param>
+            /// <returns>Field value.</returns>
         public JsonValue this[int index]
         {
             get { return GetValue(index); }
