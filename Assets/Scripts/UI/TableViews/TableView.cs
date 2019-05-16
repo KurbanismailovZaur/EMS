@@ -155,7 +155,7 @@ namespace UI.TableViews
 
         protected void Cell_Clicked(Cell cell) => _inputController.Edit(cell);
 
-        private void AddButton_OnClick() => AddRowToCurrentTable();
+        protected virtual void AddButton_OnClick() => AddRowToCurrentTable();
 
         private void SaveButton_OnClick() => Save();
 

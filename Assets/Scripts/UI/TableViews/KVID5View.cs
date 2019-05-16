@@ -178,6 +178,13 @@ namespace UI.TableViews
         }
         #region Event handlers
         private void Import_OnClick() => Import();
+
+        protected override void AddButton_OnClick()
+        {
+            if (TableDataManager.Instance.KVID2Data.Count == 0) return;
+
+            base.AddButton_OnClick();
+        }
         #endregion
     }
 }

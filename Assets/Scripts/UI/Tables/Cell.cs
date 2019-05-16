@@ -26,13 +26,14 @@ namespace UI.Tables
 
         public static class Factory
         {
-            private static Cell Create(Cell cellPrefab, Type type, Action<Cell> valueSetter, Column column, Action<Cell> cellClickHandler)
+            private static Cell Create(Cell cellPrefab, Type type, Action<Cell> valueSetter, Column column, Action<Cell> cellClickHandler, params string[] avaliableValues)
             {
                 var cell = Instantiate(cellPrefab, column.transform);
                 cell._type = type;
                 cell.DoubleClicked += cellClickHandler;
                 valueSetter(cell);
                 cell.Column = column;
+                cell._avaliableValues = avaliableValues;
 
                 return cell;
             }
@@ -47,9 +48,9 @@ namespace UI.Tables
                 return Create(cellPrefab, Type.NullableInt, (c) => c.NullableIntValue = value, column, cellClickHandler);
             }
 
-            public static Cell Create(Cell cellPrefab, string value, bool isNullableString, Column column, Action<Cell> cellClickHandler)
+            public static Cell Create(Cell cellPrefab, string value, bool isNullableString, Column column, Action<Cell> cellClickHandler, params string[] avaliableValues)
             {
-                return Create(cellPrefab, isNullableString ? Type.NullableString : Type.String, (c) => { if (isNullableString) c.NullableStringValue = value; else c.StringValue = value; }, column, cellClickHandler);
+                return Create(cellPrefab, isNullableString ? Type.NullableString : Type.String, (c) => { if (isNullableString) c.NullableStringValue = value; else c.StringValue = value; }, column, cellClickHandler, avaliableValues);
             }
 
             public static Cell Create(Cell cellPrefab, float value, Column column, Action<Cell> cellClickHandler)
@@ -84,6 +85,8 @@ namespace UI.Tables
 
         [SerializeField]
         private Type _type;
+
+        private string[] _avaliableValues = new string[0];
 
         private static readonly NumberFormatInfo _numberFormatInfo = new NumberFormatInfo { NumberDecimalSeparator = "." };
         
@@ -143,6 +146,18 @@ namespace UI.Tables
         private void SetText(string value)
         {
             value = value?.Trim();
+
+            bool canContinue = false;
+            if (_avaliableValues.Length == 0) canContinue = true;
+            for(int i = 0; i < _avaliableValues.Length; ++i)
+            {
+                if(value == _avaliableValues[i])
+                {
+                    canContinue = true;
+                    break;
+                }
+            }
+            if (!canContinue) return;
 
             if (_text.text == value) return;
             

@@ -13,7 +13,7 @@ using System.Linq;
 
 namespace UI.Tables.Concrete.KVIDS
 {
-    
+
     public class KVID5Table : Table
     {
         public class KVID5Panel : Panel
@@ -189,7 +189,7 @@ namespace UI.Tables.Concrete.KVIDS
             var xCell = Cell.Factory.Create(_cellPrefab, x, _xs, cellClickHandler);
             var yCell = Cell.Factory.Create(_cellPrefab, y, _ys, cellClickHandler);
             var zCell = Cell.Factory.Create(_cellPrefab, z, _zs, cellClickHandler);
-            var tCell = Cell.Factory.Create(_cellPrefab, type, false, _types, cellClickHandler);
+            var tCell = Cell.Factory.Create(_cellPrefab, type, false, _types, cellClickHandler, "И", "П", "У");
             var irCell = Cell.Factory.Create(_cellPrefab, iR, _innerResists, cellClickHandler);
             var ovCell = Cell.Factory.Create(_cellPrefab, oV, _operatingVoltages, cellClickHandler);
             var ofCell = Cell.Factory.Create(_cellPrefab, oF, _operatingFrequensies, cellClickHandler);
@@ -254,7 +254,7 @@ namespace UI.Tables.Concrete.KVIDS
             _operatingVoltages.AddCell(kvid5Panel.OperatingVoltage);
             _operatingFrequensies.AddCell(kvid5Panel.OperatingFrequensy);
             _connectorTypes.AddCell(kvid5Panel.ConnectorType);
-          
+
             // reference cells
             _blockBAs.AddCell(kvid5Panel.BlockBA);
         }
@@ -297,5 +297,5 @@ namespace UI.Tables.Concrete.KVIDS
         }
         #endregion
     }
-    
+
 }
