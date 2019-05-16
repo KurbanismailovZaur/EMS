@@ -49,8 +49,9 @@ namespace Management.Calculations
                     for (int k = 0; k < pointsByAxis; k++)
                     {
                         var position = new Vector3(i * distanceBetween - halfCount, j * distanceBetween - halfCount, k * distanceBetween - halfCount);
+                        position += bounds.center;
 
-                        if (position.magnitude <= sphereRadius)
+                        if ((position - bounds.center).magnitude <= sphereRadius)
                             points.Add(($"Т{codeIndex++}", position));
                     }
                 }
