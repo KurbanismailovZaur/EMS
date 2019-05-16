@@ -99,7 +99,6 @@ namespace UI.TableViews
         {
             var headersGroup = AddAssociationAndSelect(wire.Name);
 
-            headersGroup.head0.Panel.WireLenght.FloatValue = wire.Lenght;
             headersGroup.head1.Panel.WireID.SelectOption(wire.WireType);
             headersGroup.head4.Panel.I.SelectOption(wire.ESID_I);
             headersGroup.head4.Panel.P.SelectOption(wire.ESID_P);
@@ -158,12 +157,11 @@ namespace UI.TableViews
             foreach (var association in _tabsAssociations)
             {
                 var data = ((KVID3Table)association.table).GetWireDataFromPanels();
-                var lenght = association.header.GetComponentInChildren<KVID3TableHeader0>().Panel.WireLenght.FloatValue;
                 var type = association.header.GetComponentInChildren<KVID3TableHeader1>().Panel.WireID.GetSelectedOptionName();
                 var i = association.header.GetComponentInChildren<KVID3TableHeader4>().Panel.I.GetSelectedOptionName();
                 var p = association.header.GetComponentInChildren<KVID3TableHeader4>().Panel.P.GetSelectedOptionName();
 
-                wires.Add(Wire.Factory.Create(data.name, lenght, type, i, p, data.points));
+                wires.Add(Wire.Factory.Create(data.name, type, i, p, data.points));
             }
 
 
@@ -252,7 +250,7 @@ namespace UI.TableViews
             return Instantiate(_headerPrefab, _headersParent.transform);
         }
 
-        private (KVID3TableHeader0 head0, KVID3TableHeader1 head1, KVID3TableHeader4 head4) AddAssociationAndSelect(string name = null)
+        private (KVID3TableHeader0 head0, KVID3TableHeader1 head1, KVID3TableHeader4 head4, Table table) AddAssociationAndSelect(string name = null)
         {
             var tab = AddTab(name);
             var table = AddTable(tab.Name);
@@ -274,7 +272,7 @@ namespace UI.TableViews
 
             _headersParent.SetActive(true);
 
-            return (header0Component, header1Component, header4Component);
+            return (header0Component, header1Component, header4Component, table);
         }
 
         private void RemoveCurrentAssociation()
@@ -355,7 +353,10 @@ namespace UI.TableViews
         #region Event handlers
         private void AddTabButton_OnClick()
         {
-            AddAssociationAndSelect();
+            var associationGroup = AddAssociationAndSelect();
+            associationGroup.table.AddEmpty(Cell_Clicked);
+            associationGroup.table.AddEmpty(Cell_Clicked);
+
             StartCoroutine(UpdateScrollrectHorizontalRoutine());
         }
 

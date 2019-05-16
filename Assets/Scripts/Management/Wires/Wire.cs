@@ -29,7 +29,7 @@ namespace Management.Wires
 
         public static class Factory
         {
-            public static Wire Create(string name, float lenght, string wireType, string iID, string pID, List<Point> points)
+            public static Wire Create(string name, string wireType, string iID, string pID, List<Point> points)
             {
                 var line = VectorLine.SetLine3D(Color.yellow, points.Select(p => p.position).ToArray());
                 line.Draw3DAuto();
@@ -39,7 +39,6 @@ namespace Management.Wires
 
                 wire.name = wire.Name = name;
                 wire.WireType = wireType;
-                wire.Lenght = lenght;
                 wire.ESID_I = iID;
                 wire.ESID_P = pID;
                 wire._points = points;
@@ -51,8 +50,6 @@ namespace Management.Wires
         protected VectorLine _line;
 
         public string Name { get; protected set; }
-
-        public float Lenght { get; protected set; }
 
         public string WireType { get; protected set; }
 

@@ -340,9 +340,9 @@ namespace UI.TableViews
 
         private void AddTabButton_OnClick()
         {
-            var assotiationGroup = AddAssociationAndSelect();
-            assotiationGroup.table.AddEmpty(Cell_Clicked);
-            assotiationGroup.table.AddEmpty(Cell_Clicked);
+            var assctiationGroup = AddAssociationAndSelect();
+            assctiationGroup.table.AddEmpty(Cell_Clicked);
+            assctiationGroup.table.AddEmpty(Cell_Clicked);
 
             StartCoroutine(UpdateScrollrectHorizontalRoutine());
         }
