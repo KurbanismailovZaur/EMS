@@ -20,7 +20,7 @@ namespace UI.Tables.Concrete.KVIDS
         {
             public RemoveButton RemoveButton { get; private set; }
 
-            public ReferenceCell ID { get; private set; }
+            public Cell ID { get; private set; }
 
             public Cell MaxVoltage { get; private set; }
 
@@ -29,7 +29,7 @@ namespace UI.Tables.Concrete.KVIDS
             public Cell FrequencyMax { get; private set; }
 
 
-            public KVID8Tab0Panel(RemoveButton removeButton, ReferenceCell id, Cell maxVoltage, Cell frequencyMin, Cell frequencyMax)
+            public KVID8Tab0Panel(RemoveButton removeButton, Cell id, Cell maxVoltage, Cell frequencyMin, Cell frequencyMax)
             {
                 RemoveButton = removeButton;
                 ID = id;
@@ -51,13 +51,14 @@ namespace UI.Tables.Concrete.KVIDS
             {
                 switch (name)
                 {
-
                     case "MaxVoltage":
                         return MaxVoltage;
                     case "FrequencyMin":
                         return FrequencyMin;
                     case "FrequencyMax":
                         return FrequencyMax;
+                    case "ID":
+                        return ID;
                     default:
                         throw new ArgumentException($"No cell with name \"{ name }\"");
                 }
@@ -65,13 +66,7 @@ namespace UI.Tables.Concrete.KVIDS
 
             public override ReferenceCell GetReferenceCell(string name)
             {
-                switch (name)
-                {
-                    case "ID":
-                        return ID;
-                    default:
-                        throw new ArgumentException($"No reference cell with name \"{ name }\"");
-                }
+                throw new ArgumentException($"No reference cell with name \"{ name }\"");
             }
         }
 
@@ -121,11 +116,7 @@ namespace UI.Tables.Concrete.KVIDS
             var mvCell = Cell.Factory.Create(_cellPrefab, maxVoltage, _maxVoltages, cellClickHandler);
             var fMinCell = Cell.Factory.Create(_cellPrefab, frequencyMin, _frequencyMins, cellClickHandler);
             var fMaxCell = Cell.Factory.Create(_cellPrefab, frequencyMax, _frequencyMaxs, cellClickHandler);
-
-
-            // reference cells
-            var list =  CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => p.Code).ToList();
-            var idCell = ReferenceCell.Factory.Create(_referenceCellPrefab, list, id, _ids);
+            var idCell = Cell.Factory.Create(_cellPrefab, id, false, _ids, cellClickHandler); 
 
 
 
@@ -187,7 +178,7 @@ namespace UI.Tables.Concrete.KVIDS
 
 
             foreach (var panel in _kvid8Panels)
-                result.Add((panel.ID.GetSelectedOptionName(), panel.MaxVoltage.FloatValue, panel.FrequencyMin.IntValue, panel.FrequencyMax.IntValue));
+                result.Add((panel.ID.StringValue, panel.MaxVoltage.FloatValue, panel.FrequencyMin.IntValue, panel.FrequencyMax.IntValue));
 
             return result;
         }

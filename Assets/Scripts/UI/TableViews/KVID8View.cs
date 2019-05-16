@@ -95,7 +95,7 @@ namespace UI.TableViews
             {
                 var panel = (KVID8Tab0Table.KVID8Tab0Panel)table0.AddEmpty(Cell_Clicked);
 
-                panel.ID.SelectOption(pointID);
+                panel.ID.StringValue = pointID;
                 panel.MaxVoltage.FloatValue = maxVoltage;
                 panel.FrequencyMin.IntValue = fMin;
                 panel.FrequencyMax.IntValue = fMax;
@@ -106,8 +106,8 @@ namespace UI.TableViews
             {
                 var panel = (KVID8Tab1Table.KVID8Tab1Panel)table1.AddEmpty(Cell_Clicked);
 
-                panel.ID.SelectOption(idES);
-                panel.WireID.SelectOption(wireID);
+                panel.ID.NullableStringValue = idES;
+                panel.WireID.NullableStringValue = wireID;
                 panel.MaxVoltage.FloatValue = maxVoltage;
                 panel.FrequencyMin.IntValue = fMin;
                 panel.FrequencyMax.IntValue = fMax;
@@ -154,7 +154,7 @@ namespace UI.TableViews
             {
                 var panel = (KVID8Tab0Table.KVID8Tab0Panel)table0.AddEmpty(Cell_Clicked);
 
-                panel.ID.SelectOption(pointID);
+                panel.ID.StringValue = pointID;
                 panel.MaxVoltage.FloatValue = maxVoltage;
                 panel.FrequencyMin.IntValue = fMin;
                 panel.FrequencyMax.IntValue = fMax;
@@ -165,8 +165,8 @@ namespace UI.TableViews
             {
                 var panel = (KVID8Tab1Table.KVID8Tab1Panel)table1.AddEmpty(Cell_Clicked);
 
-                panel.ID.SelectOption(idES);
-                panel.WireID.SelectOption(wireID);
+                panel.ID.NullableStringValue = idES;
+                panel.WireID.NullableStringValue  = wireID;
                 panel.MaxVoltage.FloatValue = maxVoltage;
                 panel.FrequencyMin.IntValue = fMin;
                 panel.FrequencyMax.IntValue = fMax;

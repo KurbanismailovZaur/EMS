@@ -20,9 +20,9 @@ namespace UI.Tables.Concrete.KVIDS
         {
             public RemoveButton RemoveButton { get; private set; }
 
-            public ReferenceCell ID { get; private set; }
+            public Cell ID { get; private set; }
 
-            public ReferenceCell WireID { get; private set; }
+            public Cell WireID { get; private set; }
 
             public Cell MaxVoltage { get; private set; }
 
@@ -31,7 +31,7 @@ namespace UI.Tables.Concrete.KVIDS
             public Cell FrequencyMax { get; private set; }
 
 
-            public KVID8Tab1Panel(RemoveButton removeButton, ReferenceCell id, ReferenceCell wireId, Cell maxVoltage, Cell frequencyMin, Cell frequencyMax)
+            public KVID8Tab1Panel(RemoveButton removeButton, Cell id, Cell wireId, Cell maxVoltage, Cell frequencyMin, Cell frequencyMax)
             {
                 RemoveButton = removeButton;
                 ID = id;
@@ -61,6 +61,10 @@ namespace UI.Tables.Concrete.KVIDS
                         return FrequencyMin;
                     case "FrequencyMax":
                         return FrequencyMax;
+                    case "WireID":
+                        return WireID;
+                    case "ID":
+                        return ID;
                     default:
                         throw new ArgumentException($"No cell with name \"{ name }\"");
                 }
@@ -68,15 +72,7 @@ namespace UI.Tables.Concrete.KVIDS
 
             public override ReferenceCell GetReferenceCell(string name)
             {
-                switch (name)
-                {
-                    case "WireID":
-                        return WireID;
-                    case "ID":
-                        return ID;
-                    default:
-                        throw new ArgumentException($"No reference cell with name \"{ name }\"");
-                }
+                throw new ArgumentException($"No reference cell with name \"{ name }\"");
             }
         }
 
@@ -123,7 +119,7 @@ namespace UI.Tables.Concrete.KVIDS
         public Column FrequencyMaxs => _frequencyMaxs;
         #endregion
 
-        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add("-", "-", 0f, 0, 0, cellClickHandler);
+        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add("", "", 0f, 0, 0, cellClickHandler);
 
         private KVID8Tab1Panel Add(string id, string wireId, float maxVoltage, int frequencyMin, int frequencyMax, Action<Cell> cellClickHandler)
         {
@@ -131,15 +127,8 @@ namespace UI.Tables.Concrete.KVIDS
             var mvCell = Cell.Factory.Create(_cellPrefab, maxVoltage, _maxVoltages, cellClickHandler);
             var fMinCell = Cell.Factory.Create(_cellPrefab, frequencyMin, _frequencyMins, cellClickHandler);
             var fMaxCell = Cell.Factory.Create(_cellPrefab, frequencyMax, _frequencyMaxs, cellClickHandler);
-
-
-            // reference cells
-            var list = TableDataManager.Instance.KVID5Data.Select(d => d.code).ToList();
-            var idCell = ReferenceCell.Factory.Create(_referenceCellPrefab, list, id, _ids);
-
-
-            var list1 = (WiringManager.Instance.Wiring == null) ? new List<string>() : WiringManager.Instance.Wiring.Wires.Select(w => w.Name).ToList();
-            var wireIdCell = ReferenceCell.Factory.Create(_referenceCellPrefab, list1, wireId, _wireIds);
+            var idCell = Cell.Factory.Create(_cellPrefab, id, true, _ids, cellClickHandler);
+            var wireIdCell = Cell.Factory.Create(_cellPrefab, wireId, true, _wireIds, cellClickHandler);
 
 
 
@@ -202,7 +191,7 @@ namespace UI.Tables.Concrete.KVIDS
 
 
             foreach (var panel in _kvid8Panels)
-                result.Add((panel.ID.GetSelectedOptionName(), panel.WireID.GetSelectedOptionName(), panel.MaxVoltage.FloatValue, panel.FrequencyMin.IntValue, panel.FrequencyMax.IntValue));
+                result.Add((panel.ID.NullableStringValue, panel.WireID.NullableStringValue, panel.MaxVoltage.FloatValue, panel.FrequencyMin.IntValue, panel.FrequencyMax.IntValue));
 
             return result;
         }
