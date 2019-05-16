@@ -187,7 +187,7 @@ namespace UI.TableViews
         }
 
 
-        private (KVID2TableHeader header, KVID2TableHeader0 header0) AddAssociationAndSelect(string name = null)
+        private (KVID2TableHeader header, KVID2TableHeader0 header0, Table table) AddAssociationAndSelect(string name = null)
         {
             var tab = AddTab(name);
             var table = AddTable(tab.Name);
@@ -206,7 +206,7 @@ namespace UI.TableViews
 
             _header.SetActive(true);
 
-            return (headerComponent, header0Component);
+            return (headerComponent, header0Component, table);
         }
 
         private Tab AddTab(string name)
@@ -340,7 +340,10 @@ namespace UI.TableViews
 
         private void AddTabButton_OnClick()
         {
-            AddAssociationAndSelect();
+            var assotiationGroup = AddAssociationAndSelect();
+            assotiationGroup.table.AddEmpty(Cell_Clicked);
+            assotiationGroup.table.AddEmpty(Cell_Clicked);
+
             StartCoroutine(UpdateScrollrectHorizontalRoutine());
         }
 

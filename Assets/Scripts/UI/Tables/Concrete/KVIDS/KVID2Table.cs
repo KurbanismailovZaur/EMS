@@ -152,6 +152,7 @@ namespace UI.Tables.Concrete.KVIDS
         #region Event handlers
         private void RemoveButton_Clicked(RemoveButton removeButton, Panel panel)
         {
+            if (_kvid2Panels.Count == 2) return;
             Remove(panel);
             Destroy(removeButton.gameObject);
         }
