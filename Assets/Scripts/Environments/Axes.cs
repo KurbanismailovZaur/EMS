@@ -128,7 +128,7 @@ namespace Environments
                     axis.Draw3D();
                 }
 
-                var angle = Vector3.Angle(_camera.transform.position, new Vector3(_camera.transform.position.x, 0f, _camera.transform.position.z));
+                var angle = Vector3.Angle(-_camera.transform.forward, new Vector3(-_camera.transform.forward.x, 0f, -_camera.transform.forward.z));
 
                 float alpha = Mathf.Min(Mathf.Max(angle - _invisibleAngle, 0f) / _visibleAngleOffset, 1f);
 

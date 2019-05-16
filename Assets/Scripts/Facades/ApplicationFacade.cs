@@ -442,6 +442,55 @@ namespace Facades
         }
         #endregion
 
+        public void CameraContext_Selected(CameraContext.Action action)
+        {
+            switch (action)
+            {
+                case CameraContext.Action.ViewRight:
+                    _cameraController.ViewFromDirection(Vector3.right, Vector3.up);
+                    break;
+                case CameraContext.Action.ViewLeft:
+                    _cameraController.ViewFromDirection(Vector3.left, Vector3.up);
+                    break;
+                case CameraContext.Action.ViewTop:
+                    _cameraController.ViewFromDirection(Vector3.up, Vector3.forward);
+                    break;
+                case CameraContext.Action.ViewBottom:
+                    _cameraController.ViewFromDirection(Vector3.down, -Vector3.forward);
+                    break;
+                case CameraContext.Action.ViewFront:
+                    _cameraController.ViewFromDirection(-Vector3.forward, Vector3.up);
+                    break;
+                case CameraContext.Action.ViewBack:
+                    _cameraController.ViewFromDirection(Vector3.forward, Vector3.up);
+                    break;
+                case CameraContext.Action.FocusModel:
+                    if (ModelManager.Instance.Model)
+                        _cameraController.FocusOn(ModelManager.Instance.Model.Bounds.center);
+                    break;
+                case CameraContext.Action.FocusWiring:
+                    if (WiringManager.Instance.Wiring)
+                        _cameraController.FocusOn(WiringManager.Instance.Wiring.Bounds.center);
+                    break;
+                case CameraContext.Action.FocusScene:
+                    if (!ModelManager.Instance.Model)
+                        goto case CameraContext.Action.FocusWiring;
+
+                    if (!WiringManager.Instance.Wiring)
+                        goto case CameraContext.Action.FocusModel;
+
+                    var bounds = ModelManager.Instance.Model.Bounds;
+                    bounds.Encapsulate(WiringManager.Instance.Wiring.Bounds);
+
+                    _cameraController.FocusOn(bounds.center);
+                    break;
+                case CameraContext.Action.Reset:
+                    _cameraController.FocusOn(Vector3.zero);
+                    _cameraController.ViewFromDirection(Vector3.up, Vector3.forward);
+                    break;
+            }
+        }
+
         public void Filter_Changed(float min, float max) => FilterCurrentCalculations(min, max);
 
         public void CameraViewport_EmptyClick()

@@ -56,9 +56,8 @@ namespace Management.Models
             var bounds = GetBounds(go);
 
             Clamp(go, ref bounds);
-            // Center(go, bounds);
 
-            Model = Model.Factory.MakeModel(go);
+            Model = Model.Factory.MakeModel(go, bounds);
             Model.transform.SetParent(transform);
 
             ModelImported.Invoke();

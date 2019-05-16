@@ -12,9 +12,10 @@ namespace Management.Models
         #region Classes
         public static class Factory
         {
-            public static Model MakeModel(GameObject go)
+            public static Model MakeModel(GameObject go, Bounds bounds)
             {
                 var model = go.AddComponent<Model>();
+                model.Bounds = bounds;
 
                 model.Initialize();
 
@@ -32,6 +33,8 @@ namespace Management.Models
         private Dictionary<Renderer, (Material[] materials, Material[] fadeMaterials)> _pairs = new Dictionary<Renderer, (Material[] materials, Material[] fadeMaterials)>();
         
         public bool IsFaded { get; private set; }
+
+        public Bounds Bounds { get; private set; }
 
         private void Initialize()
         {

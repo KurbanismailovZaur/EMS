@@ -10,7 +10,10 @@ namespace Control
     public class CameraController : MonoBehaviour
     {
         [SerializeField]
-        private KeyCode _key;
+        private KeyCode _rotateKey = KeyCode.Mouse0;
+
+        [SerializeField]
+        private KeyCode _planarShiftKey = KeyCode.Mouse2;
 
         [SerializeField]
         private Vector3 _origin;
@@ -85,6 +88,8 @@ namespace Control
             SetTransformToTargets();
             SetSizeToTarget();
 
+            CheckPlanarShifting();
+
             #region Editor
 #if UNITY_EDITOR
             if (_drawDebugLines) DrawDebugLines();
@@ -96,7 +101,7 @@ namespace Control
         {
             if (!_isActive) return;
 
-            Vector2 mouseDeltas = Input.GetKey(_key) ? new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) : Vector2.zero;
+            Vector2 mouseDeltas = Input.GetKey(_rotateKey) ? new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) : Vector2.zero;
             mouseDeltas *= _mouseDeltaMultiplier;
 
             Quaternion deltaXRotation = Quaternion.Euler(0f, mouseDeltas.x, 0f);
@@ -141,6 +146,41 @@ namespace Control
             _currentVector = _targetVector;
             _currentUpVector = _targetUpVector;
         }
+
+        public void CheckPlanarShifting()
+        {
+            if (_isMouseInViewport && Input.GetKeyDown(_planarShiftKey))
+                StartCoroutine(PlanarShiftRoutine());
+        }
+
+        private IEnumerator PlanarShiftRoutine()
+        {
+            var originStartPosition = _origin;
+            var right = transform.right;
+            var up = transform.up;
+
+            var mouseStartPosition = Input.mousePosition;
+
+            while (Input.GetKey(_planarShiftKey))
+            {
+                var mouseDelta = Input.mousePosition - mouseStartPosition;
+
+                var deltaX = mouseDelta.x / Screen.width * Camera.orthographicSize * Camera.aspect * 2f;
+                var deltaY = mouseDelta.y / Screen.height * Camera.orthographicSize * 2f;
+                
+                _origin = originStartPosition - (right * deltaX) - (up * deltaY);
+
+                yield return null;
+            }
+        }
+
+        public void ViewFromDirection(Vector3 direction, Vector3 up)
+        {
+            _targetVector = direction;
+            _targetUpVector = up;
+        }
+
+        public void FocusOn(Vector3 point) => _origin = point;
 
         #region Editor
 #if UNITY_EDITOR
