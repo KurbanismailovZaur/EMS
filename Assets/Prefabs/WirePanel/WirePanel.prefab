@@ -1468,7 +1468,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: 64
+  m_MinWidth: 96
   m_MinHeight: -1
   m_PreferredWidth: -1
   m_PreferredHeight: -1
@@ -1723,7 +1723,7 @@ MonoBehaviour:
   m_IgnoreLayout: 0
   m_MinWidth: -1
   m_MinHeight: -1
-  m_PreferredWidth: 48
+  m_PreferredWidth: 64
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
@@ -1806,7 +1806,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2763008218756711702
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2063,7 +2063,7 @@ GameObject:
   - component: {fileID: 4867283444491309571}
   - component: {fileID: 2538727363389961665}
   m_Layer: 5
-  m_Name: Colon
+  m_Name: Frequency
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2123,13 +2123,13 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 4
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: "\u0427\u0430\u0441\u0442\u043E\u0442\u0430"
 --- !u!114 &2538727363389961665
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2145,7 +2145,7 @@ MonoBehaviour:
   m_IgnoreLayout: 0
   m_MinWidth: -1
   m_MinHeight: -1
-  m_PreferredWidth: 40
+  m_PreferredWidth: 96
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
@@ -2161,11 +2161,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Devider
-      objectReference: {fileID: 0}
-    - target: {fileID: 2072932668549030933, guid: 76fd7be0d91072d4ca9fdfcbe1fdd94c,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2072932668549030934, guid: 76fd7be0d91072d4ca9fdfcbe1fdd94c,
         type: 3}
@@ -2225,7 +2220,7 @@ PrefabInstance:
     - target: {fileID: 2072932668549030934, guid: 76fd7be0d91072d4ca9fdfcbe1fdd94c,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 84
+      value: 36.5
       objectReference: {fileID: 0}
     - target: {fileID: 2072932668549030934, guid: 76fd7be0d91072d4ca9fdfcbe1fdd94c,
         type: 3}
@@ -2235,7 +2230,7 @@ PrefabInstance:
     - target: {fileID: 2072932668549030934, guid: 76fd7be0d91072d4ca9fdfcbe1fdd94c,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 168
+      value: 73
       objectReference: {fileID: 0}
     - target: {fileID: 2072932668549030934, guid: 76fd7be0d91072d4ca9fdfcbe1fdd94c,
         type: 3}

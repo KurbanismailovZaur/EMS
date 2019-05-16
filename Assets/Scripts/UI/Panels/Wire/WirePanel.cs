@@ -138,7 +138,7 @@ namespace UI.Panels.Wire
 
             foreach (var influence in wire.Influences)
             {
-                var inf = Influence.Factory.Create(_influencePrefab, influence.Wire.Name, influence.Value);
+                var inf = Influence.Factory.Create(_influencePrefab, influence.Wire.Name, influence.Frequency, influence.Value);
                 inf.transform.SetParent(_content);
             }
 
