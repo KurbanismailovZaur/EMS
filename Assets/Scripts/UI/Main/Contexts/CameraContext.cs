@@ -87,12 +87,30 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void ProjectManager_Created()
         {
-            
+            _viewRightButton.interactable = true;
+            _viewLeftButton.interactable = true;
+            _viewTopButton.interactable = true;
+            _viewBottomButton.interactable = true;
+            _viewFrontButton.interactable = true;
+            _viewBackButton.interactable = true;
+            _focusModelButton.interactable = true;
+            _focusWiringButton.interactable = true;
+            _focusSceneButton.interactable = true;
+            _resetButton.interactable = true;
         }
 
         public void ProjectManager_Closed()
         {
-            
+            _viewRightButton.interactable = false;
+            _viewLeftButton.interactable = false;
+            _viewTopButton.interactable = false;
+            _viewBottomButton.interactable = false;
+            _viewFrontButton.interactable = false;
+            _viewBackButton.interactable = false;
+            _focusModelButton.interactable = false;
+            _focusWiringButton.interactable = false;
+            _focusSceneButton.interactable = false;
+            _resetButton.interactable = false;
         }
         #endregion
     }
