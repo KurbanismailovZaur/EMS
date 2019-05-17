@@ -39,6 +39,8 @@ namespace UI.TableViews.IO
                 if (!IsCorrectNodeRow(row)) break;
 
                 points.Add(ReadPoint(row));
+
+                if (j == 103823 + 2) break; 
             }
 
             return points;

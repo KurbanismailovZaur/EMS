@@ -103,6 +103,8 @@ namespace UI.Tables.Concrete.KVIDS
         public Column Zs => _zs;
         #endregion
 
+        public int PanelCount { get { return _kvid6Panels.Count; } }
+
         public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add(GetNextCode(), 0f, 0f, 0f, cellClickHandler);
 
         private KVID6Panel Add(string code, float x, float y, float z, Action<Cell> cellClickHandler)

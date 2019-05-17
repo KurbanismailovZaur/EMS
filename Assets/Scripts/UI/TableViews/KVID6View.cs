@@ -94,6 +94,11 @@ namespace UI.TableViews
 
         #region Event handlers
         private void Import_OnClick() => Import();
+        protected override void AddButton_OnClick()
+        {
+            if (((KVID6Table)_tabsAssociations[0].table).PanelCount == 103823) return;
+            base.AddButton_OnClick();
+        }
         #endregion
     }
 }
