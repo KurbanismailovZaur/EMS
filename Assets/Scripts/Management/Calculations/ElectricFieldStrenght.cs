@@ -98,7 +98,7 @@ namespace Management.Calculations
             foreach (var point in _points)
                 Destroy(point.gameObject);
 
-            _points = null;
+            _points.Clear();
 
             IsCalculated = false;
             IsVisible = false;

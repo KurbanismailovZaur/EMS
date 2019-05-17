@@ -150,15 +150,6 @@ namespace Facades
         }
         #endregion
 
-        #region Reports
-        private void Generate() => StartCoroutine(GenerateRoutine());
-
-        private IEnumerator GenerateRoutine()
-        {
-            yield return _reports.Open();
-        }
-        #endregion
-
         private void FilterCurrentCalculations(float min, float max) => _currentCalculations.Filter(min, max);
 
         private void FilterCurrentCalculationsWithCurrentRanges() => FilterCurrentCalculations(_filter.RangeSlider.MinValue, _filter.RangeSlider.MaxValue);
@@ -424,7 +415,7 @@ namespace Facades
             switch (action)
             {
                 case ReportsContext.Action.Generate:
-                    Generate();
+                    _reports.Open();
                     break;
             }
         }
