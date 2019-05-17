@@ -1,19 +1,31 @@
-﻿using Management.Wires;
+﻿using Management.Tables;
+using Management.Wires;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace UI.TableViews.IO
 {
     public static class KVID3DataReader
     {
-        public static List<(string name, float wireLenght, string wireType, string iEsID, string pEsID, List<Wire.Point> points)> ReadFromFile(string pathToXLS)
+        public static List<(string name, float wireLenght, string wireType, string iEsID, string pEsID, List<Wire.Point> points)> ReadFromFile(string pathToXLS, out bool hasError)
         {
+            if (TableDataManager.Instance.KVID5Data.Count == 0)
+            {
+                hasError = true;
+                return null;
+            }
+
+
             var tabs = new List<(string name, float wireLenght, string wireType, string iEsID, string pEsID, List<Wire.Point> points)>();
+            var avaliableIds = TableDataManager.Instance.KVID5Data.Select(d => d.code);
+            StringComparer invCmp = StringComparer.InvariantCulture;
+
 
             HSSFWorkbook workbook;
 
@@ -31,9 +43,16 @@ namespace UI.TableViews.IO
                 var iID = sheet.GetRow(4).GetCell(0).StringCellValue;
                 var pID = sheet.GetRow(4).GetCell(1).StringCellValue;
 
+                if (!avaliableIds.Contains(iID, invCmp) || !avaliableIds.Contains(pID, invCmp))
+                {
+                    hasError = true;
+                    return null;
+                }
+
                 tabs.Add((sheet.SheetName, l, wT, iID, pID, ReadPoints(sheet)));
             }
 
+            hasError = false;
             return tabs;
         }
 
