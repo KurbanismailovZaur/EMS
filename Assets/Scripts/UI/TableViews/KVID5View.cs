@@ -106,7 +106,8 @@ namespace UI.TableViews
 
         public override void Save()
         {
-            TableDataManager.Instance.SetKVID5Data(((KVID5Table)_tabsAssociations[0].table).GetPanelsData());
+            var usableKvid2Tabs = new List<string>();
+            TableDataManager.Instance.SetKVID5Data(((KVID5Table)_tabsAssociations[0].table).GetPanelsData(usableKvid2Tabs), usableKvid2Tabs);
 
             Close();
         }

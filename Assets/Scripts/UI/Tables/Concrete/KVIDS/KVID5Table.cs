@@ -278,13 +278,17 @@ namespace UI.Tables.Concrete.KVIDS
             _blockBAs.RemoveCell(kvid5Panel.BlockBA);
         }
 
-        public List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> GetPanelsData()
+        public List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> GetPanelsData(List<string> usableKvid2Tabs)
         {
             var result = new List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)>();
 
-
             foreach (var panel in _kvid5Panels)
+            {
+                if (!usableKvid2Tabs.Contains(panel.BlockBA.GetSelectedOptionName()))
+                    usableKvid2Tabs.Add(panel.BlockBA.GetSelectedOptionName());
+
                 result.Add((panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue), panel.Type.StringValue, panel.InnerResist.NullableIntValue, panel.OperatingVoltage.NullableIntValue, panel.OperatingFrequensy.NullableIntValue, panel.BlockBA.GetSelectedOptionName(), panel.ConnectorType.NullableStringValue));
+            }
 
             return result;
         }
@@ -292,6 +296,8 @@ namespace UI.Tables.Concrete.KVIDS
         #region Event handlers
         private void RemoveButton_Clicked(RemoveButton removeButton, Panel panel)
         {
+            if (TableDataManager.Instance.IsUsableKVID5Row(((KVID5Panel)panel).Code.StringValue)) return;
+
             Remove(panel);
             Destroy(removeButton.gameObject);
         }

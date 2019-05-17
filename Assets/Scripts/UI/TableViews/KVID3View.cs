@@ -12,6 +12,7 @@ using UI.TableViews.IO;
 using System.Linq;
 using UnityScrollRect = UnityEngine.UI.ScrollRect;
 using System;
+using Management.Tables;
 
 namespace UI.TableViews
 {
@@ -153,6 +154,7 @@ namespace UI.TableViews
         public override void Save()
         {
             var wires = new List<Wire>();
+            List<string> usableKVID5RowIds = new List<string>();
 
             foreach (var association in _tabsAssociations)
             {
@@ -161,9 +163,16 @@ namespace UI.TableViews
                 var i = association.header.GetComponentInChildren<KVID3TableHeader4>().Panel.I.GetSelectedOptionName();
                 var p = association.header.GetComponentInChildren<KVID3TableHeader4>().Panel.P.GetSelectedOptionName();
 
+                if (!usableKVID5RowIds.Contains(i))
+                    usableKVID5RowIds.Add(i);
+                if (!usableKVID5RowIds.Contains(p))
+                    usableKVID5RowIds.Add(p);
+
+
                 wires.Add(Wire.Factory.Create(data.name, type, i, p, data.points));
             }
 
+            TableDataManager.Instance.SetKVID3References(usableKVID5RowIds);
 
             var wiring = Wiring.Factory.Create(wires);
 
@@ -214,6 +223,8 @@ namespace UI.TableViews
         {
             SelectPreviousOrNextTab(tab);
             Destroy(tab.gameObject);
+
+            _tabNextIndex = 0;
         }
 
         private void SelectPreviousOrNextTab(Tab tab)
@@ -353,6 +364,8 @@ namespace UI.TableViews
         #region Event handlers
         private void AddTabButton_OnClick()
         {
+            if (TableDataManager.Instance.KVID5Data.Count == 0) return;
+
             var associationGroup = AddAssociationAndSelect();
             associationGroup.table.AddEmpty(Cell_Clicked);
             associationGroup.table.AddEmpty(Cell_Clicked);

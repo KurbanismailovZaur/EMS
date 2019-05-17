@@ -262,6 +262,8 @@ namespace UI.TableViews
 
             if (_tabsAssociations.Count == 0)
                 _header.SetActive(false);
+
+            _tabNextIndex = 0;
         }
 
         private void RemoveTable(Table table)
@@ -347,7 +349,13 @@ namespace UI.TableViews
             StartCoroutine(UpdateScrollrectHorizontalRoutine());
         }
 
-        private void RemoveTabButton_OnClick() => RemoveCurrentAssociation();
+        private void RemoveTabButton_OnClick()
+        {
+            var currentAssociation = _tabsAssociations.Find(a => a.tab == _currentTab);
+            if (TableDataManager.Instance.IsUsableKVID2Name(currentAssociation.tab.Name)) return;
+
+            RemoveAssociation(currentAssociation);
+        }
         #endregion
     }
 }

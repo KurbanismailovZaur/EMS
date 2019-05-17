@@ -31,6 +31,11 @@ namespace Management.Tables
 
         private List<(string idES, string wireID, float maxVoltage, int fMin, int fMax)> _kvid8Tab1Data =
             new List<(string idES, string wireID, float maxVoltage, int fMin, int fMax)>();
+
+        //runtime fields (not need serialize)
+        private List<string> _usableKVID2TabNames = new List<string>();
+        private List<string> _usableKVID5RowIds = new List<string>();
+
         #endregion
 
         #region Events
@@ -122,9 +127,17 @@ namespace Management.Tables
             DatabaseManager.Instance.UpdateKVID2(_kvid2Data);
         }
 
-        public void SetKVID5Data(List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> data)
+        public void SetKVID3References(List<string> usableKVID5RowIds)
+        {
+            _usableKVID5RowIds = usableKVID5RowIds;
+        }
+
+        public void SetKVID5Data(List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> data, List<string> usableKVID2Tabs)
         {
             _kvid5Data = data;
+            _usableKVID2TabNames = usableKVID2Tabs;
+
+
 
             IsKVID5Imported = _kvid5Data?.Count > 0;
             CallEvent(KVID5Imported, KVID5Removed, IsKVID5Imported);
@@ -168,6 +181,28 @@ namespace Management.Tables
             DatabaseManager.Instance.UpdateKVID4(_wireMarks);
             DatabaseManager.Instance.UpdateKVID5(_kvid5Data);
             DatabaseManager.Instance.UpdateKVID8(_kvid8Tab0Data, _kvid8Tab1Data);
+        }
+
+
+
+        public bool IsUsableKVID2Name(string name)
+        {
+            if (_usableKVID2TabNames.Count == 0) return false;
+
+            if (_usableKVID2TabNames.Contains(name))
+                return true;
+            else
+                return false;
+        }
+
+        public bool IsUsableKVID5Row(string name)
+        {
+            if (_usableKVID5RowIds.Count == 0) return false;
+
+            if (_usableKVID5RowIds.Contains(name))
+                return true;
+            else
+                return false;
         }
     }
 }
