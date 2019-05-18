@@ -33,9 +33,9 @@ namespace Management.Calculations
             }
         }
 
-        public abstract float FilterMinValue { get; protected set; }
+        public abstract double FilterMinValue { get; protected set; }
 
-        public abstract float FilterMaxValue { get; protected set; }
+        public abstract double FilterMaxValue { get; protected set; }
 
         public abstract void Remove();
 

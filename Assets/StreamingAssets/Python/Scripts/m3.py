@@ -1,4 +1,5 @@
 from classes import Point
+from functions import get_distance
 
 import math as mt
 import numpy as np
@@ -8,9 +9,12 @@ import constants as ct
 class Math3:
     def __init__(self):
         self.wire = None
+        self.BBA = None
         self.X0 = None
         self.X1 = None
         self.C = None
+        self.BBA_f = None  # частота определенного диапазона ББА
+        self.BBA_E = None  # значение напряженности у определенного диапазона ББА
         # время
         self.t = 0
 
@@ -19,10 +23,20 @@ class Math3:
         :param wire: Wire
         """
         self.wire = wire
+        
+    def set_bba(self, bba):
+        """
+        :param bba: BBA
+        """
+        self.BBA = bba
 
     def set_fragment(self, p1, p2):
         self.X0 = p1
         self.X1 = p2
+
+    def set_range_params(self, f, e_id):
+        self.BBA_f = f
+        self.BBA_E = e_id
 
     def set_c(self, c):
         self.C = c
@@ -30,9 +44,10 @@ class Math3:
     def set_t(self, t):
         self.t = t
 
-    def do(self, limit_a=0):
+    def do(self, limit_a=0, is_bba=False):
         """
         Основной алгоритм действий
+        :param is_bba: если False расчет проводится для фрагмента провода иначе для ББА
         """
         if self.wire.get_is_metallization():  # если присутсвует на кабеле метализация то мы не рассчитываем алгоритм
             return np.zeros(3), 0
@@ -40,10 +55,12 @@ class Math3:
         # Вычисляем волновое число
         wk = self.wire.w / ct.CC
 
-        # TODO Добавить вариант просчета БА
-        # G = Point([])
-        # r = get_distance(G, self.C)
-
+        if is_bba:
+            r = get_distance(self.BBA.point, self.C)
+            w = 2 * mt.pi * self.BBA_f
+            er = self.BBA_E * ((1 / (w * r ** 3) - w / (r * ct.CC ** 2) + 1 / (ct.CC * r ** 2))
+                               / (1 / w - w / ct.CC ** 2 + 1 / ct.CC))
+            return er
 
         """
         Вычисления:

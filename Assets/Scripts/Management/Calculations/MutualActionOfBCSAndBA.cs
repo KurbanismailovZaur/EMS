@@ -21,9 +21,9 @@ namespace Management.Calculations
 
         public ClickedEvent Clicked;
 
-        public override float FilterMinValue { get; protected set; } = 0f;
+        public override double FilterMinValue { get; protected set; } = 0f;
 
-        public override float FilterMaxValue { get; protected set; }
+        public override double FilterMaxValue { get; protected set; }
 
         public void Calculate(Wiring wiring)
         {
@@ -36,7 +36,7 @@ namespace Management.Calculations
             var sourceMutuals = DatabaseManager.Instance.GetCalculatedMutualActionOfBCSAndBA();
 
             var maxValue = sourceMutuals.Max(m => m.value);
-            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), influences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.value, _gradient.Evaluate(m.value / maxValue))).ToList();
+            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), influences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.value, _gradient.Evaluate((float)(m.value / maxValue)))).ToList();
             
             _wires = Wire.Factory.Create(mutuals, transform);
 
@@ -67,7 +67,7 @@ namespace Management.Calculations
         public override void Filter(float min, float max)
         {
             foreach (var wire in _wires)
-                wire.gameObject.SetActive(wire.Value >= min && wire.Value <= max);
+                wire.gameObject.SetActive(Math.Abs(wire.Value) >= min && Math.Abs(wire.Value) <= max);
         }
 
         private void Wire_Clicked(Wire wire) => Clicked.Invoke(wire);

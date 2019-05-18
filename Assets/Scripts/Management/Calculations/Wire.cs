@@ -14,7 +14,7 @@ namespace Management.Calculations
     {
         public static new class Factory
         {
-            public static Wire[] Create(List<(Wires.Wire wire, List<(Wires.Wire wire, int frequency, float value)> influences, float value, Color color)> mutuals, Transform parent)
+            public static Wire[] Create(List<(Wires.Wire wire, List<(Wires.Wire wire, int frequency, double value)> influences, double value, Color color)> mutuals, Transform parent)
             {
                 var wires = mutuals.Select(mutual =>
                 {
@@ -64,9 +64,9 @@ namespace Management.Calculations
 
             public int Frequency { get; set; }
 
-            public float Value { get; private set; }
+            public double Value { get; private set; }
 
-            public Influence(Wire wire, int frequency, float value)
+            public Influence(Wire wire, int frequency, double value)
             {
                 Wire = wire;
                 Frequency = frequency;
@@ -78,7 +78,7 @@ namespace Management.Calculations
 
         public ReadOnlyCollection<Influence> Influences => _influences.AsReadOnly();
 
-        public float Value { get; private set; }
+        public double Value { get; private set; }
 
         public event Action<Wire> Clicked;
 

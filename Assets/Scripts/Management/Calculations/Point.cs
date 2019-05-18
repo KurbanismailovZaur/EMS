@@ -11,7 +11,7 @@ namespace Management.Calculations
         #region Classes
         public static class Factory
         {
-            public static Point Create(Point prefab, Transform parent, (string code, Vector3 position) point, float radius, Color[] gradients, float[] values)
+            public static Point Create(Point prefab, Transform parent, (string code, Vector3 position) point, float radius, Color[] gradients, double[] values)
             {
                 var pointGO = Instantiate(prefab, parent);
                 pointGO.transform.position = point.position;
@@ -33,11 +33,11 @@ namespace Management.Calculations
 
         public string Code { get; private set; }
 
-        public float[] Values { get; set; }
+        public double[] Values { get; set; }
 
         public Color[] Gradients { get; set; }
 
-        public float CurrentValue => Values[_currentTimeIndex];
+        public double CurrentValue => Values[_currentTimeIndex];
 
         public void SetCurrentTimeIndex(int index)
         {

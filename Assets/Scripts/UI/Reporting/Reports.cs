@@ -10,18 +10,14 @@ using System.Linq;
 using Management.Wires;
 using System;
 using UnityEngine.Events;
+using Management;
+using Management.Interop;
+using UI.Exploring.FileSystem;
 
 namespace UI.Reporting
 {
 	public class Reports : MonoBehaviour 
 	{
-        public enum GenerateType
-        {
-            Points,
-            Wires,
-            All
-        }
-        
         [SerializeField]
         private CanvasGroup _canvasGroup;
 
@@ -37,27 +33,11 @@ namespace UI.Reporting
         [SerializeField]
         private Button _cancelButton;
 
-        [SerializeField]
-        private Button _generateOptions;
-
-        [SerializeField]
-        private Button _generatePointsButton;
-
-        [SerializeField]
-        private Button _generateWiresButton;
-
-        [SerializeField]
-        private Button _GenerateAllButton;
-
         private bool _isOpen;
 
         private void Start()
         {
             _generateButton.onClick.AddListener(GenerateButton_OnClick);
-            _generateOptions.onClick.AddListener(GenerateOptionsButton_OnClick);
-            _generatePointsButton.onClick.AddListener(GeneratePointsButton_OnClick);
-            _generateWiresButton.onClick.AddListener(GenerateWiresButton_OnClick);
-            _GenerateAllButton.onClick.AddListener(GenerateAllButton_OnClick);
 
             _cancelButton.onClick.AddListener(CancelButton_OnClick);
         }
@@ -99,25 +79,27 @@ namespace UI.Reporting
             _canvasGroup.blocksRaycasts = blockRaycast;
         }
 
-        private void ShowGerateOptions() => _generateOptions.gameObject.SetActive(true);
+        private void Generate() => StartCoroutine(GenerateRoutine());
 
-        private void HideGerateOptions() => _generateOptions.gameObject.SetActive(false);
-
-        private void SelectAndClose(GenerateType type)
+        private IEnumerator GenerateRoutine()
         {
+            yield return FileExplorer.Instance.SaveFile("Сгенерировать Отчеты", null, "xlsx", "reports.xlsx");
+
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            var points = _kvid6.SelectedElements.Select(el => el.Name).ToArray();
+            var wires = _kvid3.SelectedElements.Select(el => el.Name).ToArray();
+
+            DatabaseManager.Instance.RemoveSelectPointAndWire();
+            DatabaseManager.Instance.UpdateSelectPointAndWire(points, wires);
+
+            PythonManager.Instance.GenerateReports(FileExplorer.Instance.LastResult);
+
             Close();
         }
 
         #region Event handlers
-        private void GenerateButton_OnClick() => ShowGerateOptions();
-
-        private void GenerateOptionsButton_OnClick() => HideGerateOptions();
-
-        private void GeneratePointsButton_OnClick() => SelectAndClose(GenerateType.Points);
-
-        private void GenerateWiresButton_OnClick() => SelectAndClose(GenerateType.Wires);
-
-        private void GenerateAllButton_OnClick() => SelectAndClose(GenerateType.All);
+        private void GenerateButton_OnClick() => Generate();
 
         private void CancelButton_OnClick() => Close();
         #endregion

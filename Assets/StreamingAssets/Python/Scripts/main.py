@@ -3,15 +3,17 @@ from m2 import Math2
 from m3 import Math3
 from m4 import Math4
 from m4_create_figures import Math4Figure
+from report import Report
 
 import numpy as np
+import math as mt
 import itertools
 
-# TODO добавить емкостное взаимоедйствие проводов в m2
 # TODO добавить БА
 # TODO привести в порядок каталог проекта
 # TODO генерация отчетов
 # TODO проверить зависимост ИД в скрипах
+# TODO добавить скрип валидации входных данных
 
 
 def default(*args):  # функция заглушка для аргументов вызывающих функции
@@ -27,7 +29,8 @@ def create_figures(db_path):
     figures = m.do()
 
     # запись полученных кубов в базу данных
-    print(storage.set_figures(figures))
+    storage.set_figures(figures)
+    print('ok')
 
 
 def script_m3(db_path):
@@ -35,13 +38,13 @@ def script_m3(db_path):
     storage = Storage(db_path)
     materials = storage.get_materials()
     wires = storage.get_wires()
-    BAs = storage.get_BAs()
+    BBAs = list(storage.get_BBAs())
     set_points = storage.get_set_points()
     set_points_limits, ba_limits = storage.get_limits()
     figures = storage.get_figures()
 
     # Найдем минимальную частоту для вычислении 36 шагов времени
-    f_min = min(*[w.f for w in wires], *[f[0] for ba in BAs for f in ba[-1]])
+    f_min = min(*[w.f for w in wires], *[bba.get_min_frequency() for bba in BBAs])
     t_step = (1 / f_min) / 36  # шаг времени
 
     m3 = Math3()
@@ -76,6 +79,23 @@ def script_m3(db_path):
 
                     Ew += ec
                 E += Ew
+
+            for bba in BBAs:  # цикл по ББА
+                m3.set_bba(bba)
+                Ebba = 0
+                for f_start, f_end, e_id in bba.get_frequency_range():
+                    m3.set_range_params((f_start + f_end) / 2, e_id)
+                    er = m3.do(is_bba=True)
+                    # ослабление влияние ББА на заданную точку
+                    m4.set_u(bba.point)
+                    SEf = m4.do()
+                    er = er * SEf
+                    Ebba += er
+
+                # Сложение напряженности по БКС с напряженностью по ББА
+                Ebba /= 3 ** 0.5
+                for i in range(3):
+                    E[i] = mt.copysign(abs(E[i]) + Ebba, E[i])
 
             time_values.append((E ** 2).sum() ** 0.5)
         res.append([point.id, time_values])
@@ -113,10 +133,38 @@ def script_m3(db_path):
                 if (point_limit[1] <= wire.f <= point_limit[2]) and (Ew_sum > point_limit[0]):
                     is_excessive = True
 
-            data_wires.append([wire.id, *Ew, Ew_sum, wire.f, wire.f, is_excessive])
+            data_wires.append([wire.id, *Ew, Ew_sum, wire.f, is_excessive])
 
             E += Ew
-        res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires])
+
+        data_bbas = []
+        for bba in BBAs:  # цикл по ББА
+            m3.set_bba(bba)
+
+            data_frequencies = []
+            Ebba = 0
+            for f_start, f_end, e_id in bba.get_frequency_range():
+                m3.set_range_params((f_start + f_end) / 2, e_id)
+                er = m3.do(is_bba=True)
+                # ослабление влияние ББА на заданную точку
+                m4.set_u(bba.point)
+                SEf = m4.do()
+                er = er * SEf
+                Ebba += er
+
+                # Проверяем на превышения значения
+                is_excessive = False
+                point_limit = set_points_limits.get(point.id)
+                if point_limit:
+                    if ((point_limit[1] <= f_start <= point_limit[2]) or (point_limit[1] <= f_end <= point_limit[2])) \
+                            and (er > point_limit[0]):
+                        is_excessive = True
+
+                data_frequencies.append([er, f_start, f_end, is_excessive])
+
+            data_bbas.append([bba.id, data_frequencies])
+
+        res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires, data_bbas])
     storage.set_result_m3_times(res)
     storage.set_result_m3(res_report)
     print('ok')
@@ -127,6 +175,8 @@ def script_m2(db_path):
     storage = Storage(db_path)
     materials = storage.get_materials()
     wires = storage.get_wires()
+    BBAs = list(storage.get_BBAs())
+    set_points_limits, ba_limits = storage.get_limits()
     figures = storage.get_figures()
 
     # Проверка на кол-во проводов, их должно быть больше чем 1
@@ -136,38 +186,127 @@ def script_m2(db_path):
     m2 = Math2()
     m4 = Math4(figures, materials)
 
-    dct_wires = {}
-    for index_compare, wire_compare in enumerate(wires[:-1]):  # кабель источник
-        for index_current, wire_current in enumerate(wires[index_compare + 1:]):  # кабель приемник
-            m4.set_f(wire_current.f)
-            H = 0
-            for A2, B2 in wire_current.get_fragment():
-                m4.set_u((A2 + B2) / 2)
-                for A1, B1 in wire_compare.get_fragment():
-                    m2.set_fragments(A1, B1, A2, B2)
-                    H += m2.do()
+    # Взаимодейтсвием между кабелями БКС
+    dct_sources = {}
+    for wire_a in wires:  # кабель источник
+        for wire_b in wires:  # кабель приемник
+            # провод сам с собой не сравниваем и ветвящиеся провода между собой не сравниваем
+            if wire_a == wire_b or wire_a.get_id_real() == wire_b.get_id_real():
+                continue
 
-                    m4.set_c((A1 + B1) / 2)
-                    H *= m4.do(is_magnetic=True)
+            m2.set_wires(wire_a, wire_b)
+            m4.set_f(wire_b.f)
+            E = H = 0
+            for b1, b2 in wire_b.get_fragment():
+                m4.set_c((b1 + b2) / 2)
+                for a1, a2 in wire_a.get_fragment():
+                    m2.set_fragments(a1, a2, b1, b2)
+                    Ucf, Hf = m2.do()
 
-            Uh = H * wire_current.w * wire_current.I
+                    m4.set_u((a1 + a2) / 2)
 
-            Uh *= wire_compare.SH * wire_current.SH
+                    Hf *= m4.do(is_magnetic=True)
+                    if not (wire_a.get_is_metallization() or wire_b.get_is_metallization()):
+                        Ucf *= m4.do()
+                    E += Ucf
+                    H += Hf
+
+            Uc = E * wire_a.SE * wire_b.SE
+
+            Uh = H * wire_b.w * wire_b.I
+            Uh *= wire_a.SH * wire_b.SH
 
             # Создаю словаря проводов со списком значений влияния на данный провод других проводов
-            if dct_wires.get(wire_current.id) is None:
-                dct_wires[wire_current.id] = []
-            dct_wires[wire_current.id].append([wire_compare.id, wire_compare.f, Uh])
+            if dct_sources.get(wire_b.id) is None:
+                dct_sources[wire_b.id] = [[], []]  # [0] - кабеля, [1] - ББА
+            dct_sources[wire_b.id][0].append([wire_a.id, wire_a.f, Uc, Uh])
 
-            if dct_wires.get(wire_compare.id) is None:
-                dct_wires[wire_compare.id] = []
-            dct_wires[wire_compare.id].append([wire_current.id, wire_current.f, Uh])
+    # Взаимодействие между БКС и ББА
+    for wire in wires:
+        for bba in BBAs:  # цикл по ББА
+            m2.set_bba(bba)
+            m4.set_u(bba.point)
+
+            data_frequencies = []
+            for f_start, f_end, e_id in bba.get_frequency_range():
+                m2.set_range_params((f_start + f_end) / 2, e_id)
+
+                Ebba = 0
+                for b1, b2 in wire.get_fragment():
+                    m2.set_fragments(None, None, b1, b2)
+                    m4.set_c((b1 + b2) / 2)
+
+                    Uf = m2.do(is_bba=True)
+                    # ослабление влияние ББА на заданную точку
+                    SEf = m4.do()
+                    Uf *= SEf
+                    Ebba += Uf
+
+                data_frequencies.append([Ebba, f_start, f_end])
+
+            dct_sources[wire.id][1].append([bba.id, data_frequencies])
 
     res = []
-    for wire_id, values in dct_wires.items():
-        res.append([wire_id, values, sum([x[-1] for x in values])])
+    for wire_id, values in dct_sources.items():
+        wires_sum = bbas_sum = 0
+
+        dct_wires = {}
+        for item in values[0]:
+            if dct_wires.get(item[1]) is None:
+                dct_wires[item[1]] = 0
+            dct_wires[item[1]] += item[-2] + item[-1]
+            wires_sum += item[-2] + item[-1]
+
+        dct_bbas = {}
+        for item in [x for frequencies in values[1] for x in frequencies[1]]:
+            key = (item[1], item[2])
+            if dct_bbas.get(key) is None:
+                dct_bbas[key] = 0
+            dct_bbas[key] += item[0]
+            bbas_sum += item[0]
+
+        for f_bba_min, f_bba_max in dct_bbas:
+            for f_wire in dct_wires:
+                if f_bba_min <= f_wire <= f_bba_max:
+                    dct_wires[f_wire] += dct_bbas[(f_bba_min, f_bba_max)]
+
+        # Проверяем на превышения значения
+        res_5KV = []
+
+        for f, value in dct_wires.items():
+            is_excessive = False
+            wire_limit = ba_limits.get(wire_id)
+            if wire_limit:
+                if (wire_limit[1] <= f <= wire_limit[2]) and (value > wire_limit[0]):
+                    is_excessive = True
+            res_5KV.append([value, f, is_excessive])
+
+        for (f_start, f_end), value in dct_bbas.items():
+            is_excessive = False
+            wire_limit = ba_limits.get(wire_id)
+            if wire_limit:
+                if ((wire_limit[1] <= f_start <= wire_limit[2]) or (wire_limit[1] <= f_end <= wire_limit[2])) \
+                        and (value > wire_limit[0]):
+                    is_excessive = True
+            res_5KV.append([value, f_start, f_end, is_excessive])
+
+        res.append([wire_id, values[0], values[1], res_5KV, wires_sum + bbas_sum])
 
     storage.set_result_m2(res)
+    print('ok')
+
+
+def script_report(db_path, xlsx_path):
+    # Загрузка данных
+    storage = Storage(db_path)
+    results_m3 = storage.get_result_m3()
+    results_m2 = storage.get_result_m2()
+    select_points = storage.get_select_points()
+    select_wires = storage.get_select_wires()
+
+    report = Report(results_m3, results_m2, select_points, select_wires, path=xlsx_path)
+    report.do()
+
     print('ok')
 
 
@@ -178,14 +317,20 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-db', action='store', dest='db_path', default=DB_PATH, help='Путь к файлу базы данных')
+    parser.add_argument('-xlsx', action='store', dest='xlsx_path', default='report.xlsx', help='Путь к файлу отчета')
     parser.add_argument('--create_figures', action='store_const', const=create_figures, default=default,
                         help='Преобразование плоскостей в фигуры')
     parser.add_argument('--script_m3', action='store_const', const=script_m3, default=default,
                         help='Расчет напряженности электрического поля в заданных точках')
     parser.add_argument('--script_m2', action='store_const', const=script_m2, default=default,
                         help='Расчет взаимного воздействия кабелей БКС и БА на БКС')
+    parser.add_argument('--script_report', action='store_const', const=script_report, default=default,
+                        help='Генерация отчета')
 
     results = parser.parse_args()
     results.create_figures(results.db_path)
     results.script_m3(results.db_path)
     results.script_m2(results.db_path)
+    results.script_report(results.db_path, results.xlsx_path)
+    # script_m2('./db/ems.bytes')
+    # script_report('./db/ems.bytes', './report.xlsx')

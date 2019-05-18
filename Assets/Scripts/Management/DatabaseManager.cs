@@ -33,7 +33,11 @@ namespace Management
         {
             public string id { get; set; }
 
-            public string data { get; set; }
+            public string data_wires { get; set; }
+
+            public string data_bbas { get; set; }
+
+            public string data_report { get; set; }
 
             public float result { get; set; }
         }
@@ -58,6 +62,8 @@ namespace Management
         private const string kvid81 = "KVID8_1";
         private const string kvid82 = "KVID8_2";
         private const string modelPoint = "ModelPoint";
+        private const string selectPoint = "SelectPoint";
+        private const string selectWire = "SelectPoint";
         #endregion
 
         public string DatabasePath { get; private set; }
@@ -76,6 +82,7 @@ namespace Management
             RemoveKVID6();
             RemoveKVID8();
             RemovePlanes();
+            RemoveSelectPointAndWire();
 
             _dbManager.Commit();
         }
@@ -246,36 +253,57 @@ namespace Management
         }
         #endregion
 
-        public List<(string name, float[] values)> GetCalculatedElectricFieldStrengts()
+        public void UpdateSelectPointAndWire(string[] points, string[] wires)
+        {
+            _dbManager.BeginTransaction();
+
+            foreach (var name in points)
+                _dbManager.Execute($"INSERT INTO {selectPoint} VALUES (?)", name);
+
+            foreach (var name in wires)
+                _dbManager.Execute($"INSERT INTO {selectWire} VALUES (?)", name);
+
+            _dbManager.Commit();
+        }
+
+        public void RemoveSelectPointAndWire()
+        {
+            _dbManager.BeginTransaction();
+            _dbManager.Execute($"DELETE FROM {selectPoint}");
+            _dbManager.Execute($"DELETE FROM {selectWire}");
+            _dbManager.Commit();
+        }
+
+        public List<(string name, double[] values)> GetCalculatedElectricFieldStrengts()
         {
             var sourceInfos = _dbManager.Query<ElectricFieldStrenghtInfo>("SELECT * FROM ResultM3Times");
 
-            var infos = new List<(string name, float[] values)>();
+            var infos = new List<(string name, double[] values)>();
 
             foreach (var info in sourceInfos)
             {
                 var jArray = new JsonArray(info.val);
-                var values = Enumerable.Repeat(0f, 1).Concat(jArray.Select(el => (float)(((JsonNumber)el).ToFloat()))).ToArray();
+                var values = Enumerable.Repeat(0d, 1).Concat(jArray.Select(el => (((JsonNumber)el).ToDouble()))).ToArray();
                 infos.Add((info.id, values));
             }
 
             return infos;
         }
 
-        public List<(string name, List<(string name, int frequency, float value)> influences, float value)> GetCalculatedMutualActionOfBCSAndBA()
+        public List<(string name, List<(string name, int frequency, double value)> influences, double value)> GetCalculatedMutualActionOfBCSAndBA()
         {
             var sourceInfos = _dbManager.Query<MutualActionOfBCSAndBAInfo>("SELECT * FROM ResultM2");
 
-            var mutuals = new List<(string name, List<(string name, int frequency, float value)> influences, float value)>();
+            var mutuals = new List<(string name, List<(string name, int frequency, double value)> influences, double value)>();
 
             foreach (var info in sourceInfos)
             {
-                var influences = new List<(string name, int frequency, float value)>();
+                var influences = new List<(string name, int frequency, double value)>();
 
-                foreach (JsonArray jInfluenceInfo in new JsonArray(info.data))
+                foreach (JsonArray jInfluenceInfo in new JsonArray(info.data_wires))
                 {
                     ((JsonString)jInfluenceInfo[0]).UnEscape();
-                    var influence = (jInfluenceInfo.GetString(0), jInfluenceInfo.GetNumber(1).ToInt(), jInfluenceInfo.GetNumber(2).ToFloat());
+                    var influence = (jInfluenceInfo.GetString(0), jInfluenceInfo.GetNumber(1).ToInt(), jInfluenceInfo.GetNumber(2).ToDouble() + jInfluenceInfo.GetNumber(3).ToDouble());
                     influences.Add(influence);
                 }
 

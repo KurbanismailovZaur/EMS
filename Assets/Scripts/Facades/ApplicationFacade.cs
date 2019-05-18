@@ -81,11 +81,10 @@ namespace Facades
 
         private void SetCameraToDefaultState()
         {
-            _cameraController.transform.position = DefaultSettings.Camera.Position;
-            _cameraController.transform.rotation = DefaultSettings.Camera.Rotation;
-            _cameraController.Camera.orthographicSize = DefaultSettings.Camera.OrthographicSize;
+            _cameraController.Size = DefaultSettings.Camera.OrthographicSize;
 
-            _cameraController.SetTargetsToCurrentState();
+            _cameraController.FocusOn(Vector3.zero);
+            _cameraController.ViewFromDirection(Vector3.up, Vector3.forward);
         }
 
         #region Model
@@ -188,7 +187,7 @@ namespace Facades
 
         private void HandleAdditionalCalculationInstuments()
         {
-            _filter.SetRanges(_currentCalculations.FilterMinValue, _currentCalculations.FilterMaxValue);
+            _filter.SetRanges((float)_currentCalculations.FilterMinValue, (float)_currentCalculations.FilterMaxValue);
             _filter.ResetValues();
             _filter.Show();
 

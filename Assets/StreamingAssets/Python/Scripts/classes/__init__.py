@@ -76,7 +76,7 @@ class Figure:
 
 
 class Wire:
-    def __init__(self, wire_id, points, f, I, materials, type_wire):
+    def __init__(self, wire_id, points, f, U, R1, R2, materials, type_wire):
         """
         :param wire_id: идентификатор кабеля
         :param points: точки изгибов
@@ -88,7 +88,10 @@ class Wire:
         self.id = wire_id
         self.points = points
         self.f = f
-        self.I = I
+        self.U = U
+        self.R1 = R1
+        self.R2 = R2
+        self.I = U / (R1 + R2)
         # Определим для дальнейших расчетов ослабления угловую частоту
         self.w = f * 2 * mt.pi
         # Определение метализирован ли кабель
@@ -102,6 +105,8 @@ class Wire:
                 m_indexes[1].append(ind)
                 hs[1] += point.metal2
         self.is_metallization = any(m_indexes)
+        # Диаметр жилы кабеля
+        self.diam = type_wire[1]
 
         # Находим коэффициент ослабление эраном провода (стр 43)
         SEs = 1
@@ -181,9 +186,37 @@ class Wire:
     def get_is_metallization(self):
         return self.is_metallization
 
+    def get_id_real(self):
+        return self.id.split('_')[0]
+
     @staticmethod
     def get_distance(points):
         res = 0
         for i in range(len(points) - 1):
             res += get_distance(points[i], points[i + 1])
         return res
+
+
+class BBA:
+    def __init__(self, bba_id, name, point, frequencies):
+        """
+        Класс - блок бортовой аппаратуры
+        :param bba_id: идентификатор ББА
+        :param name: наименование
+        :param point: геометрический центр
+        :param frequencies: диапазоны частот со значениями напряженности
+        """
+        self.id = bba_id
+        self.name = name
+        self.point = point
+        self.frequencies = frequencies
+
+    def __str__(self):
+        return f"<{self.__class__.__name__} name:{self.name}>"
+
+    def get_min_frequency(self):
+        return min([f[0] for f in self.frequencies])
+
+    def get_frequency_range(self):
+        for i in range(len(self.frequencies) - 1):
+            yield self.frequencies[i][0], self.frequencies[i + 1][0], self.frequencies[i][1]

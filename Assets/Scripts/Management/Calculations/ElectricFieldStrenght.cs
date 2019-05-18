@@ -20,9 +20,9 @@ namespace Management.Calculations
 
         public ReadOnlyCollection<Point> Points => new ReadOnlyCollection<Point>(_points);
 
-        public override float FilterMinValue { get; protected set; } = 0;
+        public override double FilterMinValue { get; protected set; } = 0;
 
-        public override float FilterMaxValue { get; protected set; }
+        public override double FilterMaxValue { get; protected set; }
 
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
@@ -68,7 +68,7 @@ namespace Management.Calculations
 
             for (int i = 0; i < points.Count; i++)
             {
-                var values = Enumerable.Repeat(0f, 37).ToArray();
+                var values = Enumerable.Repeat(0d, 37).ToArray();
                 var gradients = Enumerable.Range(0, 37).Select(_ => _gradient.Evaluate(0f)).ToArray();
 
                 _points.Add(Point.Factory.Create(_pointPrefab, transform, points[i], radius, gradients, values));
@@ -78,7 +78,7 @@ namespace Management.Calculations
             Calculated.Invoke();
         }
 
-        public void SetStrenghts(List<(string name, float[] values)> strenghts)
+        public void SetStrenghts(List<(string name, double[] values)> strenghts)
         {
             for (int i = 0; i < strenghts.Count; i++)
                 _points[i].Values = strenghts[i].values;
@@ -86,7 +86,7 @@ namespace Management.Calculations
             FilterMaxValue = _points.Max(p => p.Values.Max());
 
             for (int i = 0; i < strenghts.Count; i++)
-                _points[i].Gradients = _points[i].Values.Select(v => _gradient.Evaluate(v / FilterMaxValue)).ToArray();
+                _points[i].Gradients = _points[i].Values.Select(v => _gradient.Evaluate((float)(v / FilterMaxValue))).ToArray();
         }
 
         public override void Remove()
@@ -107,7 +107,7 @@ namespace Management.Calculations
         public override void Filter(float min, float max)
         {
             foreach (var point in _points)
-                point.gameObject.SetActive(point.CurrentValue >= min && point.CurrentValue <= max);
+                point.gameObject.SetActive(Math.Abs(point.CurrentValue) >= min && Math.Abs(point.CurrentValue) <= max);
         }
 
         public void SetCurrentIndexToPoints(int index)

@@ -1,4 +1,4 @@
-from classes import Point, Figure, Wire
+from classes import Point, Figure, Wire, BBA
 
 import sqlite3
 import json
@@ -104,28 +104,26 @@ class Storage:
 
                 wires[w_real] = [f, U, R1, R2]
 
-            I = U / (R1 + R2)
-
             materials = self.get_materials()  # загрузка материалов
             types_wire = self.get_types_wire()  # загрузка типов проводов
             type_wire = types_wire[wire[1]]  # получаем параметры типа кабеля
 
-            res.append(Wire(wire_id, points, f, I, materials, type_wire))
+            res.append(Wire(wire_id, points, f, U, R1, R2, materials, type_wire))
 
         conn.close()
 
         return res
 
-    def get_BAs(self):
+    def get_BBAs(self):
         """
         Загрузка блоков аппаратуры (2КВИД)
-        :return: итерационнай объект list
+        :return: итерационнай объект BBA
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM KVID2")
-        res = map(lambda x: [*x[:2], Point(np.array(x[2:-1])), json.loads(x[-1])], cursor.fetchall())
+        res = map(lambda x: BBA(*x[:2], Point(np.array(x[2:-1])), json.loads(x[-1])), cursor.fetchall())
 
         conn.close()
 
@@ -158,7 +156,7 @@ class Storage:
         data_8_1 = {row[0]: row[1:] for row in cursor.fetchall()}
 
         cursor.execute("SELECT * FROM KVID8_2")
-        data_8_2 = {row[0]: row[1:] for row in cursor.fetchall()}
+        data_8_2 = {row[1]: row[2:] for row in cursor.fetchall()}  # отбрасываем первую колонку, т.к. она не нужна
 
         conn.close()
 
@@ -188,6 +186,66 @@ class Storage:
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM ModelPoint")
+        res = cursor.fetchall()
+
+        conn.close()
+
+        return res
+
+    def get_result_m3(self):
+        """
+        Загрузка результатов по M3
+        :return: итерационнай объект list
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM ResultM3")
+        res = {row[0]: row[1:] for row in cursor.fetchall()}
+
+        conn.close()
+
+        return res
+
+    def get_result_m2(self):
+        """
+        Загрузка результатов по M2
+        :return: итерационнай объект list
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM ResultM2")
+        res = {row[0]: row[1:] for row in cursor.fetchall()}
+
+        conn.close()
+
+        return res
+
+    def get_select_points(self):
+        """
+        Загрузка выбранный точек
+        :return: итерационнай объект list
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM SelectPoint")
+        res = cursor.fetchall()
+
+        conn.close()
+
+        return res
+
+    def get_select_wires(self):
+        """
+        Загрузка выбранный кабелей
+        :return: итерационнай объект list
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM SelectWire")
         res = cursor.fetchall()
 
         conn.close()
@@ -255,8 +313,8 @@ class Storage:
 
         count = sum(1 for _ in
                     map(lambda item:
-                        cursor.execute(f"INSERT into ResultM3 values ({', '.join('?' * 6)})",
-                                       [*item[:-1], json.dumps(item[-1])]),
+                        cursor.execute(f"INSERT into ResultM3 values ({', '.join('?' * 7)})",
+                                       [*item[:-2], json.dumps(item[-2]), json.dumps(item[-1])]),
                         data))
 
         conn.commit()
@@ -279,8 +337,9 @@ class Storage:
 
         count = sum(1 for _ in
                     map(lambda item:
-                        cursor.execute(f"INSERT into ResultM2 values ({', '.join('?' * 3)})",
-                                       [item[0], json.dumps(item[1]), item[2]]),
+                        cursor.execute(f"INSERT into ResultM2 values ({', '.join('?' * 5)})",
+                                       [item[0],
+                                        json.dumps(item[1]), json.dumps(item[2]), json.dumps(item[3]), item[4]]),
                         data))
 
         conn.commit()
@@ -292,4 +351,4 @@ class Storage:
 
 if __name__ == "__main__":
     storage = Storage('../db/ems.bytes')
-    print(list(storage.get_BAs()))
+    print(list(storage.get_BBAs()))

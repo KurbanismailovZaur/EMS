@@ -42,10 +42,24 @@ namespace Management.Interop
 
         public void CalculateMutualActionOfBCSAndBA() => RunPythonScript(_pathToMainScript, "--script_m2");
 
+        public void GenerateReports(string path) => RunPythonScript(_pathToMainScript, "--script_report", path);
+
+        private string RunPythonScript(string script, string action, string path)
+        {
+            var arguments = $"\"{script}\" -db \"{DatabaseManager.Instance.DatabasePath}\" {action} -xlsx \"{path}\"";
+
+            return RunPythonScript(arguments);
+        }
+
         private string RunPythonScript(string script, string action)
         {
             var arguments = $"\"{script}\" -db \"{DatabaseManager.Instance.DatabasePath}\" {action}";
 
+            return RunPythonScript(arguments);
+        }
+
+        private string RunPythonScript(string arguments)
+        {
             ProcessStartInfo start = new ProcessStartInfo
             {
                 FileName = _pythonPath,
@@ -55,7 +69,6 @@ namespace Management.Interop
                 RedirectStandardOutput = true,
                 RedirectStandardError = true
             };
-
 
             using (Process process = Process.Start(start))
             {

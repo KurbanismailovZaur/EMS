@@ -8,3 +8,7 @@ def get_distance(a, b):
     result **= 0.5
 
     return result
+
+
+def get_cos(a, b, da, db):
+    return round((a * b).sum() / (da * db), 3)

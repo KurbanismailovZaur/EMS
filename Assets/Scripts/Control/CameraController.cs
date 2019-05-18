@@ -67,7 +67,7 @@ namespace Control
 
         public Camera Camera { get; private set; }
 
-        private float Size
+        public float Size
         {
             get { return _size; }
             set { _size = Mathf.Clamp(value, 1f, _maxSize); }

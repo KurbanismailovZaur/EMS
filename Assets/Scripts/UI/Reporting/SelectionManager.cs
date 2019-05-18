@@ -20,8 +20,12 @@ namespace UI.Reporting
         [SerializeField]
         private Transform _selectedContent;
 
+        public Element[] SelectedElements => _selectedContent.GetComponentsInChildren<Element>();
+
         public void Initialize(string[] names)
         {
+            RemoveAll();
+
             foreach (var name in names)
             {
                 var element = Element.Factory.Create(_elementPrefab, name, _sourceContent);
@@ -50,6 +54,14 @@ namespace UI.Reporting
             {
                 SetElementClickedBehaviour(_selectedContent.GetChild(0).GetComponent<Element>(), _sourceContent, SelectedElement_OnClick, SourceElement_OnClick);
             }
+        }
+
+        private void RemoveAll()
+        {
+            DeselectAll();
+
+            foreach (Transform child in _sourceContent)
+                Destroy(child.gameObject);
         }
 
         #region Event handlers

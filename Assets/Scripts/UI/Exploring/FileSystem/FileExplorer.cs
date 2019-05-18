@@ -14,7 +14,7 @@ using System.Collections.ObjectModel;
 
 namespace UI.Exploring.FileSystem
 {
-    public class FileExplorer : MonoBehaviour
+    public class FileExplorer : MonoSingleton<FileExplorer>
     {
         #region Classes
         [Serializable]
