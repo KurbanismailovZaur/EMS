@@ -1,18 +1,28 @@
-﻿using Management.Wires;
+﻿using Management.Tables;
+using Management.Wires;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace UI.TableViews.IO
 {
     public static class KVID5DataReader
     {
-        public static List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> ReadFromFile(string pathToXLS)
+        public static List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> ReadFromFile(string pathToXLS, out bool hasError)
         {
+            if (TableDataManager.Instance.KVID2Data.Count == 0)
+            {
+                hasError = true;
+                return null;
+            }
+
+
+
             HSSFWorkbook workbook;
 
             using (FileStream stream = new FileStream(pathToXLS, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -25,12 +35,15 @@ namespace UI.TableViews.IO
 
             ISheet sheet = workbook.GetSheetAt(0);
 
-            return ReadData(sheet);
+            return ReadData(sheet, out hasError);
         }
 
-        private static List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> ReadData(ISheet sheet)
+        private static List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> ReadData(ISheet sheet, out bool hasError)
         {
-            var data = new List<(string code, Vector3 point, string type, int? iR,int? oV, int? oF, string bBA, string conType)>();
+            var data = new List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)>();
+            var nameList = TableDataManager.Instance.KVID2Data.Select(d => d.tabName);
+
+            StringComparer invCmp = StringComparer.InvariantCulture;
 
             for (int j = 2; j <= sheet.LastRowNum; j++)
             {
@@ -38,9 +51,17 @@ namespace UI.TableViews.IO
 
                 if (!IsCorrectNodeRow(row)) break;
 
-                data.Add(ReadDataRow(row));
+                var rowData = ReadDataRow(row);
+
+                if (!nameList.Contains(rowData.bBA, invCmp))
+                {
+                    hasError = true;
+                    return null;
+                }
+                data.Add(rowData);
             }
 
+            hasError = false;
             return data;
         }
 

@@ -8,6 +8,7 @@ using UnityObject = UnityEngine.Object;
 using UnityEngine.UI;
 using System.Collections.ObjectModel;
 using Management.Wires;
+using UI.TableViews;
 
 namespace UI.Tables.Concrete.KVIDS
 {
@@ -105,6 +106,8 @@ namespace UI.Tables.Concrete.KVIDS
 
         public int PanelCount { get { return _kvid6Panels.Count; } }
 
+        public List<KVID6Panel> Panels { get { return _kvid6Panels; } }
+
         public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add(GetNextCode(), 0f, 0f, 0f, cellClickHandler);
 
         private KVID6Panel Add(string code, float x, float y, float z, Action<Cell> cellClickHandler)
@@ -128,9 +131,7 @@ namespace UI.Tables.Concrete.KVIDS
 
         private string GetNextCode()
         {
-            while (_kvid6Panels.Find(p => p.Code.StringValue == $"Т{_nextCodeIndex}") != null) _nextCodeIndex += 1;
-
-            return $"Т{_nextCodeIndex}";
+            return $"Т{GetComponentInParent<KVID6View>().GetNextRowIndex()}";
         }
 
         public override void Clear()

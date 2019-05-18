@@ -193,7 +193,10 @@ namespace UI.TableViews
 
             yield return null;
 
-            var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult);
+            bool hasError;
+            var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult, out hasError);
+
+            if (hasError) yield break;
 
             Add(tabs);
         }

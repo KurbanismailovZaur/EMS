@@ -124,8 +124,10 @@ namespace UI.TableViews
 
             yield return null;
 
-            var data = KVID5DataReader.ReadFromFile(_explorer.LastResult);
+            bool hasError;
+            var data = KVID5DataReader.ReadFromFile(_explorer.LastResult, out hasError);
 
+            if (hasError) yield break;
 
             foreach (var(code, position, type, iR, oV, oF, bBA, conType) in data)
             {
