@@ -45,6 +45,18 @@ namespace UI.TableViews
             }
         }
 
+        public int GetNextRowIndex()
+        {
+            int nextIndex = 0;
+
+            foreach(var page in _pages)
+            {
+                while (page.Panels.Find(p => p.Code.StringValue == $"Т{nextIndex}") != null) nextIndex += 1;
+            }
+
+            return nextIndex;
+        }
+
         protected override void Start()
         {
             base.Start();
@@ -200,15 +212,31 @@ namespace UI.TableViews
             ActivatePage(_activePageIndex + 1);
         }
 
+        private IEnumerator UpdateScrollrectVerticalRoutine()
+        {
+            yield return null;
+            _content.GetComponentInParent<UnityEngine.UI.ScrollRect>().verticalNormalizedPosition = 0f;
+        }
+
         #region Event handlers
         private void Import_OnClick() => Import();
         protected override void AddButton_OnClick()
         {
             if (CountPanelsInAllPages == 103823) return;
 
+
+            int lastPageRowsCount = _pages[_pages.Count - 1].PanelCount;
+            if(lastPageRowsCount == _maxRowsOnPage)
+            {
+                var currentTable = AddTable("KVID6Table");
+                _pages.Add(currentTable);
+            }
+
             ActivatePage(_pages.Count -1);
 
             _pages[_pages.Count - 1].AddEmpty(Cell_Clicked);
+
+            StartCoroutine(UpdateScrollrectVerticalRoutine());
         }
         #endregion
     }
