@@ -142,6 +142,50 @@ namespace UI.Tables.Concrete.KVIDS
             _kvid6Panels.Clear();
         }
 
+        public void ForceClear()
+        {
+            var remT = _removes.transform;
+            var codT = _codes.transform;
+            var xT = _xs.transform;
+            var yT = _ys.transform;
+            var zT = _zs.transform;
+
+            {
+                for (int i = 0; i < remT.childCount; ++i)
+                {
+                    Destroy(remT.GetChild(i).gameObject);
+                }
+            }
+
+            {
+                for (int i = 0; i < codT.childCount; ++i)
+                {
+                    Destroy(codT.GetChild(i).gameObject);
+                }
+            }
+
+            {
+                for (int i = 0; i < xT.childCount; ++i)
+                {
+                    Destroy(xT.GetChild(i).gameObject);
+                }
+            }
+
+            {
+                for (int i = 0; i < yT.childCount; ++i)
+                {
+                    Destroy(yT.GetChild(i).gameObject);
+                }
+            }
+
+            {
+                for (int i = 0; i < zT.childCount; ++i)
+                {
+                    Destroy(zT.GetChild(i).gameObject);
+                }
+            }
+        }
+
         public override void Remove(Panel panel)
         {
             if (!_kvid6Panels.Contains((KVID6Panel)panel)) return;

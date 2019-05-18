@@ -9,6 +9,7 @@ using UI.TableViews.IO;
 using UI.Tables.Concrete.KVIDS;
 using Management.Calculations;
 using UI.Tables;
+using System.Linq;
 
 namespace UI.TableViews
 {
@@ -16,9 +17,6 @@ namespace UI.TableViews
     {
         [SerializeField]
         private int _maxRowsOnPage = 50;
-
-        [SerializeField]
-        private KVID6Table _tablePrefab;
 
         [SerializeField]
         private Button _importButton;
@@ -49,13 +47,27 @@ namespace UI.TableViews
         {
             int nextIndex = 0;
 
-            foreach(var page in _pages)
+            bool needContinue = true;
+            while (needContinue)
             {
-                while (page.Panels.Find(p => p.Code.StringValue == $"Т{nextIndex}") != null) nextIndex += 1;
+                bool finded = false;
+                foreach (var page in _pages)
+                {
+                    if (page.Panels.Find(p => p.Code.StringValue == $"Т{nextIndex}") != null)
+                    {
+                        ++nextIndex;
+                        finded = true;
+                        break;
+                    }
+                }
+
+                if (!finded)
+                    needContinue = false;
             }
 
             return nextIndex;
         }
+
 
         protected override void Start()
         {
@@ -69,6 +81,7 @@ namespace UI.TableViews
             SelectFirstTab();
 
             _pages.Add(_tabsAssociations[0].table as KVID6Table);
+            ActivatePage(0);
         }
 
         public override void Open()
@@ -113,7 +126,24 @@ namespace UI.TableViews
 
         protected override void Clear()
         {
-            GetCurrentTable().Clear();
+            PagesClear();
+        }
+
+        private void PagesClear()
+        {
+            for (int i = 0; i < _pages.Count; ++i)
+            {
+                if (i == 0) continue;
+
+                Destroy(_pages[i].gameObject);
+            }
+
+            _pages[0].Clear();
+            _pages.Clear();
+
+            _activePageIndex = 0;
+            _pages.Add(_tabsAssociations[0].table as KVID6Table);
+            ActivatePage(0);
         }
 
         public override void Save()
@@ -122,7 +152,7 @@ namespace UI.TableViews
 
             foreach (var table in _pages)
             {
-                points.AddRange(((KVID6Table)GetCurrentTable()).GetPoints());
+                points.AddRange(table.GetPoints());
             }
 
             CalculationsManager.Instance.CalculateElectricFieldStrenght(points, 1f);
@@ -152,7 +182,6 @@ namespace UI.TableViews
 
             foreach (var (code, position) in points)
             {
-
                 var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
 
                 panel.Code.StringValue = code;
@@ -165,7 +194,6 @@ namespace UI.TableViews
                 if (lastTableRowsCount == _maxRowsOnPage)
                 {
                     currentTable.gameObject.SetActive(false);
-                    _pages.Add(currentTable);
 
                     currentTable = AddTable("KVID6Table");
                     _pages.Add(currentTable);
@@ -181,8 +209,8 @@ namespace UI.TableViews
 
         private KVID6Table AddTable(string name)
         {
-            var table = Instantiate(_tablePrefab, _content);
-            table.name = name;
+            var table = (KVID6Table)Instantiate(_tabsAssociations[0].table, _content);
+            table.ForceClear();
 
             return table;
         }
@@ -224,13 +252,13 @@ namespace UI.TableViews
 
 
             int lastPageRowsCount = _pages[_pages.Count - 1].PanelCount;
-            if(lastPageRowsCount == _maxRowsOnPage)
+            if (lastPageRowsCount == _maxRowsOnPage)
             {
                 var currentTable = AddTable("KVID6Table");
                 _pages.Add(currentTable);
             }
 
-            ActivatePage(_pages.Count -1);
+            ActivatePage(_pages.Count - 1);
 
             _pages[_pages.Count - 1].AddEmpty(Cell_Clicked);
 
