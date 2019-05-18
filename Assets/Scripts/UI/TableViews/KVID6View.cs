@@ -15,7 +15,7 @@ namespace UI.TableViews
     public class KVID6View : TableView
     {
         [SerializeField]
-        private int _maxRowsOnPage = 100;
+        private int _maxRowsOnPage = 50;
 
         [SerializeField]
         private KVID6Table _tablePrefab;
