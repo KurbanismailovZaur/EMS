@@ -22,6 +22,7 @@ using UI.TableViews;
 using Management;
 using Management.Interop;
 using UI.Sequencing;
+using System.Threading;
 
 namespace Facades
 {
@@ -69,14 +70,14 @@ namespace Facades
         [SerializeField]
         private PointCalculationOptions _pointCalculationOptions;
 
-        [Header("Contexts")]
-        [SerializeField]
-        private WiringContext _wiringContext;
-
-        [SerializeField]
-        private CalculationsContext _calculationsContext;
-
         private CalculationBase _currentCalculations;
+
+        [Header("Managers (for thread safe reasons)")]
+        [SerializeField]
+        private DatabaseManager _databaseManager;
+
+        [SerializeField]
+        private PythonManager _pythonManager;
 
         private void SetCameraToDefaultState()
         {
@@ -107,7 +108,7 @@ namespace Facades
 
             if (_explorer.LastResult == null) yield break;
 
-            ModelManager.Instance.ImportPlanes(_explorer.LastResult);
+            ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).CatchErrors();
         }
         #endregion
 
@@ -116,10 +117,7 @@ namespace Facades
         #endregion
 
         #region Calculations
-        private void CalculateElectricFieldStrenght()
-        {
-            StartCoroutine(CalculateElectricFieldStrenghtRoutine());
-        }
+        private void CalculateElectricFieldStrenght() => StartCoroutine(CalculateElectricFieldStrenghtRoutine());
 
         private IEnumerator CalculateElectricFieldStrenghtRoutine()
         {
@@ -136,6 +134,22 @@ namespace Facades
             }
         }
 
+        private async Task CalculateMutualActionOfBCSAndBAAsync()
+        {
+            ProgressManager.Instance.Show("Вычисление взаимного воздействия БКС и БА..");
+
+            await new WaitForBackgroundThread();
+
+            _pythonManager.CalculateMutualActionOfBCSAndBA();
+
+            await new WaitForUpdate();
+
+            CalculationsManager.Instance.CalculateMutualActionOfBCSAndBA(WiringManager.Instance.Wiring);
+            CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible = true;
+
+            ProgressManager.Instance.Hide();
+        }
+
         private void SetCurrentCalculations(CalculationBase calculation)
         {
             if (_currentCalculations)
@@ -148,9 +162,27 @@ namespace Facades
 
             _currentCalculations = calculation;
         }
+
+        private async Task ContinueCalculateElectricFieldStrenghtInPythonAsync()
+        {
+            ProgressManager.Instance.Show("Вычисление напряженности электрического поля..");
+
+            var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => (p.Code, p.transform.position.x, p.transform.position.y, p.transform.position.z)).ToArray();
+
+            await new WaitForBackgroundThread();
+
+            _databaseManager.UpdateKVID6(points);
+            _pythonManager.CalculateElectricFieldStrenght();
+
+            await new WaitForUpdate();
+
+            CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
+            CalculationsManager.Instance.ElectricFieldStrenght.IsVisible = true;
+            ProgressManager.Instance.Hide();
+        }
         #endregion
 
-        private void FilterCurrentCalculations(float min, float max) => _currentCalculations.Filter(min, max);
+        private void FilterCurrentCalculations(float min, float max) => _currentCalculations?.Filter(min, max);
 
         private void FilterCurrentCalculationsWithCurrentRanges() => FilterCurrentCalculations(_filter.RangeSlider.MinValue, _filter.RangeSlider.MaxValue);
 
@@ -261,7 +293,7 @@ namespace Facades
 
         public void ModelManager_PlanesImported()
         {
-            DatabaseManager.Instance.UpdatePlanes(ModelManager.Instance.MaterialPlanesPairs);
+            DatabaseManager.Instance.UpdatePlanesAsync(ModelManager.Instance.MaterialPlanesPairs).CatchErrors();
         }
 
         public void ModelManager_PlanesRemoved()
@@ -325,7 +357,7 @@ namespace Facades
                     CalculateElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
-                    CalculationsManager.Instance.CalculateMutualActionOfBCSAndBA(WiringManager.Instance.Wiring);
+                    CalculateMutualActionOfBCSAndBAAsync().CatchErrors();
                     break;
                 case CalculationsContext.Action.ElectricFieldStrenghtVisibility:
                     CalculationsManager.Instance.ElectricFieldStrenght.ToggleVisibility();
@@ -347,12 +379,7 @@ namespace Facades
         }
 
         #region Electric
-        public void ElectricFieldStrenght_Calculated()
-        {
-            DatabaseManager.Instance.UpdateKVID6(CalculationsManager.Instance.ElectricFieldStrenght.Points);
-            PythonManager.Instance.CalculateElectricFieldStrenght();
-            CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
-        }
+        public void ElectricFieldStrenght_Calculated() => ContinueCalculateElectricFieldStrenghtInPythonAsync().CatchErrors();
 
         public void ElectricFieldStrenght_VisibilityChanged()
         {

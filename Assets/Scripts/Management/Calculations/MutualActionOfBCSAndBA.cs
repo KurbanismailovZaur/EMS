@@ -33,7 +33,6 @@ namespace Management.Calculations
 
             var influences = new List<(int a, int b, float value)>();
 
-            PythonManager.Instance.CalculateMutualActionOfBCSAndBA();
             var sourceMutuals = DatabaseManager.Instance.GetCalculatedMutualActionOfBCSAndBA();
 
             var maxValue = sourceMutuals.Max(m => m.value);
@@ -48,8 +47,6 @@ namespace Management.Calculations
             Calculated.Invoke();
 
             FilterMaxValue = maxValue;
-
-            IsVisible = true;
         }
 
         public override void Remove()

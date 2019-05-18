@@ -18,7 +18,7 @@ namespace Management.Interop
 
         private string _pythonPath;
 
-        private void Start()
+        private void Awake()
         {
             var paths = Environment.GetEnvironmentVariable("path").Split(';');
 
@@ -62,7 +62,7 @@ namespace Management.Interop
                 using (StreamReader reader = process.StandardOutput)
                 {
                     var error = process.StandardError.ReadToEnd();
-                    Log(error);
+                    Log($"Error in python: {(string.IsNullOrWhiteSpace(error) ? "none" : error)}");
 
                     return reader.ReadToEnd();
                 }

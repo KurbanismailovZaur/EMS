@@ -11,6 +11,7 @@ using System.IO;
 using System.Globalization;
 using System.Linq;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Management.Models
 {
@@ -110,9 +111,13 @@ namespace Management.Models
             ModelRemoved.Invoke();
         }
 
-        public void ImportPlanes(string path)
+        public async Task ImportPlanesAsync(string path)
         {
+            ProgressManager.Instance.Show("Вычисление плоскостей..");
+
             RemovePlanes();
+
+            await new WaitForBackgroundThread();
 
             var info = GetVerticesInfoFromOBJ(path);
 
@@ -121,6 +126,8 @@ namespace Management.Models
             int index = 0;
             foreach (var pair in info)
                 _materialsPlanesPairs.Add((index++, pair.Value));
+
+            await new WaitForUpdate();
 
             PlanesImported.Invoke();
         }

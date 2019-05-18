@@ -42,6 +42,12 @@ namespace Management
         [SerializeField]
         private SimpleSQLManager _dbManager;
 
+        /// <summary>
+        /// Required for avoid "can only calling from the main thread" exception.
+        /// </summary>
+        [SerializeField]
+        private PythonManager _pythonManager;
+
         #region Table names
         private const string kvid1 = "KVID1_REF";
         private const string kvid2 = "KVID2";
@@ -54,7 +60,9 @@ namespace Management
         private const string modelPoint = "ModelPoint";
         #endregion
 
-        public string DatabasePath => Path.Combine(Application.persistentDataPath, "emsdb.bytes");
+        public string DatabasePath { get; private set; }
+
+        private void Awake() => DatabasePath = Path.Combine(Application.persistentDataPath, "emsdb.bytes");
 
         public void ClearAllTalbes()
         {
@@ -72,8 +80,10 @@ namespace Management
             _dbManager.Commit();
         }
 
-        public void UpdatePlanes(ICollection<(int materialID, List<ModelManager.Plane> planes)> materialPlanesPairs)
+        public async Task UpdatePlanesAsync(ICollection<(int materialID, List<ModelManager.Plane> planes)> materialPlanesPairs)
         {
+            await new WaitForBackgroundThread();
+
             _dbManager.BeginTransaction();
 
             foreach (var (materialID, planes) in materialPlanesPairs)
@@ -82,7 +92,11 @@ namespace Management
 
             _dbManager.Commit();
 
-            PythonManager.Instance.HandlePlanes();
+            _pythonManager.HandlePlanes();
+
+            await new WaitForUpdate();
+
+            ProgressManager.Instance.Hide();
         }
 
         public void RemovePlanes()
@@ -193,14 +207,14 @@ namespace Management
             _dbManager.Execute($"DELETE FROM {kvid5}");
         }
 
-        public void UpdateKVID6(ICollection<Point> points)
+        public void UpdateKVID6(IEnumerable<(string Code, float x, float y, float z)> points)
         {
             _dbManager.BeginTransaction();
 
             RemoveKVID6();
 
             foreach (var point in points)
-                _dbManager.Execute($"INSERT INTO {kvid6} VALUES (?, ?, ?, ?)", point.Code, point.transform.position.x, point.transform.position.y, point.transform.position.z);
+                _dbManager.Execute($"INSERT INTO {kvid6} VALUES (?, ?, ?, ?)", point.Code, point.x, point.y, point.z);
 
             _dbManager.Commit();
         }

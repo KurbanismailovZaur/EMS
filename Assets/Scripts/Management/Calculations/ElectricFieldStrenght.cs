@@ -76,8 +76,6 @@ namespace Management.Calculations
 
             IsCalculated = true;
             Calculated.Invoke();
-
-            IsVisible = true;
         }
 
         public void SetStrenghts(List<(string name, float[] values)> strenghts)
