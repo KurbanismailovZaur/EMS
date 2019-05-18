@@ -67,6 +67,8 @@ namespace UI.TableViews
             _importButton.onClick.AddListener(Import_OnClick);
 
             SelectFirstTab();
+
+            _pages.Add(_tabsAssociations[0].table as KVID6Table);
         }
 
         public override void Open()
@@ -97,9 +99,8 @@ namespace UI.TableViews
                 if (lastTableRowsCount == _maxRowsOnPage)
                 {
                     currentTable.gameObject.SetActive(false);
-                    _pages.Add(currentTable);
-
                     currentTable = AddTable("KVID6Table");
+                    _pages.Add(currentTable);
 
                     lastTableRowsCount = 0;
                 }
@@ -107,8 +108,6 @@ namespace UI.TableViews
 
 
             currentTable.gameObject.SetActive(false);
-            _pages.Add(currentTable);
-
             ActivatePage(0);
         }
 
@@ -169,6 +168,7 @@ namespace UI.TableViews
                     _pages.Add(currentTable);
 
                     currentTable = AddTable("KVID6Table");
+                    _pages.Add(currentTable);
 
                     lastTableRowsCount = 0;
                 }
@@ -176,8 +176,6 @@ namespace UI.TableViews
 
 
             currentTable.gameObject.SetActive(false);
-            _pages.Add(currentTable);
-
             ActivatePage(0);
         }
 
