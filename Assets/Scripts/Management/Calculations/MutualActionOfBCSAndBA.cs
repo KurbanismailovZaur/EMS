@@ -36,7 +36,7 @@ namespace Management.Calculations
             var sourceMutuals = DatabaseManager.Instance.GetCalculatedMutualActionOfBCSAndBA();
 
             var maxValue = sourceMutuals.Max(m => m.value);
-            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), influences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.value, _gradient.Evaluate((float)(m.value / maxValue)))).ToList();
+            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), wiresInfluences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.blocksInfluences,  m.value, color: _gradient.Evaluate((float)(m.value / maxValue)))).ToList();
             
             _wires = Wire.Factory.Create(mutuals, transform);
 

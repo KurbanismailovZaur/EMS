@@ -290,24 +290,23 @@ namespace Management
             return infos;
         }
 
-        public List<(string name, List<(string name, int frequency, double value)> influences, double value)> GetCalculatedMutualActionOfBCSAndBA()
+        public List<(string name, List<(string name, double frequency, double value)> influences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, double value)> GetCalculatedMutualActionOfBCSAndBA()
         {
             var sourceInfos = _dbManager.Query<MutualActionOfBCSAndBAInfo>("SELECT * FROM ResultM2");
 
-            var mutuals = new List<(string name, List<(string name, int frequency, double value)> influences, double value)>();
+            var mutuals = new List<(string name, List<(string name, double frequency, double value)> wiresInfluences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, double value)>();
 
             foreach (var info in sourceInfos)
             {
-                var influences = new List<(string name, int frequency, double value)>();
-
-                foreach (JsonArray jInfluenceInfo in new JsonArray(info.data_wires))
+                var wiresInfluences = new JsonArray(info.data_wires).Cast<JsonArray>().Select(jArray =>
                 {
-                    ((JsonString)jInfluenceInfo[0]).UnEscape();
-                    var influence = (jInfluenceInfo.GetString(0), jInfluenceInfo.GetNumber(1).ToInt(), jInfluenceInfo.GetNumber(2).ToDouble() + jInfluenceInfo.GetNumber(3).ToDouble());
-                    influences.Add(influence);
-                }
+                    ((JsonString)jArray[0]).UnEscape();
+                    return (name: jArray.GetString(0), frequency: jArray.GetNumber(1).ToDouble(), value: jArray.GetNumber(2).ToDouble() + jArray.GetNumber(3).ToDouble());
+                }).ToList();
 
-                mutuals.Add((info.id, influences, info.result));
+                var blocksInfluences = new JsonArray(info.data_bbas).Cast<JsonArray>().Select(jArray => (name: jArray.GetString(0), values: jArray.GetArray(1).Cast<JsonArray>().Select(pair => (frequencyMin: pair.GetNumber(1).ToDouble(), frequencyMax: pair.GetNumber(2).ToDouble(), value: pair.GetNumber(0).ToDouble())).ToList())).ToList();
+
+                mutuals.Add((info.id, wiresInfluences, blocksInfluences, info.result));
             }
 
             return mutuals;

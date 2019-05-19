@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System;
+using System.Linq;
 
 namespace UI.Panels.Wire
 {
@@ -23,6 +24,9 @@ namespace UI.Panels.Wire
 
         [SerializeField]
         private Text _wireValue;
+
+        [SerializeField]
+        private LayoutElement _headerFrequencyLayoutElement;
 
         [SerializeField]
         private LayoutElement _scrollviewElement;
@@ -129,20 +133,31 @@ namespace UI.Panels.Wire
         {
             ClearInfluences();
 
-            var isInfluencesExists = wire.Influences.Count != 0;
+            var isWiresInfluencesExists = wire.WiresInfluences.Count != 0;
+            var isBlocksInfluencesExists = wire.BlocksInfluences.Count != 0;
 
-            _scrollviewElement.gameObject.SetActive(isInfluencesExists);
-            _noInfluence.SetActive(!isInfluencesExists);
+            _scrollviewElement.gameObject.SetActive(isWiresInfluencesExists || isBlocksInfluencesExists);
+            _noInfluence.SetActive(!(isWiresInfluencesExists || isBlocksInfluencesExists));
 
-            if (!isInfluencesExists) return;
+            if (!(isWiresInfluencesExists || isBlocksInfluencesExists)) return;
 
-            foreach (var influence in wire.Influences)
+            foreach (var influence in wire.WiresInfluences)
             {
-                var inf = Influence.Factory.Create(_influencePrefab, influence.Wire.Name, influence.Frequency, influence.Value);
+                var inf = Influence.Factory.Create(_influencePrefab, influence.Wire.Name, influence.Frequency.ToString(), influence.Value);
                 inf.transform.SetParent(_content);
             }
 
-            SetScrollViewHeightToShowElements(Mathf.Clamp(wire.Influences.Count, 1, 4));
+            foreach (var influence in wire.BlocksInfluences)
+            {
+                foreach (var (frequencyMin, frequencyMax, value) in influence.Influences)
+                {
+                    var inf = Influence.Factory.Create(_influencePrefab, influence.Name, $"{frequencyMin} / {frequencyMax}", value);
+                    inf.transform.SetParent(_content);
+                }
+            }
+
+            SetScrollViewHeightToShowElements(Mathf.Clamp(wire.WiresInfluences.Count + wire.BlocksInfluences.Count, 1, 4));
+            SetFreuquencyColumnWidthToMax();
         }
 
         private void ClearInfluences()
@@ -155,6 +170,18 @@ namespace UI.Panels.Wire
         {
             _scrollviewElement.preferredHeight = 32 * count;
             _viewportElement.preferredHeight = 32 * count;
+        }
+
+        private void SetFreuquencyColumnWidthToMax()
+        {
+            var influences = _content.GetComponentsInChildren<Influence>();
+
+            float maxFrequencyWidth = influences.Max(inf => inf.FrequencyPrefferedWidth) + 12;
+
+            _headerFrequencyLayoutElement.preferredWidth = maxFrequencyWidth;
+
+            foreach (var influence in influences)
+                influence.FrequencyLayoutElement.preferredWidth = maxFrequencyWidth;
         }
 
         #region Event handlers

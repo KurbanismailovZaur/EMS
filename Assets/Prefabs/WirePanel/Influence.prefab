@@ -79,7 +79,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 0
+  m_Text: 
 --- !u!114 &5695999222990160213
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,7 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
+  m_MinWidth: 96
   m_MinHeight: -1
   m_PreferredWidth: 96
   m_PreferredHeight: -1
@@ -179,7 +179,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 0
+  m_Text: 
 --- !u!114 &5363562162955197933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -460,6 +460,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _nameText: {fileID: 5363562163064411805}
   _frequencyText: {fileID: 3439358728331962007}
+  _frequencyLayoutElement: {fileID: 5695999222990160213}
   _valueText: {fileID: 5363562162955197932}
 --- !u!114 &7987062882831954223
 MonoBehaviour:

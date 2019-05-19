@@ -13,7 +13,7 @@ namespace UI.Panels.Wire
     {
         public static class Factory
         {
-            public static Influence Create(Influence prefab, string name, float frequency, double value)
+            public static Influence Create(Influence prefab, string name, string frequency, double value)
             {
                 var influence = Instantiate(prefab);
                 influence.Name = name;
@@ -31,9 +31,10 @@ namespace UI.Panels.Wire
         private Text _frequencyText;
 
         [SerializeField]
-        private Text _valueText;
+        private LayoutElement _frequencyLayoutElement;
 
-        private double _frequency;
+        [SerializeField]
+        private Text _valueText;
 
         private double _value;
 
@@ -43,15 +44,18 @@ namespace UI.Panels.Wire
             private set => _nameText.text = value;
         }
 
-        public double Frequency
+        public string Frequency
         {
-            get => _value;
+            get => _frequencyText.text;
             private set
             {
-                _frequency = value;
-                _frequencyText.text = _frequency.ToString();
+                _frequencyText.text = value;
             }
         }
+
+        public float FrequencyPrefferedWidth => _frequencyText.preferredWidth;
+
+        public LayoutElement FrequencyLayoutElement => _frequencyLayoutElement;
 
         public double Value
         {

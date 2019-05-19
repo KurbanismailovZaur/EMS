@@ -14,7 +14,7 @@ namespace Management.Calculations
     {
         public static new class Factory
         {
-            public static Wire[] Create(List<(Wires.Wire wire, List<(Wires.Wire wire, int frequency, double value)> influences, double value, Color color)> mutuals, Transform parent)
+            public static Wire[] Create(List<(Wires.Wire wire, List<(Wires.Wire wire, double frequency, double value)> wiresInfluences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)> values)> blocksInfluences, double value, Color color)> mutuals, Transform parent)
             {
                 var wires = mutuals.Select(mutual =>
                 {
@@ -44,6 +44,8 @@ namespace Management.Calculations
                     collider.SetClickHandler(wire.LineCollider_ClickHandler);
                     #endregion
 
+                    wire._blocksInfluences.AddRange(mutual.blocksInfluences.Select(inf => new BlockInfluence(inf.name, inf.values)));
+
                     wire.Value = mutual.value;
                     wire._line.color = mutual.color;
 
@@ -51,22 +53,22 @@ namespace Management.Calculations
                 }).ToArray();
 
                 foreach (var wire in wires)
-                    wire._influences.AddRange(mutuals.First(m => m.wire.Name == wire.Name).influences.Select(i => new Influence(wires.First(w => w.Name == i.wire.name), i.frequency, i.value)));
+                    wire._wiresInfluences.AddRange(mutuals.First(m => m.wire.Name == wire.Name).wiresInfluences.Select(i => new WireInfluence(wires.First(w => w.Name == i.wire.name), i.frequency, i.value)));
 
                 return wires;
             }
         }
 
         [Serializable]
-        public struct Influence
+        public struct WireInfluence
         {
             public Wire Wire { get; private set; }
 
-            public int Frequency { get; set; }
+            public double Frequency { get; set; }
 
             public double Value { get; private set; }
 
-            public Influence(Wire wire, int frequency, double value)
+            public WireInfluence(Wire wire, double frequency, double value)
             {
                 Wire = wire;
                 Frequency = frequency;
@@ -74,9 +76,27 @@ namespace Management.Calculations
             }
         }
 
-        private List<Influence> _influences = new List<Influence>();
+        [Serializable]
+        public struct BlockInfluence
+        {
+            public string Name { get; private set; }
 
-        public ReadOnlyCollection<Influence> Influences => _influences.AsReadOnly();
+            public List<(double frequencyMin, double frequencyMax, double value)> Influences { get; set; }
+
+            public BlockInfluence(string name, List<(double frequencyMin, double frequencyMax, double value)> influences)
+            {
+                Name = name;
+                Influences = influences;
+            }
+        }
+
+        private List<WireInfluence> _wiresInfluences = new List<WireInfluence>();
+
+        public ReadOnlyCollection<WireInfluence> WiresInfluences => _wiresInfluences.AsReadOnly();
+
+        private List<BlockInfluence> _blocksInfluences = new List<BlockInfluence>();
+
+        public ReadOnlyCollection<BlockInfluence> BlocksInfluences => _blocksInfluences.AsReadOnly();
 
         public double Value { get; private set; }
 
