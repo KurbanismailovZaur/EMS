@@ -29,6 +29,23 @@ namespace Management
             public string val { get; set; }
         }
 
+        private class ElectricFieldStrenghtExceedingInfo
+        {
+            public string id { get; set; }
+
+            public double x { get; set; }
+
+            public double y { get; set; }
+
+            public double z { get; set; }
+
+            public double result { get; set; }
+
+            public string data_wires { get; set; }
+
+            public string data_bbas { get; set; }
+        }
+
         private class MutualActionOfBCSAndBAInfo
         {
             public string id { get; set; }
@@ -61,9 +78,12 @@ namespace Management
         private const string kvid6 = "KVID6";
         private const string kvid81 = "KVID8_1";
         private const string kvid82 = "KVID8_2";
+        private const string selectWire = "SelectPoint";
         private const string modelPoint = "ModelPoint";
         private const string selectPoint = "SelectPoint";
-        private const string selectWire = "SelectPoint";
+        private const string resultM3Times = "ResultM3Times";
+        private const string resultM3 = "ResultM3";
+        private const string resultM2 = "ResultM2";
         #endregion
 
         public string DatabasePath { get; private set; }
@@ -274,17 +294,22 @@ namespace Management
             _dbManager.Commit();
         }
 
-        public List<(string name, double[] values)> GetCalculatedElectricFieldStrengts()
+        public List<(string name, bool exceeded, double[] values)> GetCalculatedElectricFieldStrengts()
         {
-            var sourceInfos = _dbManager.Query<ElectricFieldStrenghtInfo>("SELECT * FROM ResultM3Times");
+            var sourceInfos = _dbManager.Query<ElectricFieldStrenghtInfo>($"SELECT * FROM {resultM3Times}");
+            var exceedingInfos = _dbManager.Query<ElectricFieldStrenghtExceedingInfo>($"SELECT * FROM {resultM3}");
 
-            var infos = new List<(string name, double[] values)>();
+            var infos = new List<(string name, bool exceeded, double[] values)>();
 
-            foreach (var info in sourceInfos)
+            for (int i = 0; i < sourceInfos.Count; i++)
             {
-                var jArray = new JsonArray(info.val);
+                var jArray = new JsonArray(sourceInfos[i].val);
                 var values = Enumerable.Repeat(0d, 1).Concat(jArray.Select(el => (((JsonNumber)el).ToDouble()))).ToArray();
-                infos.Add((info.id, values));
+
+                var exceeded = new JsonArray(exceedingInfos[i].data_wires).Cast<JsonArray>().Any(vs => vs.GetBool(6));
+                exceeded |= new JsonArray(exceedingInfos[i].data_bbas).Cast<JsonArray>().Any(ja => ja.GetArray(1).Cast<JsonArray>().Any(jb => jb.GetBool(3)));
+
+                infos.Add((sourceInfos[i].id, exceeded, values));
             }
 
             return infos;
@@ -292,7 +317,7 @@ namespace Management
 
         public List<(string name, List<(string name, double frequency, double value)> influences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, bool exceeded, double value)> GetCalculatedMutualActionOfBCSAndBA()
         {
-            var sourceInfos = _dbManager.Query<MutualActionOfBCSAndBAInfo>("SELECT * FROM ResultM2");
+            var sourceInfos = _dbManager.Query<MutualActionOfBCSAndBAInfo>($"SELECT * FROM {resultM2}");
 
             var mutuals = new List<(string name, List<(string name, double frequency, double value)> wiresInfluences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, bool exceeded, double value)>();
 

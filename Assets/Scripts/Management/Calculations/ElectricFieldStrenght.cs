@@ -24,7 +24,7 @@ namespace Management.Calculations
 
         public override double FilterMaxValue { get; protected set; }
 
-        public override string[] ExceededNames { get; }
+        public override string[] ExceededNames => _points.Where(p => !p.IsExceeded).Select(p => p.Code).ToArray();
 
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
@@ -80,10 +80,13 @@ namespace Management.Calculations
             Calculated.Invoke();
         }
 
-        public void SetStrenghts(List<(string name, double[] values)> strenghts)
+        public void SetStrenghts(List<(string name, bool exceeded, double[] values)> strenghts)
         {
             for (int i = 0; i < strenghts.Count; i++)
+            {
                 _points[i].Values = strenghts[i].values;
+                _points[i].IsExceeded = strenghts[i].exceeded;
+            }
 
             FilterMaxValue = _points.Max(p => p.Values.Max());
 

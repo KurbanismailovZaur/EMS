@@ -25,7 +25,7 @@ namespace Management.Calculations
 
         public override double FilterMaxValue { get; protected set; }
 
-        public override string[] ExceededNames => _wires.Where(w => !w.IsExceeded).Select(w => w.Name).ToArray();
+        public override string[] ExceededNames => _wires.Where(w => w.IsExceeded).Select(w => w.Name).ToArray();
 
         public void Calculate(Wiring wiring)
         {

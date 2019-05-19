@@ -33,6 +33,8 @@ namespace Management.Calculations
 
         public string Code { get; private set; }
 
+        public bool IsExceeded { get; set; }
+
         public double[] Values { get; set; }
 
         public Color[] Gradients { get; set; }
