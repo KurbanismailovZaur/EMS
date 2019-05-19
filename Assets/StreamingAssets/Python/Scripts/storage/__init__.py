@@ -201,7 +201,8 @@ class Storage:
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM ResultM3")
-        res = {row[0]: row[1:] for row in cursor.fetchall()}
+        res = {row[0]: [*row[1:5], json.loads(row[5]), json.loads(row[6]),
+                        json.loads(row[7])] for row in cursor.fetchall()}
 
         conn.close()
 
@@ -216,7 +217,8 @@ class Storage:
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM ResultM2")
-        res = {row[0]: row[1:] for row in cursor.fetchall()}
+        res = {row[0]: [json.loads(row[1]), json.loads(row[2]), json.loads(row[3]),
+                        row[-1]] for row in cursor.fetchall()}
 
         conn.close()
 
@@ -225,13 +227,13 @@ class Storage:
     def get_select_points(self):
         """
         Загрузка выбранный точек
-        :return: итерационнай объект list
+        :return: итерационнай объект str
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM SelectPoint")
-        res = cursor.fetchall()
+        res = [x[0] for x in cursor.fetchall()]
 
         conn.close()
 
@@ -246,7 +248,7 @@ class Storage:
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM SelectWire")
-        res = cursor.fetchall()
+        res = [x[0] for x in cursor.fetchall()]
 
         conn.close()
 
@@ -313,8 +315,8 @@ class Storage:
 
         count = sum(1 for _ in
                     map(lambda item:
-                        cursor.execute(f"INSERT into ResultM3 values ({', '.join('?' * 7)})",
-                                       [*item[:-2], json.dumps(item[-2]), json.dumps(item[-1])]),
+                        cursor.execute(f"INSERT into ResultM3 values ({', '.join('?' * 8)})",
+                                       [*item[:-3], json.dumps(item[-3]), json.dumps(item[-2]), json.dumps(item[-1])]),
                         data))
 
         conn.commit()

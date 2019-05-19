@@ -24,7 +24,7 @@ namespace Management.Calculations
 
         public override double FilterMaxValue { get; protected set; }
 
-        public override string[] ExceededNames => _points.Where(p => !p.IsExceeded).Select(p => p.Code).ToArray();
+        public override string[] ExceededNames => _points.Where(p => p.IsExceeded).Select(p => p.Code).ToArray();
 
         public void Calculate(int pointsByAxis, Bounds bounds)
         {

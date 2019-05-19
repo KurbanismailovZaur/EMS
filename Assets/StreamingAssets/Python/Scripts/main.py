@@ -44,8 +44,14 @@ def script_m3(db_path):
     figures = storage.get_figures()
 
     # Найдем минимальную частоту для вычислении 36 шагов времени
+    # Для кабелей
     f_min = min(*[w.f for w in wires], *[bba.get_min_frequency() for bba in BBAs])
     t_step = (1 / f_min) / 36  # шаг времени
+    time_wires = list(itertools.accumulate([t_step] * 36))
+    # Для ББА
+    f_max = max([(f_start + f_end) / 2 for bba in BBAs for f_start, f_end, value in bba.get_frequency_range()])
+    t_step = (1 / f_max) / 36
+    time_bbas = list(itertools.accumulate([t_step] * 36))
 
     m3 = Math3()
     m4 = Math4(figures, materials)
@@ -55,8 +61,8 @@ def script_m3(db_path):
     for point in set_points:
         # Блок кода получения значений для шкалы времени
         time_values = []
-        for t in itertools.accumulate([t_step] * 36):  # шкала времени
-            m3.set_t(t)
+        for t in range(36):  # шкала времени
+            m3.set_t(time_wires[t])
 
             E = np.zeros(3)  #  напряженность электрического поля в заданной точке
             for wire in wires:  # цикл по кабелям
@@ -84,13 +90,14 @@ def script_m3(db_path):
                 m3.set_bba(bba)
                 Ebba = 0
                 for f_start, f_end, e_id in bba.get_frequency_range():
-                    m3.set_range_params((f_start + f_end) / 2, e_id)
+                    f_middle = (f_start + f_end) / 2
+                    m3.set_range_params(f_middle, e_id)
                     er = m3.do(is_bba=True)
                     # ослабление влияние ББА на заданную точку
                     m4.set_u(bba.point)
                     SEf = m4.do()
                     er = er * SEf
-                    Ebba += er
+                    Ebba += er * mt.sin(2 * mt.pi * f_middle * time_bbas[t])
 
                 # Сложение напряженности по БКС с напряженностью по ББА
                 Ebba /= 3 ** 0.5
@@ -157,14 +164,53 @@ def script_m3(db_path):
                 point_limit = set_points_limits.get(point.id)
                 if point_limit:
                     if ((point_limit[1] <= f_start <= point_limit[2]) or (point_limit[1] <= f_end <= point_limit[2])) \
-                            and (er > point_limit[0]):
+                            and (abs(er) > point_limit[0]):
                         is_excessive = True
 
                 data_frequencies.append([er, f_start, f_end, is_excessive])
 
             data_bbas.append([bba.id, data_frequencies])
 
-        res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires, data_bbas])
+        dct_wires = {}
+        for item in data_wires:
+            if dct_wires.get(item[5]) is None:
+                dct_wires[item[5]] = 0
+            dct_wires[item[5]] += item[4]
+
+        dct_bbas = {}
+        for item in [x for frequencies in data_bbas for x in frequencies[1]]:
+            key = (item[1], item[2])
+            if dct_bbas.get(key) is None:
+                dct_bbas[key] = 0
+            dct_bbas[key] += item[0]
+
+        for f_bba_min, f_bba_max in dct_bbas:
+            for f_wire in dct_wires:
+                if f_bba_min <= f_wire <= f_bba_max:
+                    dct_wires[f_wire] += dct_bbas[(f_bba_min, f_bba_max)]
+
+        data_report = []
+        for key, value in dct_wires.items():
+            # Проверяем на превышения значения
+            is_excessive = False
+            point_limit = set_points_limits.get(point.id)
+            if point_limit:
+                if (point_limit[1] <= key <= point_limit[2]) and (abs(value) > point_limit[0]):
+                    is_excessive = True
+            data_report.append([key, value, is_excessive])
+        for key, value in dct_bbas.items():
+            # Проверяем на превышения значения
+            is_excessive = False
+            point_limit = set_points_limits.get(point.id)
+            if point_limit:
+                if ((point_limit[1] <= key[0] <= point_limit[2]) or (point_limit[1] <= key[1] <= point_limit[2])) \
+                        and (abs(value) > point_limit[0]):
+                    is_excessive = True
+            data_report.append([key, value, is_excessive])
+
+        data_report.sort(key=lambda x: x[0] if isinstance(x[0], tuple) else (x[0], x[0]))
+
+        res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires, data_bbas, data_report])
     storage.set_result_m3_times(res)
     storage.set_result_m3(res_report)
     print('ok')
@@ -271,26 +317,27 @@ def script_m2(db_path):
                     dct_wires[f_wire] += dct_bbas[(f_bba_min, f_bba_max)]
 
         # Проверяем на превышения значения
-        res_5KV = []
-
-        for f, value in dct_wires.items():
+        data_report = []
+        for key, value in dct_wires.items():
             is_excessive = False
             wire_limit = ba_limits.get(wire_id)
             if wire_limit:
-                if (wire_limit[1] <= f <= wire_limit[2]) and (value > wire_limit[0]):
+                if (wire_limit[1] <= key <= wire_limit[2]) and (abs(value) > wire_limit[0]):
                     is_excessive = True
-            res_5KV.append([value, f, is_excessive])
+            data_report.append([value, key, is_excessive])
 
-        for (f_start, f_end), value in dct_bbas.items():
+        for key, value in dct_bbas.items():
             is_excessive = False
             wire_limit = ba_limits.get(wire_id)
             if wire_limit:
-                if ((wire_limit[1] <= f_start <= wire_limit[2]) or (wire_limit[1] <= f_end <= wire_limit[2])) \
-                        and (value > wire_limit[0]):
+                if ((wire_limit[1] <= key[0] <= wire_limit[2]) or (wire_limit[1] <= key[1] <= wire_limit[2])) \
+                        and (abs(value) > wire_limit[0]):
                     is_excessive = True
-            res_5KV.append([value, f_start, f_end, is_excessive])
+            data_report.append([value, key, is_excessive])
 
-        res.append([wire_id, values[0], values[1], res_5KV, wires_sum + bbas_sum])
+        data_report.sort(key=lambda x: x[1] if isinstance(x[1], tuple) else (x[1], x[1]))
+
+        res.append([wire_id, values[0], values[1], data_report, wires_sum + bbas_sum])
 
     storage.set_result_m2(res)
     print('ok')
@@ -332,5 +379,5 @@ if __name__ == "__main__":
     results.script_m3(results.db_path)
     results.script_m2(results.db_path)
     results.script_report(results.db_path, results.xlsx_path)
-    # script_m2('./db/ems.bytes')
+    # script_m3('./db/ems.bytes')
     # script_report('./db/ems.bytes', './report.xlsx')

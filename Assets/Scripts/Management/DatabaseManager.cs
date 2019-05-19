@@ -44,6 +44,8 @@ namespace Management
             public string data_wires { get; set; }
 
             public string data_bbas { get; set; }
+
+            public string data_report { get; set; }
         }
 
         private class MutualActionOfBCSAndBAInfo
@@ -78,9 +80,9 @@ namespace Management
         private const string kvid6 = "KVID6";
         private const string kvid81 = "KVID8_1";
         private const string kvid82 = "KVID8_2";
-        private const string selectWire = "SelectPoint";
-        private const string modelPoint = "ModelPoint";
+        private const string selectWire = "SelectWire";
         private const string selectPoint = "SelectPoint";
+        private const string modelPoint = "ModelPoint";
         private const string resultM3Times = "ResultM3Times";
         private const string resultM3 = "ResultM3";
         private const string resultM2 = "ResultM2";
@@ -306,9 +308,8 @@ namespace Management
                 var jArray = new JsonArray(sourceInfos[i].val);
                 var values = Enumerable.Repeat(0d, 1).Concat(jArray.Select(el => (((JsonNumber)el).ToDouble()))).ToArray();
 
-                var exceeded = new JsonArray(exceedingInfos[i].data_wires).Cast<JsonArray>().Any(vs => vs.GetBool(6));
-                exceeded |= new JsonArray(exceedingInfos[i].data_bbas).Cast<JsonArray>().Any(ja => ja.GetArray(1).Cast<JsonArray>().Any(jb => jb.GetBool(3)));
-
+                var exceeded = exceedingInfos[i].data_report.Contains("true");
+                
                 infos.Add((sourceInfos[i].id, exceeded, values));
             }
 

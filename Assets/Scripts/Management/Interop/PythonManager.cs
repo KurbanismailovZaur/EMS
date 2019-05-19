@@ -75,7 +75,8 @@ namespace Management.Interop
                 using (StreamReader reader = process.StandardOutput)
                 {
                     var error = process.StandardError.ReadToEnd();
-                    Log($"Error in python: {(string.IsNullOrWhiteSpace(error) ? "none" : error)}");
+                    if (!string.IsNullOrWhiteSpace(error))
+                        LogError($"Error in python: {(string.IsNullOrWhiteSpace(error) ? "none" : error)}");
 
                     return reader.ReadToEnd();
                 }

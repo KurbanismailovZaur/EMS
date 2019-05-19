@@ -75,6 +75,9 @@ namespace UI.Panels.Exceeding
             _hasExceeding.gameObject.SetActive(false);
             _noExceeding.SetActive(false);
 
+            _downIcon.SetActive(true);
+            _upIcon.SetActive(false);
+
             _isFolded = true;
 
             Hide();
