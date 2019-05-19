@@ -37,6 +37,8 @@ namespace Management.Calculations
 
         public abstract double FilterMaxValue { get; protected set; }
 
+        public abstract string[] ExceededNames { get; }
+
         public abstract void Remove();
 
         public void ToggleVisibility() => IsVisible = !IsVisible;

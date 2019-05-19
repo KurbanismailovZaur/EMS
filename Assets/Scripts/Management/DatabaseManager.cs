@@ -290,11 +290,11 @@ namespace Management
             return infos;
         }
 
-        public List<(string name, List<(string name, double frequency, double value)> influences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, double value)> GetCalculatedMutualActionOfBCSAndBA()
+        public List<(string name, List<(string name, double frequency, double value)> influences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, bool exceeded, double value)> GetCalculatedMutualActionOfBCSAndBA()
         {
             var sourceInfos = _dbManager.Query<MutualActionOfBCSAndBAInfo>("SELECT * FROM ResultM2");
 
-            var mutuals = new List<(string name, List<(string name, double frequency, double value)> wiresInfluences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, double value)>();
+            var mutuals = new List<(string name, List<(string name, double frequency, double value)> wiresInfluences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)>)> blocksInfluences, bool exceeded, double value)>();
 
             foreach (var info in sourceInfos)
             {
@@ -306,7 +306,7 @@ namespace Management
 
                 var blocksInfluences = new JsonArray(info.data_bbas).Cast<JsonArray>().Select(jArray => (name: jArray.GetString(0), values: jArray.GetArray(1).Cast<JsonArray>().Select(pair => (frequencyMin: pair.GetNumber(1).ToDouble(), frequencyMax: pair.GetNumber(2).ToDouble(), value: pair.GetNumber(0).ToDouble())).ToList())).ToList();
 
-                mutuals.Add((info.id, wiresInfluences, blocksInfluences, info.result));
+                mutuals.Add((info.id, wiresInfluences, blocksInfluences, info.data_report.Contains("true"), info.result));
             }
 
             return mutuals;

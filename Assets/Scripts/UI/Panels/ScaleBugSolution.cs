@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 
-namespace UI.Panels.Wire
+namespace UI.Panels
 {
 	public class ScaleBugSolution : MonoBehaviour 
 	{

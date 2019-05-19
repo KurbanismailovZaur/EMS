@@ -24,6 +24,8 @@ namespace Management.Calculations
 
         public override double FilterMaxValue { get; protected set; }
 
+        public override string[] ExceededNames { get; }
+
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
             // make sphere bounds all points.

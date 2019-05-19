@@ -23,6 +23,7 @@ using Management;
 using Management.Interop;
 using UI.Sequencing;
 using System.Threading;
+using UI.Panels.Exceeding;
 
 namespace Facades
 {
@@ -69,6 +70,9 @@ namespace Facades
 
         [SerializeField]
         private PointCalculationOptions _pointCalculationOptions;
+
+        [SerializeField]
+        private ExceedingPanel _exceedingPanel;
 
         private CalculationBase _currentCalculations;
 
@@ -205,12 +209,16 @@ namespace Facades
         {
             SetCurrentCalculations(calculation);
             HandleAdditionalCalculationInstuments();
+
+            _exceedingPanel.Open(_currentCalculations.ExceededNames);
         }
 
         private void HandleNoCalculations()
         {
             _currentCalculations = null;
             _filter.Hide();
+
+            _exceedingPanel.Close();
         }
 
         #region Event handlers

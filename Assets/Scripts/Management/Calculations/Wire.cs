@@ -14,7 +14,7 @@ namespace Management.Calculations
     {
         public static new class Factory
         {
-            public static Wire[] Create(List<(Wires.Wire wire, List<(Wires.Wire wire, double frequency, double value)> wiresInfluences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)> values)> blocksInfluences, double value, Color color)> mutuals, Transform parent)
+            public static Wire[] Create(List<(Wires.Wire wire, List<(Wires.Wire wire, double frequency, double value)> wiresInfluences, List<(string name, List<(double frequencyMin, double frequencyMax, double value)> values)> blocksInfluences, bool exceeded, double value, Color color)> mutuals, Transform parent)
             {
                 var wires = mutuals.Select(mutual =>
                 {
@@ -46,6 +46,7 @@ namespace Management.Calculations
 
                     wire._blocksInfluences.AddRange(mutual.blocksInfluences.Select(inf => new BlockInfluence(inf.name, inf.values)));
 
+                    wire.IsExceeded = mutual.exceeded;
                     wire.Value = mutual.value;
                     wire._line.color = mutual.color;
 
@@ -97,6 +98,8 @@ namespace Management.Calculations
         private List<BlockInfluence> _blocksInfluences = new List<BlockInfluence>();
 
         public ReadOnlyCollection<BlockInfluence> BlocksInfluences => _blocksInfluences.AsReadOnly();
+
+        public bool IsExceeded { get; private set; }
 
         public double Value { get; private set; }
 
