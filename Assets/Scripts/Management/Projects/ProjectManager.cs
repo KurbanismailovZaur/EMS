@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UI.Main.Contexts;
 using UnityEngine.Events;
+using UI.Exploring.FileSystem;
+using System.IO;
 
 namespace Management.Projects
 {
@@ -32,10 +34,18 @@ namespace Management.Projects
             Log("Load");
         }
 
-        public void Save()
+        public void Save() => StartCoroutine(SaveRoutine());
+
+        private IEnumerator SaveRoutine()
         {
-            Log("Save");
+            yield return FileExplorer.Instance.SaveFile("Сохранить Проект", null, "ems");
+
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            ProjectSerializer.Serialize(FileExplorer.Instance.LastResult);
         }
+
+
 
         public void Close()
         {

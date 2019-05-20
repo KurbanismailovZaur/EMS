@@ -112,7 +112,12 @@ namespace UI.Exploring.FileSystem
 
             public override void Submit()
             {
-                SetResultsAndSubmit(new string[] { Path.Combine(_explorer._addressInput.text, _explorer._nameInput.text) });
+                var path = Path.Combine(_explorer._addressInput.text, _explorer._nameInput.text);
+
+                if (!Path.HasExtension(path))
+                    path += $".{_explorer.CurrentFilter}";
+
+                SetResultsAndSubmit(new string[] { path });
             }
 
             #region Event handlers
