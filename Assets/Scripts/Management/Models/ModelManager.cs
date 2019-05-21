@@ -223,17 +223,19 @@ namespace Management.Models
                     {
                         faceWasUsed = true;
 
-                        string[] indexes = line.Substring(2).Split(' ');
+                        int[] indexes = line.Substring(2).Split(' ').Select(p => GetFirstNumber(p)).ToArray();
+
+                        if (indexes.Length < 3) continue;
+
+                        indexes = indexes.Skip(2).SelectMany((i, index) => new int[] { indexes[0], indexes[index + 1], indexes[index + 2] }).ToArray();
 
                         for (int i = 0; i < indexes.Length; i++)
-                        {
-                            int index = GetFirstNumber(indexes[i]);
-                            materialVerticesIndexes.Add(index);
-                        }
+                            materialVerticesIndexes.Add(indexes[i]);
                     }
                 }
 
-                AddVerticesAsPlanes(materialsPlanes, materialName, IndexesToVertices(vertices, materialVerticesIndexes));
+                if (materialVerticesIndexes.Count != 0)
+                    AddVerticesAsPlanes(materialsPlanes, materialName, IndexesToVertices(vertices, materialVerticesIndexes));
             }
 
             return materialsPlanes;
