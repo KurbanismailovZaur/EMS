@@ -1,3 +1,13 @@
+import os
+import sys
+
+# Add vendor directory to module search path
+parent_dir = os.path.abspath(os.path.dirname(__file__))
+vendor_dir = os.path.join(parent_dir, 'python-embed-amd64/lib')
+
+sys.path.append(vendor_dir)
+sys.path.append(parent_dir)
+
 from storage import Storage
 from m2 import Math2
 from m3 import Math3
@@ -215,7 +225,7 @@ def script_m3(db_path):
         res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires, data_bbas, data_report])
 
         # Запись прогресса
-        storage.set_progress(v_percent)
+        storage.set_progress(round(v_percent))
         v_percent += k_percent
 
     storage.set_result_m3_times(res)
@@ -279,7 +289,7 @@ def script_m2(db_path):
             dct_sources[wire_b.id][0].append([wire_a.id, wire_a.f, Uc, Uh])
 
         # Запись прогресса
-        storage.set_progress(v_percent)
+        storage.set_progress(round(v_percent))
         v_percent += k_percent
 
     # Взаимодействие между БКС и ББА
@@ -308,7 +318,7 @@ def script_m2(db_path):
             dct_sources[wire.id][1].append([bba.id, data_frequencies])
 
         # Запись прогресса
-        storage.set_progress(v_percent)
+        storage.set_progress(round(v_percent))
         v_percent += k_percent
 
     res = []
@@ -378,21 +388,21 @@ def script_report(db_path, xlsx_path):
 
 if __name__ == "__main__":
     from settings import DB_PATH
-
+    
     import argparse
-
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('-db', action='store', dest='db_path', default=DB_PATH, help='Путь к файлу базы данных')
     parser.add_argument('-xlsx', action='store', dest='xlsx_path', default='report.xlsx', help='Путь к файлу отчета')
     parser.add_argument('--create_figures', action='store_const', const=create_figures, default=default,
-                        help='Преобразование плоскостей в фигуры')
+                         help='Преобразование плоскостей в фигуры')
     parser.add_argument('--script_m3', action='store_const', const=script_m3, default=default,
-                        help='Расчет напряженности электрического поля в заданных точках')
+                         help='Расчет напряженности электрического поля в заданных точках')
     parser.add_argument('--script_m2', action='store_const', const=script_m2, default=default,
-                        help='Расчет взаимного воздействия кабелей БКС и БА на БКС')
+                         help='Расчет взаимного воздействия кабелей БКС и БА на БКС')
     parser.add_argument('--script_report', action='store_const', const=script_report, default=default,
-                        help='Генерация отчета')
-
+                         help='Генерация отчета')
+    
     results = parser.parse_args()
     results.create_figures(results.db_path)
     results.script_m3(results.db_path)
@@ -400,3 +410,4 @@ if __name__ == "__main__":
     results.script_report(results.db_path, results.xlsx_path)
     # script_m3('./db/ems.bytes')
     # script_report('./db/ems.bytes', './report.xlsx')
+    # default()

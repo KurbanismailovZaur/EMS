@@ -14,25 +14,14 @@ namespace Management.Interop
     public class PythonManager : MonoSingleton<PythonManager>
     {
         [SerializeField]
-        private string _pathToMainScript;
-
         private string _pythonPath;
+
+        [SerializeField]
+        private string _pathToMainScript;
 
         private void Awake()
         {
-            var paths = Environment.GetEnvironmentVariable("path").Split(';');
-
-            foreach (var path in paths)
-            {
-                var pythonPath = Path.Combine(path, "python.exe");
-
-                if (File.Exists(pythonPath))
-                {
-                    _pythonPath = pythonPath;
-                    break;
-                }
-            }
-
+            _pythonPath = Path.Combine(Application.streamingAssetsPath, _pythonPath);
             _pathToMainScript = Path.Combine(Application.streamingAssetsPath, _pathToMainScript);
         }
 

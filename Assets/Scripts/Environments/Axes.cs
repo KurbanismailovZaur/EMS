@@ -85,7 +85,7 @@ namespace Environments
         {
             var xLine = CreateAxis("XAxis", _xColor, Vector3.right);
             var yLine = CreateAxis("YAxis", _yColor, Vector3.up);
-            var zLine = CreateAxis("ZAxis", _zColor, Vector3.forward);
+            var zLine = CreateAxis("ZAxis", _zColor, -Vector3.forward);
 
             var axes = new List<VectorLine>() { xLine, yLine, zLine };
             var lines = new List<VectorLine>();
