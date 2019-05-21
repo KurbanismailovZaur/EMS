@@ -24,6 +24,9 @@ class Report:
                 'border': 1,
             }
 
+            # props_triad = props_base.copy()
+            # props_triad['num_format'] = '# ##0'
+
             props_exceed = props_base.copy()
             props_exceed['bg_color'] = '#FFC7CE'
 
@@ -119,9 +122,9 @@ class Report:
                                 set_format = format_base
                             worksheet.write(row, col, point_id, set_format)
                             worksheet.write(row, col + 1, bba[0], set_format)
-                            worksheet.write(row, col + 2, '', set_format)
-                            worksheet.write(row, col + 3, '', set_format)
-                            worksheet.write(row, col + 4, '', set_format)
+                            worksheet.write(row, col + 2, f_range[0] / 3 ** 0.5, set_format)
+                            worksheet.write(row, col + 3, f_range[0] / 3 ** 0.5, set_format)
+                            worksheet.write(row, col + 4, f_range[0] / 3 ** 0.5, set_format)
                             worksheet.write(row, col + 5, f_range[0], set_format)
                             worksheet.write(row, col + 6, f_range[1], set_format)
                             worksheet.write(row, col + 7, f_range[2], set_format)

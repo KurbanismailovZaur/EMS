@@ -350,7 +350,22 @@ class Storage:
 
         return count
 
+    def set_progress(self, percent):
+        """
+        Запись прогресса завершения определенной задачи в процентах
+        :param percent: int
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute(f"UPDATE Progress SET percent = {percent}")
+
+        conn.commit()
+
+        conn.close()
+
 
 if __name__ == "__main__":
     storage = Storage('../db/ems.bytes')
-    print(list(storage.get_BBAs()))
+    storage.set_progress(0)
+    # print(list(storage.get_BBAs()))

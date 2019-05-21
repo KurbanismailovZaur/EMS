@@ -205,6 +205,8 @@ namespace Facades
 
             var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => (p.Code, p.transform.position.x, p.transform.position.y, p.transform.position.z)).ToArray();
 
+
+
             await new WaitForBackgroundThread();
 
             _databaseManager.UpdateKVID6(points);

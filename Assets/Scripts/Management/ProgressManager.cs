@@ -8,8 +8,8 @@ using Exceptions;
 
 namespace Management
 {
-	public class ProgressManager : MonoSingleton<ProgressManager>
-	{
+    public class ProgressManager : MonoSingleton<ProgressManager>
+    {
         [SerializeField]
         private CanvasGroup _canvasGroup;
 
@@ -21,7 +21,9 @@ namespace Management
 
         private bool _isOpen;
 
-        private Coroutine _rotateIconRoutine;
+        private Coroutine _updateProgressRoutine;
+
+        private Coroutine _rotateRoutine;
 
         [SerializeField]
         [Range(0f, 360)]
@@ -31,14 +33,23 @@ namespace Management
         {
             if (_isOpen) throw new BusyException("Already open.");
 
-            _progressText.text = text;
-
-            _rotateIconRoutine = StartCoroutine(RotateIconRoutine());
+            //_updateProgressRoutine = StartCoroutine(UpdateProgressRoutine());
+            _rotateRoutine = StartCoroutine(RotateRoutine());
 
             SetCanvasGroupParameters(1f, true);
         }
 
-        private IEnumerator RotateIconRoutine()
+        private IEnumerator UpdateProgressRoutine()
+        {
+            while (true)
+            {
+                _progressText.text = $"Загрузка данных ({DatabaseManager.Instance.GetProgress().ToString()}%)..";
+
+                yield return new WaitForSeconds(1f);
+            }
+        }
+
+        private IEnumerator RotateRoutine()
         {
             while (true)
             {
@@ -50,8 +61,10 @@ namespace Management
 
         public void Hide()
         {
-            StopCoroutine(_rotateIconRoutine);
-            _rotateIconRoutine = null;
+            //StopCoroutine(_updateProgressRoutine);
+            StopCoroutine(_rotateRoutine);
+
+            _updateProgressRoutine = null;
 
             SetCanvasGroupParameters(0f, false);
         }
@@ -61,5 +74,5 @@ namespace Management
             _canvasGroup.alpha = alpha;
             _canvasGroup.blocksRaycasts = blocksRaycasts;
         }
-	}
+    }
 }

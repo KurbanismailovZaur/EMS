@@ -9,9 +9,7 @@ import numpy as np
 import math as mt
 import itertools
 
-# TODO добавить БА
 # TODO привести в порядок каталог проекта
-# TODO генерация отчетов
 # TODO проверить зависимост ИД в скрипах
 # TODO добавить скрип валидации входных данных
 
@@ -39,9 +37,13 @@ def script_m3(db_path):
     materials = storage.get_materials()
     wires = storage.get_wires()
     BBAs = list(storage.get_BBAs())
-    set_points = storage.get_set_points()
+    set_points = list(storage.get_set_points())
     set_points_limits, ba_limits = storage.get_limits()
     figures = storage.get_figures()
+
+    storage.set_progress(0)
+    k_percent = 100 / len(set_points)
+    v_percent = k_percent
 
     # Найдем минимальную частоту для вычислении 36 шагов времени
     # Для кабелей
@@ -211,6 +213,11 @@ def script_m3(db_path):
         data_report.sort(key=lambda x: x[0] if isinstance(x[0], tuple) else (x[0], x[0]))
 
         res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires, data_bbas, data_report])
+
+        # Запись прогресса
+        storage.set_progress(v_percent)
+        v_percent += k_percent
+
     storage.set_result_m3_times(res)
     storage.set_result_m3(res_report)
     print('ok')
@@ -224,6 +231,10 @@ def script_m2(db_path):
     BBAs = list(storage.get_BBAs())
     set_points_limits, ba_limits = storage.get_limits()
     figures = storage.get_figures()
+
+    storage.set_progress(0)
+    k_percent = 100 / len(wires) / 2
+    v_percent = k_percent
 
     # Проверка на кол-во проводов, их должно быть больше чем 1
     if len(wires) < 2:
@@ -267,6 +278,10 @@ def script_m2(db_path):
                 dct_sources[wire_b.id] = [[], []]  # [0] - кабеля, [1] - ББА
             dct_sources[wire_b.id][0].append([wire_a.id, wire_a.f, Uc, Uh])
 
+        # Запись прогресса
+        storage.set_progress(v_percent)
+        v_percent += k_percent
+
     # Взаимодействие между БКС и ББА
     for wire in wires:
         for bba in BBAs:  # цикл по ББА
@@ -291,6 +306,10 @@ def script_m2(db_path):
                 data_frequencies.append([Ebba, f_start, f_end])
 
             dct_sources[wire.id][1].append([bba.id, data_frequencies])
+
+        # Запись прогресса
+        storage.set_progress(v_percent)
+        v_percent += k_percent
 
     res = []
     for wire_id, values in dct_sources.items():

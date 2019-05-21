@@ -210,6 +210,13 @@ namespace Management
 
             public float result { get; set; }
         }
+
+        private class Progress
+        {
+            public string id { get; set; }
+
+            public float percent { get; set; }
+        }
         #endregion
 
         [SerializeField]
@@ -236,6 +243,7 @@ namespace Management
         private const string resultM3Times = "ResultM3Times";
         private const string resultM3 = "ResultM3";
         private const string resultM2 = "ResultM2";
+        private const string progress = "Progress";
         #endregion
 
         public string DatabasePath { get; private set; }
@@ -542,6 +550,12 @@ namespace Management
             }
 
             return mutuals.Count > 0 ? mutuals : null;
+        }
+
+        public float GetProgress()
+        {
+            var progressInfos = _dbManager.Query<Progress>($"SELECT * FROM {progress}");
+            return progressInfos.Count > 0 ? progressInfos[0].percent : 0f;
         }
 
         public void Disconnect() => _dbManager.Close();
