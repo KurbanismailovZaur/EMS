@@ -5064,6 +5064,16 @@ PrefabInstance:
       propertyPath: m_Text
       value: "\u0412\u0438\u0434"
       objectReference: {fileID: 0}
+    - target: {fileID: 9094376223443255350, guid: 0b5b5ecf096c5f74584f5e0726689ffe,
+        type: 3}
+      propertyPath: m_Alpha
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3129732114436286692, guid: 0b5b5ecf096c5f74584f5e0726689ffe,
+        type: 3}
+      propertyPath: m_Text
+      value: "\u0421\u043E \u0441\u0442\u043E\u0440\u043E\u043D\u044B"
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0b5b5ecf096c5f74584f5e0726689ffe, type: 3}
 --- !u!114 &1951911573 stripped
