@@ -288,7 +288,7 @@ namespace Management
         }
 
         #region KVIDs
-        public void UpdateKVID1(ICollection<Management.Tables.Material> materials)
+        public void UpdateKVID1(ICollection<TableMaterial> materials)
         {
             _dbManager.BeginTransaction();
 

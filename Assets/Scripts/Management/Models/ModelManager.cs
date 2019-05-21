@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using System.Collections.ObjectModel;
 using System.Threading;
+using UI.Panels;
 
 namespace Management.Models
 {
@@ -53,9 +54,25 @@ namespace Management.Models
 
         public void ImportModel(string path)
         {
-            RemoveModel();
+            GameObject go = null;
 
-            var go = new OBJLoader().Load(path);
+            try
+            {
+                go = new OBJLoader().Load(path);
+            }
+            catch (Exception ex)
+            {
+                ErrorManager.Instance.ShowError("Модель вида имела неверный формат.", ex);
+                return;
+            }
+
+            if (go.GetComponentsInChildren<MeshFilter>().Length == 0)
+            {
+                ErrorManager.Instance.ShowError("Модель вида пуста.");
+                return;
+            }
+
+            RemoveModel();
 
             var bounds = GetBounds(go);
 
@@ -160,13 +177,25 @@ namespace Management.Models
 
             await new WaitForBackgroundThread();
 
-            var info = GetVerticesInfoFromOBJ(path);
+            try
+            {
+                var info = GetVerticesInfoFromOBJ(path);
 
-            _materialsPlanesPairs = new List<(int materialID, List<Plane>)>(info.Count);
+                _materialsPlanesPairs = new List<(int materialID, List<Plane>)>(info.Count);
 
-            int index = 0;
-            foreach (var pair in info)
-                _materialsPlanesPairs.Add((index++, pair.Value));
+                int index = 0;
+                foreach (var pair in info)
+                    _materialsPlanesPairs.Add((index++, pair.Value));
+            }
+            catch (Exception ex)
+            {
+                await new WaitForUpdate();
+
+                ProgressManager.Instance.Hide();
+                ErrorManager.Instance.ShowError("Модель плоскостей имела неверный формат.", ex);
+
+                return;
+            }
 
             await new WaitForUpdate();
 
@@ -246,6 +275,8 @@ namespace Management.Models
             var planes = new List<Plane>(vertices.Count / 3);
             for (int i = 0; i < vertices.Count; i += 3)
                 planes.Add(new Plane(vertices[i], vertices[i + 1], vertices[i + 2]));
+
+            materialName = materialName ?? "null";
 
             if (!materialsPlanes.ContainsKey(materialName))
                 materialsPlanes.Add(materialName, planes);

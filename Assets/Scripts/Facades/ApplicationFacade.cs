@@ -25,6 +25,7 @@ using UI.Sequencing;
 using System.Threading;
 using UI.Panels.Exceeding;
 using System;
+using UI.Panels;
 
 namespace Facades
 {
@@ -146,6 +147,21 @@ namespace Facades
 
             ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).WrapErrors();
         }
+
+        private async Task PlanesImportedHandler()
+        {
+            try
+            {
+                await DatabaseManager.Instance.UpdatePlanesAsync(ModelManager.Instance.MaterialPlanesPairs);
+            }
+            catch (Exception ex)
+            {
+                ModelManager.Instance.RemovePlanes();
+
+                ProgressManager.Instance.Hide();
+                ErrorManager.Instance.ShowError("Ошибка при вычислении фигур плоскостей.", ex);
+            }
+        }
         #endregion
 
         #region KVIDS
@@ -176,7 +192,15 @@ namespace Facades
 
             await new WaitForBackgroundThread();
 
-            _pythonManager.CalculateMutualActionOfBCSAndBA();
+            try
+            {
+                _pythonManager.CalculateMutualActionOfBCSAndBA();
+            }
+            catch (Exception ex)
+            {
+                ProgressManager.Instance.Hide();
+                ErrorManager.Instance.ShowError("Ошибка при вычислении взаимного воздействия БКС и БА.", ex);
+            }
 
             await new WaitForUpdate();
 
@@ -205,12 +229,24 @@ namespace Facades
 
             var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => (p.Code, p.transform.position.x, p.transform.position.y, p.transform.position.z)).ToArray();
 
-
-
             await new WaitForBackgroundThread();
 
-            _databaseManager.UpdateKVID6(points);
-            _pythonManager.CalculateElectricFieldStrenght();
+            try
+            {
+                _databaseManager.UpdateKVID6(points);
+                _pythonManager.CalculateElectricFieldStrenght();
+            }
+            catch (Exception ex)
+            {
+                await new WaitForUpdate();
+
+                CalculationsManager.Instance.RemoveElectricFieldStrenght();
+
+                ProgressManager.Instance.Hide();
+                ErrorManager.Instance.ShowError("Ошибка при вычислении напряженности электрического поля.", ex);
+
+                return;
+            }
 
             await new WaitForUpdate();
 
@@ -339,7 +375,7 @@ namespace Facades
         {
             if (_isDeserializationState) return;
 
-            DatabaseManager.Instance.UpdatePlanesAsync(ModelManager.Instance.MaterialPlanesPairs).WrapErrors();
+            PlanesImportedHandler().WrapErrors();
         }
 
         public void ModelManager_PlanesRemoved()

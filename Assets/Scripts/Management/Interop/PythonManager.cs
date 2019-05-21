@@ -13,6 +13,11 @@ namespace Management.Interop
 {
     public class PythonManager : MonoSingleton<PythonManager>
     {
+        public class PythonException : ApplicationException
+        {
+            public PythonException(string message) : base(message) { }
+        }
+
         [SerializeField]
         private string _pythonPath;
 
@@ -64,8 +69,9 @@ namespace Management.Interop
                 using (StreamReader reader = process.StandardOutput)
                 {
                     var error = process.StandardError.ReadToEnd();
+
                     if (!string.IsNullOrWhiteSpace(error))
-                        LogError($"Error in python: {(string.IsNullOrWhiteSpace(error) ? "none" : error)}");
+                        throw new PythonException(error);
 
                     return reader.ReadToEnd();
                 }
