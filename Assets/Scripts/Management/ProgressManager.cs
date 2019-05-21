@@ -33,7 +33,7 @@ namespace Management
         {
             if (_isOpen) throw new BusyException("Already open.");
 
-            //_updateProgressRoutine = StartCoroutine(UpdateProgressRoutine());
+            _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine());
             _rotateRoutine = StartCoroutine(RotateRoutine());
 
             SetCanvasGroupParameters(1f, true);
@@ -41,11 +41,13 @@ namespace Management
 
         private IEnumerator UpdateProgressRoutine()
         {
+            _progressText.text = $"Загрузка данных (0%)..";
+
             while (true)
             {
-                _progressText.text = $"Загрузка данных ({DatabaseManager.Instance.GetProgress().ToString()}%)..";
-
                 yield return new WaitForSeconds(1f);
+
+                _progressText.text = $"Загрузка данных ({DatabaseManager.Instance.GetProgress().ToString()}%)..";
             }
         }
 
@@ -61,7 +63,7 @@ namespace Management
 
         public void Hide()
         {
-            //StopCoroutine(_updateProgressRoutine);
+            StopCoroutine(_updateProgressRoutine);
             StopCoroutine(_rotateRoutine);
 
             _updateProgressRoutine = null;
