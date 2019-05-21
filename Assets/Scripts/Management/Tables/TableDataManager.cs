@@ -103,7 +103,7 @@ namespace Management.Tables
             SetReferenceData(materials, wireMarks);
         }
 
-        public void SetReferenceData(List<Material> materials, List<WireMark> wireMarks)
+        public void SetReferenceData(List<Material> materials, List<WireMark> wireMarks, bool updateDatabase = true)
         {
             (_materials, _wireMarks) = (materials, wireMarks);
 
@@ -113,16 +113,20 @@ namespace Management.Tables
             IsKVID4Imported = _wireMarks?.Count > 0;
             CallEvent(KVID4Imported, KVID4Removed, IsKVID4Imported);
 
+            if (!updateDatabase) return;
+
             DatabaseManager.Instance.UpdateKVID1(_materials);
             DatabaseManager.Instance.UpdateKVID4(_wireMarks);
         }
 
-        public void SetKVID2Data(List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> data)
+        public void SetKVID2Data(List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> data, bool updateDatabase = true)
         {
             _kvid2Data = data;
 
             IsKVID2Imported = _kvid2Data?.Count > 0;
             CallEvent(KVID2Imported, KVID2Removed, IsKVID2Imported);
+
+            if (!updateDatabase) return;
 
             DatabaseManager.Instance.UpdateKVID2(_kvid2Data);
         }
@@ -132,7 +136,7 @@ namespace Management.Tables
             _usableKVID5RowIds = usableKVID5RowIds;
         }
 
-        public void SetKVID5Data(List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> data, List<string> usableKVID2Tabs)
+        public void SetKVID5Data(List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> data, List<string> usableKVID2Tabs, bool updateDatabase = true)
         {
             _kvid5Data = data;
             _usableKVID2TabNames = usableKVID2Tabs;
@@ -142,10 +146,12 @@ namespace Management.Tables
             IsKVID5Imported = _kvid5Data?.Count > 0;
             CallEvent(KVID5Imported, KVID5Removed, IsKVID5Imported);
 
+            if (!updateDatabase) return;
+
             DatabaseManager.Instance.UpdateKVID5(_kvid5Data);
         }
 
-        public void SetKVID8Data(List<(string pointID, float maxVoltage, int fMin, int fMax)> tab0Data, List<(string idES, string wireID, float maxVoltage, int fMin, int fMax)> tab1Data)
+        public void SetKVID8Data(List<(string pointID, float maxVoltage, int fMin, int fMax)> tab0Data, List<(string idES, string wireID, float maxVoltage, int fMin, int fMax)> tab1Data, bool updateDatabase = true)
         {
             _kvid8Tab0Data = tab0Data;
             _kvid8Tab1Data = tab1Data;
@@ -155,6 +161,8 @@ namespace Management.Tables
 
             IsKVID82Imported = _kvid8Tab1Data?.Count > 0;
             CallEvent(KVID82Imported, KVID82Removed, IsKVID82Imported);
+
+            if (!updateDatabase) return;
 
             DatabaseManager.Instance.UpdateKVID8(_kvid8Tab0Data, _kvid8Tab1Data);
         }
@@ -182,8 +190,6 @@ namespace Management.Tables
             DatabaseManager.Instance.UpdateKVID5(_kvid5Data);
             DatabaseManager.Instance.UpdateKVID8(_kvid8Tab0Data, _kvid8Tab1Data);
         }
-
-
 
         public bool IsUsableKVID2Name(string name)
         {

@@ -26,6 +26,8 @@ namespace Management.Calculations
 
         public override string[] ExceededNames => _points.Where(p => p.IsExceeded).Select(p => p.Code).ToArray();
 
+        public float PointRadius { get; set; }
+
         public void Calculate(int pointsByAxis, Bounds bounds)
         {
             // make sphere bounds all points.
@@ -60,6 +62,8 @@ namespace Management.Calculations
             }
 
             Calculate(points, distanceBetween);
+
+            PointRadius = distanceBetween;
         }
 
         public void Calculate(List<(string code, Vector3 position)> points, float radius)
@@ -75,6 +79,8 @@ namespace Management.Calculations
 
                 _points.Add(Point.Factory.Create(_pointPrefab, transform, points[i], radius, gradients, values));
             }
+
+            PointRadius = 1f;
 
             IsCalculated = true;
             Calculated.Invoke();

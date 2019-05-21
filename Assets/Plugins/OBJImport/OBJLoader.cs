@@ -48,6 +48,8 @@ namespace Dummiesman
         //file info for files loaded from file path, used for GameObject naming and MTL finding
         private FileInfo _objInfo;
 
+        public static string LocalPathToLastOBJMaterialFile { get; private set; }
+
 #if UNITY_EDITOR
         [MenuItem("GameObject/Import From OBJ")]
         static void ObjLoadMenu()
@@ -76,6 +78,8 @@ namespace Dummiesman
         /// <param name="mtlLibPath"></param>
         private void LoadMaterialLibrary(string mtlLibPath)
         {
+            LocalPathToLastOBJMaterialFile = mtlLibPath;
+
             if (_objInfo != null)
             {
                 if (File.Exists(Path.Combine(_objInfo.Directory.FullName, mtlLibPath)))
@@ -99,6 +103,8 @@ namespace Dummiesman
         /// <returns>Returns a GameObject represeting the OBJ file, with each imported object as a child.</returns>
         public GameObject Load(Stream input)
         {
+            LocalPathToLastOBJMaterialFile = null;
+
             var reader = new StreamReader(input);
             //var reader = new StringReader(inputReader.ReadToEnd());
 

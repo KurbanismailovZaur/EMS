@@ -24,6 +24,7 @@ using Management.Interop;
 using UI.Sequencing;
 using System.Threading;
 using UI.Panels.Exceeding;
+using System;
 
 namespace Facades
 {
@@ -76,12 +77,16 @@ namespace Facades
 
         private CalculationBase _currentCalculations;
 
+        private bool _isDeserializationState;
+
+        #region Managers (for thread safe reasons)
         [Header("Managers (for thread safe reasons)")]
         [SerializeField]
         private DatabaseManager _databaseManager;
 
         [SerializeField]
         private PythonManager _pythonManager;
+        #endregion
 
         private void SetCameraToDefaultState()
         {
@@ -90,6 +95,34 @@ namespace Facades
             _cameraController.FocusOn(Vector3.zero);
             _cameraController.ViewFromDirection(Vector3.up, Vector3.forward);
         }
+
+        #region Project
+        private void SaveProject() => StartCoroutine(SaveProjectRoutine());
+
+        private IEnumerator SaveProjectRoutine()
+        {
+            yield return FileExplorer.Instance.SaveFile("Сохранить Проект", null, "ems");
+
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            ProjectManager.Instance.Save(FileExplorer.Instance.LastResult);
+        }
+
+        private void LoadProject() => StartCoroutine(LoadProjectRoutine());
+
+        private IEnumerator LoadProjectRoutine()
+        {
+            yield return FileExplorer.Instance.OpenFile("Открыть Проект", null, "ems");
+
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            _isDeserializationState = true;
+
+            ProjectManager.Instance.Load(FileExplorer.Instance.LastResult);
+
+            _isDeserializationState = false;
+        }
+        #endregion
 
         #region Model
         private void ImportModel() => StartCoroutine(ImportModelRoutine());
@@ -111,7 +144,7 @@ namespace Facades
 
             if (_explorer.LastResult == null) yield break;
 
-            ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).CatchErrors();
+            ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).WrapErrors();
         }
         #endregion
 
@@ -232,10 +265,10 @@ namespace Facades
                     TableDataManager.Instance.LoadDefaultData();
                     break;
                 case ProjectContext.Action.Load:
-                    ProjectManager.Instance.Load();
+                    LoadProject();
                     break;
                 case ProjectContext.Action.Save:
-                    ProjectManager.Instance.Save();
+                    SaveProject();
                     break;
                 case ProjectContext.Action.Close:
                     ProjectManager.Instance.Close();
@@ -252,7 +285,7 @@ namespace Facades
 
             _cameraController.IsActive = true;
 
-            DatabaseManager.Instance.ClearAllTalbes();
+            DatabaseManager.Instance.CreateEmptyDatabaseAndConnect();
         }
 
         public void ProjectManager_Closed()
@@ -269,6 +302,8 @@ namespace Facades
             CalculationsManager.Instance.RemoveElectricFieldStrenght();
             CalculationsManager.Instance.RemoveMutualActionOfBCSAndBA();
             TableDataManager.Instance.RemoveAll();
+
+            DatabaseManager.Instance.DisconectAndDeleteDatabase();
         }
         #endregion
 
@@ -300,7 +335,9 @@ namespace Facades
 
         public void ModelManager_PlanesImported()
         {
-            DatabaseManager.Instance.UpdatePlanesAsync(ModelManager.Instance.MaterialPlanesPairs).CatchErrors();
+            if (_isDeserializationState) return;
+
+            DatabaseManager.Instance.UpdatePlanesAsync(ModelManager.Instance.MaterialPlanesPairs).WrapErrors();
         }
 
         public void ModelManager_PlanesRemoved()
@@ -340,6 +377,8 @@ namespace Facades
 
         public void WiringManager_Imported()
         {
+            if (_isDeserializationState) return;
+
             DatabaseManager.Instance.UpdateKVID3(WiringManager.Instance.Wiring);
         }
 
@@ -364,7 +403,7 @@ namespace Facades
                     CalculateElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
-                    CalculateMutualActionOfBCSAndBAAsync().CatchErrors();
+                    CalculateMutualActionOfBCSAndBAAsync().WrapErrors();
                     break;
                 case CalculationsContext.Action.ElectricFieldStrenghtVisibility:
                     CalculationsManager.Instance.ElectricFieldStrenght.ToggleVisibility();
@@ -386,7 +425,12 @@ namespace Facades
         }
 
         #region Electric
-        public void ElectricFieldStrenght_Calculated() => ContinueCalculateElectricFieldStrenghtInPythonAsync().CatchErrors();
+        public void ElectricFieldStrenght_Calculated()
+        {
+            if (_isDeserializationState) return;
+
+            ContinueCalculateElectricFieldStrenghtInPythonAsync().WrapErrors();
+        }
 
         public void ElectricFieldStrenght_VisibilityChanged()
         {

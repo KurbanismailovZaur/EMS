@@ -162,7 +162,7 @@ namespace UI.Panels.Wire
 
         private void ClearInfluences()
         {
-            for (int i = 2; i < _content.childCount; i++)
+            for (int i = 0; i < _content.childCount; i++)
                 Destroy(_content.GetChild(i).gameObject);
         }
 

@@ -16,12 +16,162 @@ using Management.Interop;
 using System.Linq;
 using System;
 using UnityEngine.Networking;
+using TableMaterial = Management.Tables.Material;
 
 namespace Management
 {
     public class DatabaseManager : MonoSingleton<DatabaseManager>
     {
         #region Classes
+        private class ModelPointInfo
+        {
+            public float x1 { get; set; }
+
+            public float y1 { get; set; }
+
+            public float z1 { get; set; }
+
+            public float x2 { get; set; }
+
+            public float y2 { get; set; }
+
+            public float z2 { get; set; }
+
+            public float x3 { get; set; }
+
+            public float y3 { get; set; }
+
+            public float z3 { get; set; }
+
+            public int material_id { get; set; }
+        }
+
+        private class KVID1Info
+        {
+            public int id { get; set; }
+
+            public string name { get; set; }
+
+            public float? val1 { get; set; }
+
+            public float? val2 { get; set; }
+
+            public float? val3 { get; set; }
+        }
+
+        private class KVID4Info
+        {
+            public string id { get; set; }
+
+            public int material { get; set; }
+
+            public float d1 { get; set; }
+
+            public int? t1_m1 { get; set; }
+
+            public float? t1_val1 { get; set; }
+
+            public float? t1_val2 { get; set; }
+
+            public int? t1_m2 { get; set; }
+
+            public int? t2_m1 { get; set; }
+
+            public float? t2_val1 { get; set; }
+
+            public float? t2_val2 { get; set; }
+
+            public int? t2_m2 { get; set; }
+
+            public float d2 { get; set; }
+        }
+
+        private class KVID2Info
+        {
+            public string id { get; set; }
+
+            public string name { get; set; }
+
+            public float x { get; set; }
+
+            public float y { get; set; }
+
+            public float z { get; set; }
+
+            public string frequencies { get; set; }
+        }
+
+        private class KVID3Info
+        {
+            public string id { get; set; }
+
+            public string type_wire { get; set; }
+
+            public string source { get; set; }
+            
+            public string recipient { get; set; }
+
+            public string points { get; set; }
+        }
+
+        private class KVID5Info
+        {
+            public string id { get; set; }
+
+            public float x { get; set; }
+
+            public float y { get; set; }
+
+            public float z { get; set; }
+
+            public string type { get; set; }
+
+            public int? val1 { get; set; }
+
+            public int? val2 { get; set; }
+
+            public int? val3 { get; set; }
+
+            public string block { get; set; }
+
+            public string val4 { get; set; }
+        }
+
+        private class KVID6Info
+        {
+            public string id { get; set; }
+
+            public float x { get; set; }
+
+            public float y { get; set; }
+
+            public float z { get; set; }
+        }
+
+        private class KVID81Info
+        {
+            public string id { get; set; }
+
+            public float val { get; set; }
+
+            public int fmin { get; set; }
+
+            public int fmax { get; set; }
+        }
+
+        private class KVID82Info
+        {
+            public string id { get; set; }
+
+            public string wire { get; set; }
+
+            public float val { get; set; }
+
+            public int fmin { get; set; }
+
+            public int fmax { get; set; }
+        }
+
         private class ElectricFieldStrenghtInfo
         {
             public string id { get; set; }
@@ -90,23 +240,19 @@ namespace Management
 
         public string DatabasePath { get; private set; }
 
-        private void Awake() => DatabasePath = Path.Combine(Application.persistentDataPath, "emsdb.bytes");
-
-        public void ClearAllTalbes()
+        private void Start()
         {
-            _dbManager.BeginTransaction();
+            DatabasePath = Path.Combine(Application.persistentDataPath, "emsdb.bytes");
 
-            RemoveKVID1();
-            RemoveKVID2();
-            RemoveKVID3();
-            RemoveKVID4();
-            RemoveKVID5();
-            RemoveKVID6();
-            RemoveKVID8();
-            RemovePlanes();
-            RemoveSelectPointAndWire();
+            DisconectAndDeleteDatabase();
+        }
 
-            _dbManager.Commit();
+        public void CreateEmptyDatabaseAndConnect() => Connect();
+
+        public void DisconectAndDeleteDatabase()
+        {
+            Disconnect();
+            File.Delete(DatabasePath);
         }
 
         public async Task UpdatePlanesAsync(ICollection<(int materialID, List<ModelManager.Plane> planes)> materialPlanesPairs)
@@ -296,6 +442,66 @@ namespace Management
             _dbManager.Commit();
         }
 
+        public List<(int materialID, List<ModelManager.Plane> planes)> GetPlanes()
+        {
+            var modelPoints = _dbManager.Query<ModelPointInfo>($"SELECT * FROM {modelPoint}");
+            var planes = modelPoints.GroupBy(p => p.material_id).Select(g => (g.Key, g.Select(gp => new ModelManager.Plane(new Vector3(gp.x1, gp.y1, gp.z1), new Vector3(gp.x2, gp.y2, gp.z2), new Vector3(gp.x3, gp.y3, gp.z3))).ToList())).ToList();
+
+            return planes.Count == 0 ? null : planes;
+
+        }
+
+        public (List<TableMaterial> materials, List<WireMark> wireMarks) GetReferencesData()
+        {
+            var kvid1Infos = _dbManager.Query<KVID1Info>($"SELECT * FROM {kvid1}");
+            var materials = kvid1Infos.Select(info => new TableMaterial(info.id, info.name, info.val1, info.val2, info.val3)).ToList();
+
+            var kvid4Infos = _dbManager.Query<KVID4Info>($"SELECT * FROM {kvid4}");
+            var wireMarks = kvid4Infos.Select(i => new WireMark(i.id, string.Empty, materials.Find(m => m.Code == i.material), i.d1, materials.Find(m => m.Code == i.t1_m1), i.t1_val1, i.t1_val2, materials.Find(m => m.Code == i.t1_m2), materials.Find(m => m.Code == i.t2_m1), i.t2_val1, i.t2_val2, materials.Find(m => m.Code == i.t2_m2), i.d2)).ToList();
+
+            return (materials, wireMarks);
+        }
+
+        public List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> GetKVID2()
+        {
+            var kvid2Infos = _dbManager.Query<KVID2Info>($"SELECT * FROM {kvid2}");
+
+            return kvid2Infos.Select(i => (i.id, i.name, new Vector3(i.x, i.y, i.z), Json.Parse<JsonArray>(i.frequencies).Cast<JsonArray>().Select(els => (els.CheckNull(0) ? (float?)null : els.GetNumber(0).ToFloat(), els.CheckNull(1) ? (float?)null : els.GetNumber(1).ToFloat())).ToList())).ToList();
+        }
+
+        public Wiring GetKVID3()
+        {
+            var kvid3Infos = _dbManager.Query<KVID3Info>($"SELECT * FROM {kvid3}");
+
+            var wires = kvid3Infos.Select(i => Wires.Wire.Factory.Create(i.id, i.type_wire, i.source, i.recipient, Json.Parse<JsonArray>(i.points).Cast<JsonArray>().Select(els => new Wires.Wire.Point(new Vector3(els.GetNumber(0).ToFloat(), els.GetNumber(1).ToFloat(), els.GetNumber(2).ToFloat()), els.CheckNull(3) ? (float?)null : els.GetNumber(3).ToFloat(), els.CheckNull(4) ? (float?)null : els.GetNumber(4).ToFloat())).ToList())).ToList();
+
+            return wires.Count == 0 ? null : Wiring.Factory.Create(wires);
+        }
+
+        public List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> GetKVID5()
+        {
+            var kvid5Infos = _dbManager.Query<KVID5Info>($"SELECT * FROM {kvid5}");
+            return kvid5Infos.Select(i => (i.id, new Vector3(i.x, i.y, i.z), i.type, i.val1, i.val2, i.val3, i.block, i.val4)).ToList();
+        }
+
+        public List<(string code, Vector3 point)> GetKVID6()
+        {
+            var kvid6Infos = _dbManager.Query<KVID6Info>($"SELECT * FROM {kvid6}");
+
+            return kvid6Infos.Select(i => (i.id, new Vector3(i.x, i.y, i.z))).ToList();
+        }
+
+        public (List<(string pointID, float maxVoltage, int fMin, int fMax)> kvid81, List<(string idES, string wireID, float maxVoltage, int fMin, int fMax)> kvid82) GetKVID8()
+        {
+            var kvid8_1Infos = _dbManager.Query<KVID81Info>($"SELECT * FROM {kvid81}");
+            var kvid8_1 = kvid8_1Infos.Select(i => (i.id, i.val, i.fmin, i.fmax)).ToList();
+
+            var kvid8_2Infos = _dbManager.Query<KVID82Info>($"SELECT * FROM {kvid82}");
+            var kvid8_2 = kvid8_2Infos.Select(i => (i.id, i.wire, i.val, i.fmin, i.fmax)).ToList();
+
+            return (kvid8_1, kvid8_2);
+        }
+
         public List<(string name, bool exceeded, double[] values)> GetCalculatedElectricFieldStrengts()
         {
             var sourceInfos = _dbManager.Query<ElectricFieldStrenghtInfo>($"SELECT * FROM {resultM3Times}");
@@ -309,7 +515,7 @@ namespace Management
                 var values = Enumerable.Repeat(0d, 1).Concat(jArray.Select(el => (((JsonNumber)el).ToDouble()))).ToArray();
 
                 var exceeded = exceedingInfos[i].data_report.Contains("true");
-                
+
                 infos.Add((sourceInfos[i].id, exceeded, values));
             }
 
@@ -335,7 +541,11 @@ namespace Management
                 mutuals.Add((info.id, wiresInfluences, blocksInfluences, info.data_report.Contains("true"), info.result));
             }
 
-            return mutuals;
+            return mutuals.Count > 0 ? mutuals : null;
         }
+
+        public void Disconnect() => _dbManager.Close();
+
+        public void Connect() => _dbManager.Initialize(true);
     }
 }

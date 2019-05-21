@@ -234,7 +234,7 @@ namespace UI.Tables.Concrete
             var codeCell = Cell.Factory.CreateUnique(_cellPrefab, code, _codes, cellClickHandler);
             var typeCell = Cell.Factory.Create(_cellPrefab, type, false, _types, cellClickHandler);
 
-            var selected = nullableMaterialPanels.IndexOf(nullableMaterialPanels.First(p => p?.Code.IntValue == coreMaterial?.Code));
+            var selected = materialPanels.IndexOf(materialPanels.First(p => p?.Code.IntValue == coreMaterial?.Code));
 
             var coreMaterialCell = ReferenceCell.Factory.Create(_referenceCellPrefab, _materialsTable, materialPanels, selected, "Name", _coreMaterials);
             var coreDiameterCell = Cell.Factory.Create(_cellPrefab, coreDiameter, _coreDiameters, cellClickHandler);

@@ -10,8 +10,8 @@ using System.IO;
 
 namespace Management.Projects
 {
-	public class ProjectManager : MonoSingleton<ProjectManager> 
-	{
+    public class ProjectManager : MonoSingleton<ProjectManager>
+    {
         private Project? _project;
 
         #region Events
@@ -29,32 +29,23 @@ namespace Management.Projects
             Created.Invoke();
         }
 
-        public void Load()
+        public void Load(string path)
         {
-            Log("Load");
+            New();
+
+            ProjectSerializer.Deserialize(path);
         }
 
-        public void Save() => StartCoroutine(SaveRoutine());
-
-        private IEnumerator SaveRoutine()
-        {
-            yield return FileExplorer.Instance.SaveFile("Сохранить Проект", null, "ems");
-
-            if (FileExplorer.Instance.LastResult == null) yield break;
-
-            ProjectSerializer.Serialize(FileExplorer.Instance.LastResult);
-        }
-
-
+        public void Save(string path) => ProjectSerializer.Serialize(path);
 
         public void Close()
         {
             if (_project == null) return;
-            
+
             CheckChangingAndShowDialog();
-            
+
             _project = null;
-            
+
             Closed.Invoke();
         }
 
@@ -66,7 +57,7 @@ namespace Management.Projects
         private void CheckChangingAndShowDialog()
         {
             if (_project == null) return;
-            
+
             //TODO: modal dialog to save current project if it was changed
         }
     }

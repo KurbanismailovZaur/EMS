@@ -15,7 +15,7 @@ using System.Threading;
 
 namespace Management.Models
 {
-	public class ModelManager : MonoSingleton<ModelManager>
+    public class ModelManager : MonoSingleton<ModelManager>
     {
         public struct Plane
         {
@@ -31,6 +31,9 @@ namespace Management.Models
         private float _allowedMaxSize;
 
         private List<(int materialID, List<Plane>)> _materialsPlanesPairs;
+
+        public string PathToCahchedModelFile { get; private set; }
+        public string PathToCahchedMaterialsFile { get; private set; }
 
         public UnityEvent ModelImported;
 
@@ -61,6 +64,35 @@ namespace Management.Models
             Model = Model.Factory.MakeModel(go, bounds);
             Model.transform.SetParent(transform);
 
+            PathToCahchedModelFile = Path.Combine(Application.temporaryCachePath, "Model.obj");
+            File.Copy(path, PathToCahchedModelFile, true);
+
+            PathToCahchedMaterialsFile = null;
+
+            var localPathToMaterialsFile = OBJLoader.LocalPathToLastOBJMaterialFile;
+            if (localPathToMaterialsFile != null)
+            {
+                PathToCahchedMaterialsFile = Path.Combine(Application.temporaryCachePath, "Materials.mtl");
+                File.Copy(Path.Combine(Path.GetDirectoryName(path), localPathToMaterialsFile), PathToCahchedMaterialsFile, true);
+
+                var tempModelPath = Path.Combine(Application.temporaryCachePath, "TempModel.obj");
+
+                using (var reader = new StreamReader(File.Open(PathToCahchedModelFile, FileMode.Open, FileAccess.Read)))
+                {
+                    using (var writer = new StreamWriter(File.Create(tempModelPath)))
+                    {
+                        string line;
+                        while (!(line = reader.ReadLine()).Contains("mtllib")) writer.WriteLine(line);
+
+                        writer.WriteLine("mtllib Materials.mtl");
+                        writer.Write(reader.ReadToEnd());
+                    }
+                }
+
+                File.Delete(PathToCahchedModelFile);
+                File.Move(tempModelPath, PathToCahchedModelFile);
+            }
+
             ModelImported.Invoke();
         }
 
@@ -79,7 +111,7 @@ namespace Management.Models
 
             go.transform.localScale *= ratio;
             bounds.center *= ratio;
-            bounds.size *= ratio; 
+            bounds.size *= ratio;
         }
 
         private void Center(GameObject go, Bounds bounds)
@@ -108,6 +140,15 @@ namespace Management.Models
             Destroy(Model.gameObject);
             Model = null;
 
+            File.Delete(PathToCahchedModelFile);
+            PathToCahchedModelFile = null;
+
+            if (PathToCahchedMaterialsFile != null)
+            {
+                File.Delete(PathToCahchedMaterialsFile);
+                PathToCahchedMaterialsFile = null;
+            }
+
             ModelRemoved.Invoke();
         }
 
@@ -128,6 +169,13 @@ namespace Management.Models
                 _materialsPlanesPairs.Add((index++, pair.Value));
 
             await new WaitForUpdate();
+
+            PlanesImported.Invoke();
+        }
+
+        public void ImportPlanes(List<(int materialID, List<Plane>)> planes)
+        {
+            _materialsPlanesPairs = planes;
 
             PlanesImported.Invoke();
         }
@@ -223,7 +271,7 @@ namespace Management.Models
             {
                 int e = str.IndexOf(' ', i);
                 if (e < 0) e = str.Length;
-                
+
                 vec[elem] = float.TryParse(str.Substring(i, e - i), NumberStyles.Float, new NumberFormatInfo { NumberDecimalSeparator = "." }, out float f) ? f : 0f;
                 i = EndOfCharRepetition(str, e);
             }
@@ -262,5 +310,7 @@ namespace Management.Models
 
             PlanesRemoved.Invoke();
         }
+
+        private void OnDestroy() => RemoveModel();
     }
 }

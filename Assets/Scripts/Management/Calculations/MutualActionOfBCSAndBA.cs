@@ -29,13 +29,15 @@ namespace Management.Calculations
 
         public void Calculate(Wiring wiring)
         {
+            var sourceMutuals = DatabaseManager.Instance.GetCalculatedMutualActionOfBCSAndBA();
+
+            if (sourceMutuals == null) return;
+
             Remove();
 
             var wires = wiring.Wires;
 
             var influences = new List<(int a, int b, float value)>();
-
-            var sourceMutuals = DatabaseManager.Instance.GetCalculatedMutualActionOfBCSAndBA();
 
             var maxValue = sourceMutuals.Max(m => m.value);
             var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), wiresInfluences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.blocksInfluences, m.exceeded,  m.value, color: _gradient.Evaluate((float)(m.value / maxValue)))).ToList();

@@ -99,14 +99,12 @@ namespace UI.Main.Contexts
         public void SetElectricButtonsTo(bool state)
         {
             ElectricVisibilityInteractible = state;
-            ElectricVisibilityState = state;
             _electricRemoveButton.interactable = state;
         }
 
         public void SetMutualButtonsTo(bool state)
         {
             MutualVisibilityInteractible = state;
-            MutualVisibilityState = state;
             _mutualRemoveButton.interactable = state;
         }
 

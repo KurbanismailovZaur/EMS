@@ -46,7 +46,7 @@ namespace Management.Tables.IO
 
         private static Material ReadMaterial(IRow row)
         {
-            return new Material()
+            return new Material
             {
                 Code = GetInt(row, 0),
                 Name = GetString(row, 1),
