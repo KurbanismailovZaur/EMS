@@ -29,25 +29,26 @@ namespace Management
         [Range(0f, 360)]
         private float _rotateSpeed = 90f;
 
-        public void Show(string text)
+        public void Show(string text, bool showProgress = true)
         {
             if (_isOpen) throw new BusyException("Already open.");
 
-            _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine());
+
+            _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine(showProgress));
             _rotateRoutine = StartCoroutine(RotateRoutine());
 
             SetCanvasGroupParameters(1f, true);
         }
 
-        private IEnumerator UpdateProgressRoutine()
+        private IEnumerator UpdateProgressRoutine(bool showProgress)
         {
-            _progressText.text = $"Загрузка данных (0%)..";
+            _progressText.text = $"Загрузка данных{(showProgress == true ? " (0%)" : "")}..";
 
             while (true)
             {
                 yield return new WaitForSeconds(1f);
 
-                _progressText.text = $"Загрузка данных ({DatabaseManager.Instance.GetProgress().ToString()}%)..";
+                _progressText.text = $"Загрузка данных{(showProgress == true ? $" ({DatabaseManager.Instance.GetProgress().ToString()}%)" : "")}..";
             }
         }
 

@@ -154,7 +154,7 @@ namespace Management.Models
 
         public async Task ImportPlanesAsync(string path)
         {
-            ProgressManager.Instance.Show("Вычисление плоскостей..");
+            ProgressManager.Instance.Show("Вычисление плоскостей..", false);
 
             RemovePlanes();
 
