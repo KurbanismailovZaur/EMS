@@ -18,7 +18,7 @@ namespace Management.Calculations
             {
                 var wires = mutuals.Select(mutual =>
                 {
-                    var line = VectorLine.SetLine3D(Color.yellow, mutual.wire.Points.Select(p => p.position).ToArray());
+                    var line = VectorLine.SetLine3D(Color.yellow, mutual.wire.Points.Select(p => new Vector3(p.position.x, p.position.y, -p.position.z)).ToArray());
                     line.Draw3DAuto();
 
                     var wire = line.rectTransform.gameObject.AddComponent<Wire>();

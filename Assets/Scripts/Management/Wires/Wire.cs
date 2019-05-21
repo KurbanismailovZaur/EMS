@@ -31,7 +31,7 @@ namespace Management.Wires
         {
             public static Wire Create(string name, string wireType, string iID, string pID, List<Point> points)
             {
-                var line = VectorLine.SetLine3D(Color.yellow, points.Select(p => p.position).ToArray());
+                var line = VectorLine.SetLine3D(Color.yellow, points.Select(p => new Vector3(p.position.x, p.position.y, -p.position.z)).ToArray());
                 line.Draw3DAuto();
 
                 var wire = line.rectTransform.gameObject.AddComponent<Wire>();
