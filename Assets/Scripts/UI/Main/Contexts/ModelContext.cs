@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using System;
@@ -48,6 +49,12 @@ namespace UI.Main.Contexts
         private Toggle _fadeToggle;
 
         [SerializeField]
+        private Image _viewModelImported;
+
+        [SerializeField]
+        private Image _planesModelImported;
+
+        [SerializeField]
         private UnityButton _removeViewButton;
 
         [SerializeField]
@@ -92,6 +99,7 @@ namespace UI.Main.Contexts
             SetViewModelButtonsInteractibility(true);
             _visibilityToggle.State = true;
             _fadeToggle.State = false;
+            _viewModelImported.enabled = true;
         }
 
         public void ModelManager_VisibilityChanged()
@@ -109,16 +117,19 @@ namespace UI.Main.Contexts
             SetViewModelButtonsInteractibility(false);
             _visibilityToggle.State = false;
             _fadeToggle.State = false;
+            _viewModelImported.enabled = false;
         }
 
         public void ModelManager_PlanesImported()
         {
             _removePlanesButton.interactable = true;
+            _planesModelImported.enabled = true;
         }
 
         public void ModelManager_PlanesRemoved()
         {
             _removePlanesButton.interactable = false;
+            _planesModelImported.enabled = false;
         }
         #endregion
     }

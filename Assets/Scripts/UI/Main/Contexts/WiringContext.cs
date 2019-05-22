@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using System;
@@ -42,11 +43,26 @@ namespace UI.Main.Contexts
         [SerializeField]
         private UnityButton _8KVIDButton;
 
+
+        [SerializeField]
+        private Image _2KVIDImage;
+
+        [SerializeField]
+        private Image _3KVIDImage;
+
+        [SerializeField]
+        private Image _5KVIDImage;
+
+        [SerializeField]
+        private Image _8KVIDImage;
+
+
         [SerializeField]
         private UnityButton _3KVIDVisibilityButton;
 
         [SerializeField]
         private Toggle _3KVIDVisibilityToggle;
+
 
         public SelectedEvent Selected;
 
@@ -73,7 +89,7 @@ namespace UI.Main.Contexts
         #region Event handlers
         public void ProjectManager_Created()
         {
-            _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _8KVIDButton.interactable = true;
+            _2KVIDButton.interactable = _8KVIDButton.interactable = true;
         }
 
         public void ProjectManager_Closed()
@@ -96,6 +112,28 @@ namespace UI.Main.Contexts
         {
             _3KVIDVisibilityButton.interactable = false;
             KVID3VisibilityState = false;
+        }
+
+        public void TableDataManager_KVID2Impoted()
+        {
+            _2KVIDImage.enabled = true;
+            _5KVIDButton.interactable = true;
+        }
+
+        public void TableDataManager_KVID5Impoted()
+        {
+            _5KVIDImage.enabled = true;
+            _3KVIDButton.interactable = true;
+        }
+
+        public void TableDataManager_KVID3Impoted()
+        {
+            _3KVIDImage.enabled = true;
+        }
+
+        public void TableDataManager_KVID8Impoted()
+        {
+            _8KVIDImage.enabled = true;
         }
         #endregion
     }

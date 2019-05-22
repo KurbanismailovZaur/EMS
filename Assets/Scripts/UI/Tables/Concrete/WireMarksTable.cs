@@ -21,8 +21,6 @@ namespace UI.Tables.Concrete
         {
             public Cell Code { get; set; }
 
-            public Cell Type { get; set; }
-
             public ReferenceCell CoreMaterial { get; set; }
 
             public Cell CoreDiameter { get; set; }
@@ -45,10 +43,9 @@ namespace UI.Tables.Concrete
 
             public Cell CrossSectionDiameter { get; set; }
 
-            public WireMarkPanel(Cell code, Cell type, ReferenceCell coreMaterial, Cell coreDiameter, ReferenceCell screen1Material, Cell screen1InnerRadius, Cell screen1Thresold, ReferenceCell screen1IsolationMaterial, ReferenceCell screen2Material, Cell screen2InnerRadius, Cell screen2Thresold, ReferenceCell screen2IsolationMaterial, Cell crossSectionDiameter)
+            public WireMarkPanel(Cell code, ReferenceCell coreMaterial, Cell coreDiameter, ReferenceCell screen1Material, Cell screen1InnerRadius, Cell screen1Thresold, ReferenceCell screen1IsolationMaterial, ReferenceCell screen2Material, Cell screen2InnerRadius, Cell screen2Thresold, ReferenceCell screen2IsolationMaterial, Cell crossSectionDiameter)
             {
                 Code = code;
-                Type = type;
                 CoreMaterial = coreMaterial;
                 CoreDiameter = coreDiameter;
                 Screen1Material = screen1Material;
@@ -65,7 +62,6 @@ namespace UI.Tables.Concrete
             public override void Destroy()
             {
                 UnityObject.Destroy(Code.gameObject);
-                UnityObject.Destroy(Type.gameObject);
                 UnityObject.Destroy(CoreMaterial.gameObject);
                 UnityObject.Destroy(CoreDiameter.gameObject);
                 UnityObject.Destroy(Screen1Material.gameObject);
@@ -85,8 +81,6 @@ namespace UI.Tables.Concrete
                 {
                     case "Code":
                         return Code;
-                    case "Type":
-                        return Type;
                     case "CoreDiameter":
                         return CoreDiameter;
                     case "Screen1InnerRadius":
@@ -134,7 +128,6 @@ namespace UI.Tables.Concrete
                 return new WireMark
                 {
                     Code = Code.StringValue,
-                    Type = Type.NullableStringValue,
                     CoreMaterial = coreMaterial,
                     CoreDiameter = CoreDiameter.FloatValue,
                     Screen1 = new WireMark.Screen
@@ -158,9 +151,6 @@ namespace UI.Tables.Concrete
 
         [SerializeField]
         private Column _codes;
-
-        [SerializeField]
-        private Column _types;
 
         [SerializeField]
         private Column _coreMaterials;
@@ -214,25 +204,24 @@ namespace UI.Tables.Concrete
             var materialPanels = _materialsTable.MaterialPanels;
 
             foreach (var wireMark in TableDataManager.Instance.WireMarks)
-                Add(wireMark.Code, string.IsNullOrWhiteSpace(wireMark.Type) ? "-" : wireMark.Type, wireMark.CoreMaterial, wireMark.CoreDiameter, wireMark.Screen1.Material, wireMark.Screen1.InnerRadius, wireMark.Screen1.Thresold, wireMark.Screen1.IsolationMaterial, wireMark.Screen2.Material, wireMark.Screen2.InnerRadius, wireMark.Screen2.Thresold, wireMark.Screen2.IsolationMaterial, wireMark.CrossSectionDiameter, cellClickHandler);
+                Add(wireMark.Code, wireMark.CoreMaterial, wireMark.CoreDiameter, wireMark.Screen1.Material, wireMark.Screen1.InnerRadius, wireMark.Screen1.Thresold, wireMark.Screen1.IsolationMaterial, wireMark.Screen2.Material, wireMark.Screen2.InnerRadius, wireMark.Screen2.Thresold, wireMark.Screen2.IsolationMaterial, wireMark.CrossSectionDiameter, cellClickHandler);
         }
 
         public override Panel AddEmpty(Action<Cell> cellClickHandler)
         {
             var materialPanels = _materialsTable.MaterialPanels;
 
-            return Add(GetNextCode(), "-", TableDataManager.Instance.Materials[0], 0f, null, null, null, null, null, null, null, null, 0f, cellClickHandler);
+            return Add(GetNextCode(), TableDataManager.Instance.Materials[0], 0f, null, null, null, null, null, null, null, null, 0f, cellClickHandler);
         }
 
         private string GetNextCode() => $"м{_wireMarksPanels.Max(p => int.Parse(p.Code.StringValue.Substring(1))) + 1}";
 
-        private WireMarkPanel Add(string code, string type, Material coreMaterial, float coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, Material screen1isolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, Material screen2isolationMaterial, float crossSectionDiameter, Action<Cell> cellClickHandler)
+        private WireMarkPanel Add(string code,  Material coreMaterial, float coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, Material screen1isolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, Material screen2isolationMaterial, float crossSectionDiameter, Action<Cell> cellClickHandler)
         {
             var materialPanels = _materialsTable.MaterialPanels;
             var nullableMaterialPanels = Enumerable.Repeat((MaterialsTable.MaterialPanel)null, 1).Concat(materialPanels).ToList();
 
             var codeCell = Cell.Factory.CreateUnique(_cellPrefab, code, _codes, cellClickHandler);
-            var typeCell = Cell.Factory.Create(_cellPrefab, type, false, _types, cellClickHandler);
 
             var selected = materialPanels.IndexOf(materialPanels.First(p => p?.Code.IntValue == coreMaterial?.Code));
 
@@ -259,7 +248,7 @@ namespace UI.Tables.Concrete
 
             var crossSectionDiameterCell = Cell.Factory.Create(_cellPrefab, crossSectionDiameter, _crossSectionDiameters, cellClickHandler);
 
-            var panel = new WireMarkPanel(codeCell, typeCell, coreMaterialCell, coreDiameterCell, screen1MaterialCell, screen1InnerRadiusCell, screen1ThresoldCell, screen1IsolationMaterialCell, screen2MaterialCell, screen2InnerRadiusCell, screen2ThresoldCell, screen2IsolationMaterialCell, crossSectionDiameterCell);
+            var panel = new WireMarkPanel(codeCell, coreMaterialCell, coreDiameterCell, screen1MaterialCell, screen1InnerRadiusCell, screen1ThresoldCell, screen1IsolationMaterialCell, screen2MaterialCell, screen2InnerRadiusCell, screen2ThresoldCell, screen2IsolationMaterialCell, crossSectionDiameterCell);
             _wireMarksPanels.Add(panel);
 
             AddPanelToColumns(panel);
@@ -296,7 +285,6 @@ namespace UI.Tables.Concrete
             var wireMarkPanel = (WireMarkPanel)panel;
 
             _codes.AddCell(wireMarkPanel.Code);
-            _types.AddCell(wireMarkPanel.Type);
             _coreMaterials.AddCell(wireMarkPanel.CoreMaterial);
             _coreDiameters.AddCell(wireMarkPanel.CoreDiameter);
             _screen1Materials.AddCell(wireMarkPanel.Screen1Material);
@@ -315,7 +303,6 @@ namespace UI.Tables.Concrete
             var wireMarkPanel = (WireMarkPanel)panel;
 
             _codes.RemoveCell(wireMarkPanel.Code);
-            _types.RemoveCell(wireMarkPanel.Type);
             _coreMaterials.RemoveCell(wireMarkPanel.CoreMaterial);
             _coreDiameters.RemoveCell(wireMarkPanel.CoreDiameter);
             _screen1Materials.RemoveCell(wireMarkPanel.Screen1Material);

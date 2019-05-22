@@ -21,8 +21,6 @@ namespace Management.Tables
 
         public string Code { get; set; }
 
-        public string Type { get; set; }
-
         public Material CoreMaterial { get; set; }
 
         public float CoreDiameter { get; set; }
@@ -35,10 +33,9 @@ namespace Management.Tables
 
         public WireMark() { }
 
-        public WireMark(string code, string type, Material coreMaterial, float coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, Material screen1IsolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, Material screen2IsolationMaterial, float crossSectionDiameter)
+        public WireMark(string code, Material coreMaterial, float coreDiameter, Material screen1Material, float? screen1InnerRadius, float? screen1Thresold, Material screen1IsolationMaterial, Material screen2Material, float? screen2InnerRadius, float? screen2Thresold, Material screen2IsolationMaterial, float crossSectionDiameter)
         {
             Code = code;
-            Type = type;
             CoreMaterial = coreMaterial;
             CoreDiameter = CoreDiameter;
 

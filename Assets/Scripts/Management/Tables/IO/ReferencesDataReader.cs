@@ -82,35 +82,34 @@ namespace Management.Tables.IO
             return new WireMark
             {
                 Code = GetString(row, 0),
-                Type = GetString(row, 1),
-                CoreMaterial = GetMaterial(row, 2, materials),
-                CoreDiameter = GetFloat(row, 3),
+                CoreMaterial = GetMaterial(row, 1, materials),
+                CoreDiameter = GetFloat(row, 2),
 
                 Screen1 = new WireMark.Screen
                 {
-                    Material = GetMaterial(row, 4, materials),
-                    InnerRadius = GetFloat(row, 5),
-                    Thresold = GetFloat(row, 6),
-                    IsolationMaterial = GetMaterial(row, 7, materials)
+                    Material = GetMaterial(row, 3, materials),
+                    InnerRadius = GetFloat(row, 4),
+                    Thresold = GetFloat(row, 5),
+                    IsolationMaterial = GetMaterial(row, 6, materials)
                 },
 
                 Screen2 = new WireMark.Screen
                 {
-                    Material = GetMaterial(row, 8, materials),
-                    InnerRadius = GetNullableFloat(row, 9),
-                    Thresold = GetNullableFloat(row, 10),
-                    IsolationMaterial = GetMaterial(row, 11, materials)
+                    Material = GetMaterial(row, 7, materials),
+                    InnerRadius = GetNullableFloat(row, 8),
+                    Thresold = GetNullableFloat(row, 9),
+                    IsolationMaterial = GetMaterial(row, 10, materials)
                 },
 
-                CrossSectionDiameter = GetFloat(row, 12)
+                CrossSectionDiameter = GetFloat(row, 11)
             };
         }
 
         private static bool IsCorrectWireMark(IRow row, List<Material> materials)
         {
-            return IsNotEmptyStringCell(row, 0) && IsStringCell(row, 1) && IsMaterialCode(row, 2, materials) && IsFloatCell(row, 3)
-                && IsMaterialCode(row, 4, materials) && IsFloatCells(row, 5, 6) && IsMaterialCodeOrNull(row, 7, materials) && IsMaterialCodeOrNull(row, 8, materials)
-                && IsNullableFloatCells(row, 9, 10) && IsMaterialCodeOrNull(row, 11, materials) && IsFloatCell(row, 12);
+            return IsNotEmptyStringCell(row, 0) && IsMaterialCode(row, 1, materials) && IsFloatCell(row, 2)
+                && IsMaterialCode(row, 3, materials) && IsFloatCells(row, 4, 5) && IsMaterialCodeOrNull(row, 6, materials) && IsMaterialCodeOrNull(row, 7, materials)
+                && IsNullableFloatCells(row, 8, 9) && IsMaterialCodeOrNull(row, 10, materials) && IsFloatCell(row, 11);
         }
         
         #region Cell type checkers

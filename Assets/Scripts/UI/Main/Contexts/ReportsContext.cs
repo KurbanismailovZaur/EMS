@@ -28,6 +28,9 @@ namespace UI.Main.Contexts
 
         public SelectedEvent Selected;
 
+        private bool _electricCalculated = false;
+        private bool _bscAndBaCalculated = false;
+
         public bool GenerateInteractable
         {
             get => _generateButton.interactable;
@@ -36,15 +39,52 @@ namespace UI.Main.Contexts
 
         public void Generate() => Selected.Invoke(Action.Generate);
 
+        private void UpdateInteractable()
+        {
+            if (_electricCalculated || _bscAndBaCalculated)
+                GenerateInteractable = true;
+            else
+                GenerateInteractable = false;
+        }
+
+        private void Start()
+        {
+            UpdateInteractable();
+        }
+
         #region Event handlers
         public void ProjectManager_Created()
         {
-            GenerateInteractable = true;
+            //GenerateInteractable = true;
         }
 
         public void ProjectManager_Closed()
         {
             GenerateInteractable = false;
+        }
+
+        public void OnElectricCalculated()
+        {
+            _electricCalculated = true;
+            UpdateInteractable();
+        }
+
+        public void OnElectricRemoved()
+        {
+            _electricCalculated = false;
+            UpdateInteractable();
+        }
+
+        public void OnBscAndBaCalculated()
+        {
+            _bscAndBaCalculated = true;
+            UpdateInteractable();
+        }
+
+        public void OnBscAndBaRemoved()
+        {
+            _bscAndBaCalculated = false;
+            UpdateInteractable();
         }
         #endregion
     }

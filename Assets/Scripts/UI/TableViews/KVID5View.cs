@@ -10,6 +10,7 @@ using UI.Tables.Concrete.KVIDS;
 using Management.Calculations;
 using Management.Tables;
 using UI.Tables;
+using UI.Panels;
 
 namespace UI.TableViews
 {
@@ -127,7 +128,11 @@ namespace UI.TableViews
             bool hasError;
             var data = KVID5DataReader.ReadFromFile(_explorer.LastResult, out hasError);
 
-            if (hasError) yield break;
+            if (hasError)
+            {
+                ErrorManager.Instance.ShowError("Вводимые данные содержат некорректные значения");
+                yield break;
+            }
 
             foreach (var(code, position, type, iR, oV, oF, bBA, conType) in data)
             {

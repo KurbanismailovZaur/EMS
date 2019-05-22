@@ -13,6 +13,7 @@ using System.Linq;
 using UnityScrollRect = UnityEngine.UI.ScrollRect;
 using System;
 using Management.Tables;
+using UI.Panels;
 
 namespace UI.TableViews
 {
@@ -196,7 +197,11 @@ namespace UI.TableViews
             bool hasError;
             var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult, out hasError);
 
-            if (hasError) yield break;
+            if (hasError)
+            {
+                ErrorManager.Instance.ShowError("Вводимые данные содержат некорректные значения");
+                yield break;
+            }
 
             Add(tabs);
         }

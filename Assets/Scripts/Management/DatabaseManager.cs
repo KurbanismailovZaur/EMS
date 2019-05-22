@@ -465,7 +465,7 @@ namespace Management
             var materials = kvid1Infos.Select(info => new TableMaterial(info.id, info.name, info.val1, info.val2, info.val3)).ToList();
 
             var kvid4Infos = _dbManager.Query<KVID4Info>($"SELECT * FROM {kvid4}");
-            var wireMarks = kvid4Infos.Select(i => new WireMark(i.id, string.Empty, materials.Find(m => m.Code == i.material), i.d1, materials.Find(m => m.Code == i.t1_m1), i.t1_val1, i.t1_val2, materials.Find(m => m.Code == i.t1_m2), materials.Find(m => m.Code == i.t2_m1), i.t2_val1, i.t2_val2, materials.Find(m => m.Code == i.t2_m2), i.d2)).ToList();
+            var wireMarks = kvid4Infos.Select(i => new WireMark(i.id, materials.Find(m => m.Code == i.material), i.d1, materials.Find(m => m.Code == i.t1_m1), i.t1_val1, i.t1_val2, materials.Find(m => m.Code == i.t1_m2), materials.Find(m => m.Code == i.t2_m1), i.t2_val1, i.t2_val2, materials.Find(m => m.Code == i.t2_m2), i.d2)).ToList();
 
             return (materials, wireMarks);
         }
