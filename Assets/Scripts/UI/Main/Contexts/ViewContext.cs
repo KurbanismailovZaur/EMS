@@ -9,7 +9,7 @@ using UnityButton = UnityEngine.UI.Button;
 
 namespace UI.Main.Contexts
 {
-	public class CameraContext : MonoBehaviour 
+	public class ViewContext : MonoBehaviour 
 	{
         #region Enums
         public enum Action
@@ -23,7 +23,8 @@ namespace UI.Main.Contexts
             FocusModel,
             FocusWiring,
             FocusScene,
-            Reset
+            Reset,
+            Minimize
         }
         #endregion
 
@@ -83,6 +84,8 @@ namespace UI.Main.Contexts
         public void FocusScene() => Selected.Invoke(Action.FocusScene);
 
         public void ResetCamera() => Selected.Invoke(Action.Reset);
+
+        public void Minimize() => Selected.Invoke(Action.Minimize);
 
         #region Event handlers
         public void ProjectManager_Created()
