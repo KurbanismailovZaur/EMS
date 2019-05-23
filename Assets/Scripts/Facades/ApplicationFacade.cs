@@ -27,6 +27,7 @@ using UI.Panels.Exceeding;
 using System;
 using UI.Panels;
 using UI.Dialogs;
+using System.IO;
 
 namespace Facades
 {
@@ -252,7 +253,6 @@ namespace Facades
             CalculationsManager.Instance.ElectricFieldStrenght.IsVisible = true;
             ProgressDialog.Instance.Hide();
         }
-        #endregion
 
         private void FilterCurrentCalculations(float min, float max) => _currentCalculations?.Filter(min, max);
 
@@ -288,6 +288,18 @@ namespace Facades
             _filter.Hide();
 
             _exceedingPanel.Close();
+        }
+        #endregion
+
+        public void ExportDatabase() => StartCoroutine(ExportDatabaseRoutine());
+
+        private IEnumerator ExportDatabaseRoutine()
+        {
+            yield return FileExplorer.Instance.SaveFile("Экспорт базы данных", null, "sqlite", "database");
+
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            File.Copy(DatabaseManager.Instance.DatabasePath, FileExplorer.Instance.LastResult);
         }
 
         #region Event handlers
@@ -548,6 +560,16 @@ namespace Facades
             }
         }
         #endregion
+
+        public void DatabaseContext_Selected(DatabaseContext.Action action)
+        {
+            switch (action)
+            {
+                case DatabaseContext.Action.Export:
+                    ExportDatabase();
+                    break;
+            }
+        }
 
         public void CameraContext_Selected(CameraContext.Action action)
         {
