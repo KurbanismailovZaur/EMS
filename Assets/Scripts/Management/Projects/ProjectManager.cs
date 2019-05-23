@@ -8,6 +8,7 @@ using UnityEngine.Events;
 using UI.Exploring.FileSystem;
 using System.IO;
 using UI.Dialogs;
+using System;
 
 namespace Management.Projects
 {
@@ -53,16 +54,27 @@ namespace Management.Projects
 
                     if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Yes)
                     {
+                        string path = null;
+
                         if (string.IsNullOrEmpty(_project.Path))
                         {
                             yield return FileExplorer.Instance.SaveFile("Сохранить проект", null, "ems");
 
                             if (FileExplorer.Instance.LastResult == null) yield break;
 
-                            Serialize(FileExplorer.Instance.LastResult);
+                            path = FileExplorer.Instance.LastResult;
                         }
                         else
-                            Serialize(_project.Path);
+                            path = _project.Path;
+
+                        try
+                        {
+                            Serialize(path);
+                        }
+                        catch (Exception ex)
+                        {
+                            ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
+                        }
                     }
                 }
 
@@ -73,7 +85,14 @@ namespace Management.Projects
 
             Created.Invoke();
 
-            ProjectSerializer.Deserialize(pathToProject);
+            try
+            {
+                ProjectSerializer.Deserialize(pathToProject);
+            }
+            catch (Exception ex)
+            {
+                ErrorDialog.Instance.ShowError("Не удалось открыть проект.", ex);
+            }
 
             _project.Path = pathToProject;
             _project.WasChanged = false;

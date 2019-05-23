@@ -15,9 +15,6 @@ namespace Control.Behaviour.States
         private int _referenceDPI = 96;
 
         [SerializeField]
-        private Vector2 _initialResolution = new Vector2(1024f, 768f);
-
-        [SerializeField]
         private CanvasScaler _scaler;
 
         [SerializeField]
@@ -27,7 +24,7 @@ namespace Control.Behaviour.States
 
         private IEnumerator EnterRoutine()
         {
-            Screen.SetResolution((int)_initialResolution.x, (int)_initialResolution.y, FullScreenMode.Windowed);
+            Screen.SetResolution((int)DefaultSettings.Screen.Size.x, (int)DefaultSettings.Screen.Size.y, FullScreenMode.Windowed);
 
 #if !UNITY_EDITOR
             _scaler.scaleFactor = Screen.dpi / _referenceDPI;

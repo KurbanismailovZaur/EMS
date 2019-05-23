@@ -571,51 +571,54 @@ namespace Facades
             }
         }
 
-        public void CameraContext_Selected(CameraContext.Action action)
+        public void ViewContext_Selected(ViewContext.Action action)
         {
             switch (action)
             {
-                case CameraContext.Action.ViewRight:
+                case ViewContext.Action.ViewRight:
                     _cameraController.ViewFromDirection(Vector3.right, Vector3.up);
                     break;
-                case CameraContext.Action.ViewLeft:
+                case ViewContext.Action.ViewLeft:
                     _cameraController.ViewFromDirection(Vector3.left, Vector3.up);
                     break;
-                case CameraContext.Action.ViewTop:
+                case ViewContext.Action.ViewTop:
                     _cameraController.ViewFromDirection(Vector3.up, Vector3.forward);
                     break;
-                case CameraContext.Action.ViewBottom:
+                case ViewContext.Action.ViewBottom:
                     _cameraController.ViewFromDirection(Vector3.down, -Vector3.forward);
                     break;
-                case CameraContext.Action.ViewFront:
+                case ViewContext.Action.ViewFront:
                     _cameraController.ViewFromDirection(-Vector3.forward, Vector3.up);
                     break;
-                case CameraContext.Action.ViewBack:
+                case ViewContext.Action.ViewBack:
                     _cameraController.ViewFromDirection(Vector3.forward, Vector3.up);
                     break;
-                case CameraContext.Action.FocusModel:
+                case ViewContext.Action.FocusModel:
                     if (ModelManager.Instance.Model)
                         _cameraController.FocusOn(ModelManager.Instance.Model.Bounds.center);
                     break;
-                case CameraContext.Action.FocusWiring:
+                case ViewContext.Action.FocusWiring:
                     if (WiringManager.Instance.Wiring)
                         _cameraController.FocusOn(WiringManager.Instance.Wiring.Bounds.center);
                     break;
-                case CameraContext.Action.FocusScene:
+                case ViewContext.Action.FocusScene:
                     if (!ModelManager.Instance.Model)
-                        goto case CameraContext.Action.FocusWiring;
+                        goto case ViewContext.Action.FocusWiring;
 
                     if (!WiringManager.Instance.Wiring)
-                        goto case CameraContext.Action.FocusModel;
+                        goto case ViewContext.Action.FocusModel;
 
                     var bounds = ModelManager.Instance.Model.Bounds;
                     bounds.Encapsulate(WiringManager.Instance.Wiring.Bounds);
 
                     _cameraController.FocusOn(bounds.center);
                     break;
-                case CameraContext.Action.Reset:
+                case ViewContext.Action.Reset:
                     _cameraController.FocusOn(Vector3.zero);
                     _cameraController.ViewFromDirection(Vector3.up, Vector3.forward);
+                    break;
+                case ViewContext.Action.Minimize:
+                    Screen.SetResolution(Screen.width, Screen.height, FullScreenMode.Windowed);
                     break;
             }
         }
