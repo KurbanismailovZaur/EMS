@@ -14,7 +14,7 @@ namespace Management.Calculations
             public static Point Create(Point prefab, Transform parent, (string code, Vector3 position) point, float radius, Color[] gradients, double[] values)
             {
                 var pointGO = Instantiate(prefab, parent);
-                pointGO.transform.position = point.position;
+                pointGO.transform.localPosition = point.position;
                 pointGO.transform.localScale = new Vector3(radius, radius, radius) * 2f;
                 pointGO.Code = point.code;
                 pointGO.Values = values;

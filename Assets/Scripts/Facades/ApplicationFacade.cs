@@ -226,7 +226,7 @@ namespace Facades
         {
             ProgressDialog.Instance.Show("Вычисление напряженности электрического поля..");
 
-            var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => (p.Code, p.transform.position.x, p.transform.position.y, p.transform.position.z)).ToArray();
+            var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => (p.Code, p.transform.localPosition.x, p.transform.localPosition.y, p.transform.localPosition.z)).ToArray();
 
             await new WaitForBackgroundThread();
 

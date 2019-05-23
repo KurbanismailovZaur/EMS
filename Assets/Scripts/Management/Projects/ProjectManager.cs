@@ -74,6 +74,7 @@ namespace Management.Projects
                         catch (Exception ex)
                         {
                             ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
+                            yield break;
                         }
                     }
                 }
@@ -105,7 +106,16 @@ namespace Management.Projects
             if (string.IsNullOrEmpty(_project.Path))
                 yield return StartCoroutine(SaveAsRoutine("Сохранить проект"));
             else
-                Serialize(_project.Path);
+            {
+                try
+                {
+                    Serialize(_project.Path);
+                }
+                catch (Exception ex)
+                {
+                    ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
+                }
+            }
         }
 
         public Coroutine SaveAs() => StartCoroutine(SaveAsRoutine("Сохранить проект как.."));
@@ -116,7 +126,14 @@ namespace Management.Projects
 
             if (FileExplorer.Instance.LastResult == null) yield break;
 
-            Serialize(FileExplorer.Instance.LastResult);
+            try
+            {
+                Serialize(FileExplorer.Instance.LastResult);
+            }
+            catch (Exception ex)
+            {
+                ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
+            }
         }
 
         private void Serialize(string path)
