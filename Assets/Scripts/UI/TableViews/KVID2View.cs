@@ -13,6 +13,7 @@ using System.Linq;
 using Management.Tables;
 using System;
 using UnityScrollRect = UnityEngine.UI.ScrollRect;
+using UI.Dialogs;
 
 namespace UI.TableViews
 {
@@ -155,35 +156,43 @@ namespace UI.TableViews
 
             yield return null;
 
-            var tabs = KVID2DataReader.ReadFromFile(_explorer.LastResult);
-
-            
-
-            foreach (var (tab, productName, center, voltages) in tabs)
+            try
             {
-                var headerGroup = AddAssociationAndSelect(tab);
+                var tabs = KVID2DataReader.ReadFromFile(_explorer.LastResult);
 
-                headerGroup.header.Panel.X.FloatValue = center.x;
-                headerGroup.header.Panel.Y.FloatValue = center.y;
-                headerGroup.header.Panel.Z.FloatValue = center.z;
 
-                headerGroup.header0.Panel.ProductName.StringValue = productName;
 
-                foreach (var (x,y) in voltages)
+                foreach (var (tab, productName, center, voltages) in tabs)
                 {
-                    var panel = (KVID2Table.KVID2Panel)AddRowToCurrentTable();
+                    var headerGroup = AddAssociationAndSelect(tab);
 
-                    panel.X.NullableFloatValue = x;
-                    panel.Y.NullableFloatValue = y;
+                    headerGroup.header.Panel.X.FloatValue = center.x;
+                    headerGroup.header.Panel.Y.FloatValue = center.y;
+                    headerGroup.header.Panel.Z.FloatValue = center.z;
+
+                    headerGroup.header0.Panel.ProductName.StringValue = productName;
+
+                    foreach (var (x, y) in voltages)
+                    {
+                        var panel = (KVID2Table.KVID2Panel)AddRowToCurrentTable();
+
+                        panel.X.NullableFloatValue = x;
+                        panel.Y.NullableFloatValue = y;
+                    }
                 }
-            }
 
-            if (_tabsAssociations.Count > 0)
+
+                if (_tabsAssociations.Count > 0)
+                {
+                    Tab_Clicked(_tabsAssociations[0].tab);
+                }
+
+                _contentscrollrectImage.color = _defaultColor;
+            }
+            catch(Exception e)
             {
-                Tab_Clicked(_tabsAssociations[0].tab);
+                ErrorDialog.Instance.ShowError("Ошибка при чтении данных", e);
             }
-
-            _contentscrollrectImage.color = _defaultColor;
         }
 
 

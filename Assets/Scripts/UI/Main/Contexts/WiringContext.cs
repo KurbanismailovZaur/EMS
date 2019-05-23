@@ -95,12 +95,14 @@ namespace UI.Main.Contexts
         public void ProjectManager_Closed()
         {
             _2KVIDButton.interactable = _3KVIDButton.interactable = _5KVIDButton.interactable = _8KVIDButton.interactable = false;
+            _2KVIDImage.enabled = _3KVIDImage.enabled = _5KVIDImage.enabled = _8KVIDImage.enabled = false;
         }
 
         public void WiringManager_Imported()
         {
             _3KVIDVisibilityButton.interactable = true;
             KVID3VisibilityState = true;
+            _3KVIDImage.enabled = true;
         }
 
         public void WiringManager_VisibilityChanged()
@@ -112,6 +114,7 @@ namespace UI.Main.Contexts
         {
             _3KVIDVisibilityButton.interactable = false;
             KVID3VisibilityState = false;
+            _3KVIDImage.enabled = false;
         }
 
         public void TableDataManager_KVID2Impoted()
@@ -126,12 +129,24 @@ namespace UI.Main.Contexts
             _3KVIDButton.interactable = true;
         }
 
-        public void TableDataManager_KVID3Impoted()
+        public void TableDataManager_KVID8Impoted()
         {
-            _3KVIDImage.enabled = true;
+            _8KVIDImage.enabled = true;
         }
 
-        public void TableDataManager_KVID8Impoted()
+        public void TableDataManager_KVID2Removed()
+        {
+            _2KVIDImage.enabled = false;
+            _5KVIDButton.interactable = false;
+        }
+
+        public void TableDataManager_KVID5Removed()
+        {
+            _5KVIDImage.enabled = false;
+            _3KVIDButton.interactable = false;
+        }
+
+        public void TableDataManager_KVID8Removed()
         {
             _8KVIDImage.enabled = true;
         }

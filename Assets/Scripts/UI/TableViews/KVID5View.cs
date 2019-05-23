@@ -12,10 +12,11 @@ using Management.Tables;
 using UI.Tables;
 using UI.Panels;
 using UI.Dialogs;
+using System;
 
 namespace UI.TableViews
 {
-	public class KVID5View : TableView
+    public class KVID5View : TableView
     {
         [SerializeField]
         private Button _importButton;
@@ -126,31 +127,38 @@ namespace UI.TableViews
 
             yield return null;
 
-            var data = KVID5DataReader.ReadFromFile(_explorer.LastResult, out bool hasError);
-
-            if (hasError)
+            try
             {
-                ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
-                yield break;
+                var data = KVID5DataReader.ReadFromFile(_explorer.LastResult, out bool hasError);
+
+                if (hasError)
+                {
+                    ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
+                    yield break;
+                }
+
+                foreach (var (code, position, type, iR, oV, oF, bBA, conType) in data)
+                {
+                    var panel = (KVID5Table.KVID5Panel)AddRowToCurrentTable();
+
+                    panel.Code.StringValue = code;
+                    panel.X.FloatValue = position.x;
+                    panel.Y.FloatValue = position.y;
+                    panel.Z.FloatValue = position.z;
+
+                    panel.Type.StringValue = type;
+                    panel.InnerResist.NullableIntValue = iR;
+                    panel.OperatingVoltage.NullableIntValue = oV;
+                    panel.OperatingFrequensy.NullableIntValue = oF;
+                    panel.ConnectorType.NullableStringValue = conType;
+
+                    // reference cells
+                    panel.BlockBA.SelectOption(bBA);
+                }
             }
-
-            foreach (var(code, position, type, iR, oV, oF, bBA, conType) in data)
+            catch (Exception e)
             {
-                var panel = (KVID5Table.KVID5Panel)AddRowToCurrentTable();
-
-                panel.Code.StringValue = code;
-                panel.X.FloatValue = position.x;
-                panel.Y.FloatValue = position.y;
-                panel.Z.FloatValue = position.z;
-
-                panel.Type.StringValue = type;
-                panel.InnerResist.NullableIntValue = iR;
-                panel.OperatingVoltage.NullableIntValue = oV;
-                panel.OperatingFrequensy.NullableIntValue = oF;
-                panel.ConnectorType.NullableStringValue = conType;
-
-                // reference cells
-                panel.BlockBA.SelectOption(bBA);
+                ErrorDialog.Instance.ShowError("Ошибка при чтении данных", e);
             }
         }
 

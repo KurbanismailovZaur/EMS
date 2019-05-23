@@ -195,15 +195,22 @@ namespace UI.TableViews
 
             yield return null;
 
-            var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult, out bool hasError);
-
-            if (hasError)
+            try
             {
-                ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
-                yield break;
-            }
+                var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult, out bool hasError);
 
-            Add(tabs);
+                if (hasError)
+                {
+                    ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
+                    yield break;
+                }
+
+                Add(tabs);
+            }
+            catch (Exception e)
+            {
+                ErrorDialog.Instance.ShowError("Ошибка при чтении данных", e);
+            }
         }
 
         private Tab AddTab(string name)

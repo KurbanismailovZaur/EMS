@@ -10,6 +10,8 @@ using UI.Tables.Concrete.KVIDS;
 using Management.Calculations;
 using Management.Tables;
 using UI.Tables;
+using System;
+using UI.Dialogs;
 
 namespace UI.TableViews
 {
@@ -142,37 +144,45 @@ namespace UI.TableViews
 
             yield return null;
 
-            var kvid8Data = KVID8DataReader.ReadFromFile(_explorer.LastResult);
 
-            var table0 = _tabsAssociations[0].table;
-            var table1 = _tabsAssociations[1].table;
-
-
-
-            //tab0
-            foreach (var(pointID, maxVoltage, fMin, fMax) in kvid8Data.tab0)
+            try
             {
-                var panel = (KVID8Tab0Table.KVID8Tab0Panel)table0.AddEmpty(Cell_Clicked);
+                var kvid8Data = KVID8DataReader.ReadFromFile(_explorer.LastResult);
 
-                panel.ID.StringValue = pointID;
-                panel.MaxVoltage.FloatValue = maxVoltage;
-                panel.FrequencyMin.IntValue = fMin;
-                panel.FrequencyMax.IntValue = fMax;
+                var table0 = _tabsAssociations[0].table;
+                var table1 = _tabsAssociations[1].table;
+
+
+
+                //tab0
+                foreach (var (pointID, maxVoltage, fMin, fMax) in kvid8Data.tab0)
+                {
+                    var panel = (KVID8Tab0Table.KVID8Tab0Panel)table0.AddEmpty(Cell_Clicked);
+
+                    panel.ID.StringValue = pointID;
+                    panel.MaxVoltage.FloatValue = maxVoltage;
+                    panel.FrequencyMin.IntValue = fMin;
+                    panel.FrequencyMax.IntValue = fMax;
+                }
+
+                //tab1
+                foreach (var (idES, wireID, maxVoltage, fMin, fMax) in kvid8Data.tab1)
+                {
+                    var panel = (KVID8Tab1Table.KVID8Tab1Panel)table1.AddEmpty(Cell_Clicked);
+
+                    panel.ID.NullableStringValue = idES;
+                    panel.WireID.NullableStringValue = wireID;
+                    panel.MaxVoltage.FloatValue = maxVoltage;
+                    panel.FrequencyMin.IntValue = fMin;
+                    panel.FrequencyMax.IntValue = fMax;
+                }
+
+                _contentscrollrectImage.color = _defaultColor;
             }
-
-            //tab1
-            foreach (var(idES, wireID, maxVoltage, fMin, fMax) in kvid8Data.tab1)
+            catch (Exception e)
             {
-                var panel = (KVID8Tab1Table.KVID8Tab1Panel)table1.AddEmpty(Cell_Clicked);
-
-                panel.ID.NullableStringValue = idES;
-                panel.WireID.NullableStringValue  = wireID;
-                panel.MaxVoltage.FloatValue = maxVoltage;
-                panel.FrequencyMin.IntValue = fMin;
-                panel.FrequencyMax.IntValue = fMax;
+                ErrorDialog.Instance.ShowError("Ошибка при чтении данных", e);
             }
-
-            _contentscrollrectImage.color = _defaultColor;
         }
 
 

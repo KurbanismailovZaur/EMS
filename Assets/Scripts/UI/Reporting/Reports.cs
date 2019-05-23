@@ -28,6 +28,12 @@ namespace UI.Reporting
         private SelectionManager _kvid3;
 
         [SerializeField]
+        private GameObject _kvid6Blocker;
+
+        [SerializeField]
+        private GameObject _kvid3Blocker;
+
+        [SerializeField]
         private Button _generateButton;
 
         [SerializeField]
@@ -102,6 +108,27 @@ namespace UI.Reporting
         private void GenerateButton_OnClick() => Generate();
 
         private void CancelButton_OnClick() => Close();
+
+
+        public void ElectricFieldCalculated()
+        {
+            _kvid6Blocker.SetActive(false);
+        }
+
+        public void ElectricFieldRemoved()
+        {
+            _kvid6Blocker.SetActive(true);
+        }
+
+        public void BKSandBACalculated()
+        {
+            _kvid3Blocker.SetActive(false);
+        }
+
+        public void BKSandBARemoved()
+        {
+            _kvid3Blocker.SetActive(true);
+        }
         #endregion
     }
 }

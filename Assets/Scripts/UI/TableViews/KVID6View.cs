@@ -10,6 +10,8 @@ using UI.Tables.Concrete.KVIDS;
 using Management.Calculations;
 using UI.Tables;
 using System.Linq;
+using System;
+using UI.Dialogs;
 
 namespace UI.TableViews
 {
@@ -172,39 +174,46 @@ namespace UI.TableViews
 
             yield return null;
 
-            var points = KVID6DataReader.ReadFromFile(_explorer.LastResult);
-
-
-            int lastTableRowsCount = 0;
-            KVID6Table currentTable;
-            currentTable = (KVID6Table)GetCurrentTable();
-
-
-            foreach (var (code, position) in points)
+            try
             {
-                var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
+                var points = KVID6DataReader.ReadFromFile(_explorer.LastResult);
 
-                panel.Code.StringValue = code;
-                panel.X.FloatValue = position.x;
-                panel.Y.FloatValue = position.y;
-                panel.Z.FloatValue = position.z;
 
-                ++lastTableRowsCount;
+                int lastTableRowsCount = 0;
+                KVID6Table currentTable;
+                currentTable = (KVID6Table)GetCurrentTable();
 
-                if (lastTableRowsCount == _maxRowsOnPage)
+
+                foreach (var (code, position) in points)
                 {
-                    currentTable.gameObject.SetActive(false);
+                    var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
 
-                    currentTable = AddTable("KVID6Table");
-                    _pages.Add(currentTable);
+                    panel.Code.StringValue = code;
+                    panel.X.FloatValue = position.x;
+                    panel.Y.FloatValue = position.y;
+                    panel.Z.FloatValue = position.z;
 
-                    lastTableRowsCount = 0;
+                    ++lastTableRowsCount;
+
+                    if (lastTableRowsCount == _maxRowsOnPage)
+                    {
+                        currentTable.gameObject.SetActive(false);
+
+                        currentTable = AddTable("KVID6Table");
+                        _pages.Add(currentTable);
+
+                        lastTableRowsCount = 0;
+                    }
                 }
+
+
+                currentTable.gameObject.SetActive(false);
+                ActivatePage(0);
             }
-
-
-            currentTable.gameObject.SetActive(false);
-            ActivatePage(0);
+            catch (Exception e)
+            {
+                ErrorDialog.Instance.ShowError("Ошибка при чтении данных", e);
+            }
         }
 
         private KVID6Table AddTable(string name)

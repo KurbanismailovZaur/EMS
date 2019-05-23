@@ -92,6 +92,8 @@ namespace UI.Main.Contexts
         {
             _importViewButton.interactable = false;
             _importPlanesButton.interactable = false;
+
+            _planesModelImported.enabled = _viewModelImported.enabled = false;
         }
 
         public void ModelManager_ModelImported()
