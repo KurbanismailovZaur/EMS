@@ -99,7 +99,17 @@ namespace Facades
         }
 
         #region Project
+        private void CreateNewProject() => StartCoroutine(CreateNewProjectRoutine());
+
+        private IEnumerator CreateNewProjectRoutine()
+        {
+            yield return ProjectManager.Instance.New();
+            TableDataManager.Instance.LoadDefaultData();
+        }
+
         private void SaveProject() => ProjectManager.Instance.Save();
+
+        private void SaveProjectAs() => ProjectManager.Instance.SaveAs();
 
         private void LoadProject() => StartCoroutine(LoadProjectRoutine());
 
@@ -108,7 +118,7 @@ namespace Facades
             _isDeserializationState = true;
 
             yield return ProjectManager.Instance.Load();
-            
+
             _isDeserializationState = false;
         }
         #endregion
@@ -287,14 +297,16 @@ namespace Facades
             switch (action)
             {
                 case ProjectContext.Action.New:
-                    ProjectManager.Instance.New();
-                    TableDataManager.Instance.LoadDefaultData();
+                    CreateNewProject();
                     break;
                 case ProjectContext.Action.Load:
                     LoadProject();
                     break;
                 case ProjectContext.Action.Save:
                     SaveProject();
+                    break;
+                case ProjectContext.Action.SaveAs:
+                    SaveProjectAs();
                     break;
                 case ProjectContext.Action.Close:
                     ProjectManager.Instance.Close();

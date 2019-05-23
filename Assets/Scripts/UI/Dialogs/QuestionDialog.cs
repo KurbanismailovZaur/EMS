@@ -43,15 +43,18 @@ namespace UI.Dialogs
             _cancelButton.onClick.AddListener(CancelButton_OnClick);
         }
 
-        public Coroutine Open(string title, string questrion)
+        public Coroutine Open(string title, string questrion, bool showCancel = true)
         {
             _titleText.text = title;
             _questionText.text = questrion;
+            SetCancelVisibilityState(showCancel);
 
             Show();
 
             return _routine = StartCoroutine(Routine());
         }
+
+        public void SetCancelVisibilityState(bool state) => _cancelButton.gameObject.SetActive(state);
 
         private IEnumerator Routine() { while (IsShowed) yield return null; }
 

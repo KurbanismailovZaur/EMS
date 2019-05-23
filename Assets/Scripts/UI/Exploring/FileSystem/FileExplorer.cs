@@ -648,10 +648,15 @@ namespace UI.Exploring.FileSystem
         {
             StopExploring();
 
-            LastResult = null;
-            _lastResults = new string[0];
+            ResetLastResults();
 
             Canceled.Invoke();
+        }
+
+        private void ResetLastResults()
+        {
+            LastResult = null;
+            _lastResults = new string[0];
         }
         #endregion
 

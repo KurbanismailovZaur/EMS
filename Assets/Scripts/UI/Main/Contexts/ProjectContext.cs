@@ -17,6 +17,7 @@ namespace UI.Main.Contexts
             New,
             Load,
             Save,
+            SaveAs,
             Close,
             Quit
         }
@@ -31,6 +32,9 @@ namespace UI.Main.Contexts
         private UnityButton _saveButton;
 
         [SerializeField]
+        private UnityButton _saveAsButton;
+
+        [SerializeField]
         private UnityButton _closeButton;
 
         public SelectedEvent Selected;
@@ -41,13 +45,15 @@ namespace UI.Main.Contexts
 
         public void Save() => Selected.Invoke(Action.Save);
 
+        public void SaveAs() => Selected.Invoke(Action.SaveAs);
+
         public void Close() => Selected.Invoke(Action.Close);
 
         public void Quit() => Selected.Invoke(Action.Quit);
 
         public void SetButtonsInteractable(bool state)
         {
-            _saveButton.interactable = _closeButton.interactable = state;
+            _saveButton.interactable = _saveAsButton.interactable = _closeButton.interactable = state;
         }
 
         #region Event handler

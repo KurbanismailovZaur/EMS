@@ -21,21 +21,18 @@ namespace Management.Projects
         public UnityEvent Closed;
         #endregion
 
-        public void New()
+        public Coroutine New() => StartCoroutine(NewRoutine());
+
+        private IEnumerator NewRoutine()
         {
-            Close();
+            yield return Close();
 
             _project = new Project();
 
             Created.Invoke();
         }
 
-        public Coroutine Load()
-        {
-            New();
-
-            return StartCoroutine(LoadRoutine());
-        }
+        public Coroutine Load() => StartCoroutine(LoadRoutine());
 
         private IEnumerator LoadRoutine()
         {
@@ -43,9 +40,42 @@ namespace Management.Projects
 
             if (FileExplorer.Instance.LastResult == null) yield break;
 
-            ProjectSerializer.Deserialize(FileExplorer.Instance.LastResult);
+            string pathToProject = FileExplorer.Instance.LastResult;
 
-            _project.Path = FileExplorer.Instance.LastResult;
+            if (_project != null)
+            {
+                if (_project.WasChanged)
+                {
+                    yield return QuestionDialog.Instance.Open("Внимание!", "Если не сохранить, проект изменения будут потеряны.\nСохранить проект?");
+
+                    if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Cancel)
+                        yield break;
+
+                    if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Yes)
+                    {
+                        if (string.IsNullOrEmpty(_project.Path))
+                        {
+                            yield return FileExplorer.Instance.SaveFile("Сохранить проект", null, "ems");
+
+                            if (FileExplorer.Instance.LastResult == null) yield break;
+
+                            Serialize(FileExplorer.Instance.LastResult);
+                        }
+                        else
+                            Serialize(_project.Path);
+                    }
+                }
+
+                Closed.Invoke();
+            }
+
+            _project = new Project();
+
+            Created.Invoke();
+
+            ProjectSerializer.Deserialize(pathToProject);
+
+            _project.Path = pathToProject;
             _project.WasChanged = false;
         }
 
@@ -54,15 +84,20 @@ namespace Management.Projects
         private IEnumerator SaveRoutine()
         {
             if (string.IsNullOrEmpty(_project.Path))
-            {
-                yield return FileExplorer.Instance.SaveFile("Сохранить Проект", null, "ems");
-
-                if (FileExplorer.Instance.LastResult == null) yield break;
-
-                Serialize(FileExplorer.Instance.LastResult);
-            }
+                yield return StartCoroutine(SaveAsRoutine("Сохранить проект"));
             else
                 Serialize(_project.Path);
+        }
+
+        public Coroutine SaveAs() => StartCoroutine(SaveAsRoutine("Сохранить проект как.."));
+
+        private IEnumerator SaveAsRoutine(string explorerTitle)
+        {
+            yield return FileExplorer.Instance.SaveFile(explorerTitle, null, "ems");
+
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            Serialize(FileExplorer.Instance.LastResult);
         }
 
         private void Serialize(string path)
@@ -73,7 +108,7 @@ namespace Management.Projects
             _project.WasChanged = false;
         }
 
-        public void Close() => StartCoroutine(CloseRoutine());
+        public Coroutine Close() => StartCoroutine(CloseRoutine());
 
         private IEnumerator CloseRoutine()
         {
@@ -87,9 +122,7 @@ namespace Management.Projects
                     yield break;
 
                 if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Yes)
-                {
                     yield return Save();
-                }
             }
 
             _project = null;
