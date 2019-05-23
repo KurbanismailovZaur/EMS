@@ -2,6 +2,7 @@ from functions import get_distance
 from numba import jit
 
 import numpy as np
+import warnings
 
 
 class Math4Figure:
@@ -65,7 +66,10 @@ class Math4Figure:
             else:
                 mid_xyz[i] = min_xyz[i]
             # Для масштабирования множества точек по осям, определяется масштабирующий коэффициент
-            k_xyz[i] = self.r_xyz[i] / (max_xyz[i] - mid_xyz[i])
+            if max_xyz[i] - mid_xyz[i] == 0:
+                k_xyz[i] = 1
+            else:
+                k_xyz[i] = self.r_xyz[i] / (max_xyz[i] - mid_xyz[i])
 
         # Нормирование геометрических параметров точечной модели
         self.planes = np.array([self.relocation(pl, mid_xyz, k_xyz, pl.shape[0]) for pl in self.planes])
@@ -77,8 +81,9 @@ class Math4Figure:
         return True
 
     @staticmethod
-    @jit(nopython=False)
     def find_figures(planes):
+        warnings.filterwarnings('error')
+
         figures = []
 
         # Находим фигуры
@@ -94,16 +99,21 @@ class Math4Figure:
             bc = get_distance(b, c)
             ac = get_distance(a, c)
 
+            znam = 4 * (ab + bc + ac)
+
             # Исключаем деление на 0
-            if bc == 0 or ac == 0:
+            if bc == 0 or ac == 0 or znam == 0:
                 continue
 
             # Находим радиус вписанной окружности
-            r = (((-ab + bc + ac) * (ab - bc + ac) * (ab + bc - ac)) / (4 * (ab + bc + ac))) ** 0.5
+            try:
+                r = (((-ab + bc + ac) * (ab - bc + ac) * (ab + bc - ac)) / znam) ** 0.5
+            except Warning:
+                continue
             # Отсекаем фигуры в ходе вычисления которых возникла ошибка связанная с плавующей запятой
             # и фигуры радиус которых равен 0
-            if np.isnan(r) or r == 0:
-                continue
+            # if np.isnan(r) or r == 0:
+            #     continue
 
             # Находим соотношение АВ/ВС
             l1 = ab / bc
@@ -151,7 +161,7 @@ if __name__ == "__main__":
     from settings import DB_PATH
 
     import sqlite3
-    import time_and_memory
+    # import time_and_memory
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -178,4 +188,4 @@ if __name__ == "__main__":
 
     conn.close()
 
-    time_and_memory.endlog()
+    # time_and_memory.endlog()

@@ -10,8 +10,8 @@ class Report:
         self.path = path
 
     def do(self):
-        is_points = len(self.select_points) > 0  # если заданные точки выбраны
-        is_wires = len(self.select_wires) > 0  # если кабеля выбраны
+        is_points = len(self.select_points) > 0 and len(self.results_m3) > 0  # если заданные точки выбраны
+        is_wires = len(self.select_wires) > 0 and len(self.results_m2) > 0 # если кабеля выбраны
 
         if is_points or is_wires:
             workbook = xlsxwriter.Workbook(self.path)

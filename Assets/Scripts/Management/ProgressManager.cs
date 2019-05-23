@@ -33,7 +33,6 @@ namespace Management
         {
             if (_isOpen) throw new BusyException("Already open.");
 
-
             _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine(showProgress));
             _rotateRoutine = StartCoroutine(RotateRoutine());
 
@@ -42,6 +41,8 @@ namespace Management
 
         private IEnumerator UpdateProgressRoutine(bool showProgress)
         {
+            DatabaseManager.Instance.ResetProgress();
+
             _progressText.text = $"Загрузка данных{(showProgress == true ? " (0%)" : "")}..";
 
             while (true)

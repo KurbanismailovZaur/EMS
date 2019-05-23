@@ -552,6 +552,8 @@ namespace Management
             return mutuals.Count > 0 ? mutuals : null;
         }
 
+        public void ResetProgress() => _dbManager.Execute($"UPDATE {progress} SET percent = ?", 0f);
+
         public float GetProgress()
         {
             var progressInfos = _dbManager.Query<Progress>($"SELECT * FROM {progress}");

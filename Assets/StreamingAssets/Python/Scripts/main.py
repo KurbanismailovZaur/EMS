@@ -1,12 +1,14 @@
 import os
-import sys
+if os.name == 'nt':  # для Windows
+    import sys
 
-# Add vendor directory to module search path
-parent_dir = os.path.abspath(os.path.dirname(__file__))
-vendor_dir = os.path.join(parent_dir, 'python-embed-amd64/lib')
+    # Add vendor directory to module search path
+    parent_dir = os.path.abspath(os.path.dirname(__file__))
+    vendor_dir = os.path.join(parent_dir, 'python-embed-amd64/lib')
 
-sys.path.append(vendor_dir)
-sys.path.append(parent_dir)
+    sys.path.append(vendor_dir)
+    sys.path.append(parent_dir)
+
 
 from storage import Storage
 from m2 import Math2
@@ -388,21 +390,21 @@ def script_report(db_path, xlsx_path):
 
 if __name__ == "__main__":
     from settings import DB_PATH
-    
+
     import argparse
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-db', action='store', dest='db_path', default=DB_PATH, help='Путь к файлу базы данных')
     parser.add_argument('-xlsx', action='store', dest='xlsx_path', default='report.xlsx', help='Путь к файлу отчета')
     parser.add_argument('--create_figures', action='store_const', const=create_figures, default=default,
-                         help='Преобразование плоскостей в фигуры')
+                        help='Преобразование плоскостей в фигуры')
     parser.add_argument('--script_m3', action='store_const', const=script_m3, default=default,
-                         help='Расчет напряженности электрического поля в заданных точках')
+                        help='Расчет напряженности электрического поля в заданных точках')
     parser.add_argument('--script_m2', action='store_const', const=script_m2, default=default,
-                         help='Расчет взаимного воздействия кабелей БКС и БА на БКС')
+                        help='Расчет взаимного воздействия кабелей БКС и БА на БКС')
     parser.add_argument('--script_report', action='store_const', const=script_report, default=default,
-                         help='Генерация отчета')
-    
+                        help='Генерация отчета')
+
     results = parser.parse_args()
     results.create_figures(results.db_path)
     results.script_m3(results.db_path)
@@ -410,4 +412,3 @@ if __name__ == "__main__":
     results.script_report(results.db_path, results.xlsx_path)
     # script_m3('./db/ems.bytes')
     # script_report('./db/ems.bytes', './report.xlsx')
-    # default()
