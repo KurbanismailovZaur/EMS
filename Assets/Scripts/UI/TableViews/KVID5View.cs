@@ -11,6 +11,7 @@ using Management.Calculations;
 using Management.Tables;
 using UI.Tables;
 using UI.Panels;
+using UI.Dialogs;
 
 namespace UI.TableViews
 {
@@ -125,12 +126,11 @@ namespace UI.TableViews
 
             yield return null;
 
-            bool hasError;
-            var data = KVID5DataReader.ReadFromFile(_explorer.LastResult, out hasError);
+            var data = KVID5DataReader.ReadFromFile(_explorer.LastResult, out bool hasError);
 
             if (hasError)
             {
-                ErrorManager.Instance.ShowError("Вводимые данные содержат некорректные значения");
+                ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
                 yield break;
             }
 

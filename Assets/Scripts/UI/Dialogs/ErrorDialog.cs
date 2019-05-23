@@ -6,13 +6,10 @@ using static UnityEngine.Debug;
 using UnityEngine.UI;
 using System;
 
-namespace UI.Panels
+namespace UI.Dialogs
 {
-    public class ErrorManager : MonoSingleton<ErrorManager>
+    public class ErrorDialog : Dialog<ErrorDialog>
     {
-        [SerializeField]
-        private CanvasGroup _canvasGroup;
-
         [SerializeField]
         private Text _headerErrorText;
 
@@ -62,20 +59,12 @@ namespace UI.Panels
             Show();
         }
 
-        private void Show() => SetCanvasGroupParameters(1f, true);
-
-        public void Hide()
+        public new void Hide()
         {
             _headerErrorText.gameObject.SetActive(false);
             _headerWarningText.gameObject.SetActive(false);
 
-            SetCanvasGroupParameters(0f, false);
-        }
-
-        private void SetCanvasGroupParameters(float alpha, bool blocksRaycasts)
-        {
-            _canvasGroup.alpha = alpha;
-            _canvasGroup.blocksRaycasts = blocksRaycasts;
+            base.Hide();
         }
 
         #region Event handlers

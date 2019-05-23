@@ -13,6 +13,7 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using System.Threading;
 using UI.Panels;
+using UI.Dialogs;
 
 namespace Management.Models
 {
@@ -62,13 +63,13 @@ namespace Management.Models
             }
             catch (Exception ex)
             {
-                ErrorManager.Instance.ShowError("Модель вида имела неверный формат.", ex);
+                ErrorDialog.Instance.ShowError("Модель вида имела неверный формат.", ex);
                 return;
             }
 
             if (go.GetComponentsInChildren<MeshFilter>().Length == 0)
             {
-                ErrorManager.Instance.ShowError("Модель вида пуста.");
+                ErrorDialog.Instance.ShowError("Модель вида пуста.");
                 return;
             }
 
@@ -171,7 +172,7 @@ namespace Management.Models
 
         public async Task ImportPlanesAsync(string path)
         {
-            ProgressManager.Instance.Show("Вычисление плоскостей..", false);
+            ProgressDialog.Instance.Show("Вычисление плоскостей..", false);
 
             RemovePlanes();
 
@@ -191,8 +192,8 @@ namespace Management.Models
             {
                 await new WaitForUpdate();
 
-                ProgressManager.Instance.Hide();
-                ErrorManager.Instance.ShowError("Модель плоскостей имела неверный формат.", ex);
+                ProgressDialog.Instance.Hide();
+                ErrorDialog.Instance.ShowError("Модель плоскостей имела неверный формат.", ex);
 
                 return;
             }

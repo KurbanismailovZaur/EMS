@@ -14,6 +14,7 @@ using UnityScrollRect = UnityEngine.UI.ScrollRect;
 using System;
 using Management.Tables;
 using UI.Panels;
+using UI.Dialogs;
 
 namespace UI.TableViews
 {
@@ -194,12 +195,11 @@ namespace UI.TableViews
 
             yield return null;
 
-            bool hasError;
-            var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult, out hasError);
+            var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult, out bool hasError);
 
             if (hasError)
             {
-                ErrorManager.Instance.ShowError("Вводимые данные содержат некорректные значения");
+                ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
                 yield break;
             }
 

@@ -26,6 +26,7 @@ using System.Threading;
 using UI.Panels.Exceeding;
 using System;
 using UI.Panels;
+using UI.Dialogs;
 
 namespace Facades
 {
@@ -98,29 +99,16 @@ namespace Facades
         }
 
         #region Project
-        private void SaveProject() => StartCoroutine(SaveProjectRoutine());
-
-        private IEnumerator SaveProjectRoutine()
-        {
-            yield return FileExplorer.Instance.SaveFile("Сохранить Проект", null, "ems");
-
-            if (FileExplorer.Instance.LastResult == null) yield break;
-
-            ProjectManager.Instance.Save(FileExplorer.Instance.LastResult);
-        }
+        private void SaveProject() => ProjectManager.Instance.Save();
 
         private void LoadProject() => StartCoroutine(LoadProjectRoutine());
 
         private IEnumerator LoadProjectRoutine()
         {
-            yield return FileExplorer.Instance.OpenFile("Открыть Проект", null, "ems");
-
-            if (FileExplorer.Instance.LastResult == null) yield break;
-
             _isDeserializationState = true;
 
-            ProjectManager.Instance.Load(FileExplorer.Instance.LastResult);
-
+            yield return ProjectManager.Instance.Load();
+            
             _isDeserializationState = false;
         }
         #endregion
@@ -158,8 +146,8 @@ namespace Facades
             {
                 ModelManager.Instance.RemovePlanes();
 
-                ProgressManager.Instance.Hide();
-                ErrorManager.Instance.ShowError("Ошибка при вычислении фигур плоскостей.", ex);
+                ProgressDialog.Instance.Hide();
+                ErrorDialog.Instance.ShowError("Ошибка при вычислении фигур плоскостей.", ex);
             }
         }
         #endregion
@@ -188,7 +176,7 @@ namespace Facades
 
         private async Task CalculateMutualActionOfBCSAndBAAsync()
         {
-            ProgressManager.Instance.Show("Вычисление взаимного воздействия БКС и БА..");
+            ProgressDialog.Instance.Show("Вычисление взаимного воздействия БКС и БА..");
 
             await new WaitForBackgroundThread();
 
@@ -198,8 +186,8 @@ namespace Facades
             }
             catch (Exception ex)
             {
-                ProgressManager.Instance.Hide();
-                ErrorManager.Instance.ShowError("Ошибка при вычислении взаимного воздействия БКС и БА.", ex);
+                ProgressDialog.Instance.Hide();
+                ErrorDialog.Instance.ShowError("Ошибка при вычислении взаимного воздействия БКС и БА.", ex);
             }
 
             await new WaitForUpdate();
@@ -207,7 +195,7 @@ namespace Facades
             CalculationsManager.Instance.CalculateMutualActionOfBCSAndBA(WiringManager.Instance.Wiring);
             CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible = true;
 
-            ProgressManager.Instance.Hide();
+            ProgressDialog.Instance.Hide();
         }
 
         private void SetCurrentCalculations(CalculationBase calculation)
@@ -225,7 +213,7 @@ namespace Facades
 
         private async Task ContinueCalculateElectricFieldStrenghtInPythonAsync()
         {
-            ProgressManager.Instance.Show("Вычисление напряженности электрического поля..");
+            ProgressDialog.Instance.Show("Вычисление напряженности электрического поля..");
 
             var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => (p.Code, p.transform.position.x, p.transform.position.y, p.transform.position.z)).ToArray();
 
@@ -242,8 +230,8 @@ namespace Facades
 
                 CalculationsManager.Instance.RemoveElectricFieldStrenght();
 
-                ProgressManager.Instance.Hide();
-                ErrorManager.Instance.ShowError("Ошибка при вычислении напряженности электрического поля.", ex);
+                ProgressDialog.Instance.Hide();
+                ErrorDialog.Instance.ShowError("Ошибка при вычислении напряженности электрического поля.", ex);
 
                 return;
             }
@@ -252,7 +240,7 @@ namespace Facades
 
             CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
             CalculationsManager.Instance.ElectricFieldStrenght.IsVisible = true;
-            ProgressManager.Instance.Hide();
+            ProgressDialog.Instance.Hide();
         }
         #endregion
 

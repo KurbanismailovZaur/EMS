@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.UI;
 using Exceptions;
+using Management;
 
-namespace Management
+namespace UI.Dialogs
 {
-    public class ProgressManager : MonoSingleton<ProgressManager>
+    public class ProgressDialog : Dialog<ProgressDialog>
     {
-        [SerializeField]
-        private CanvasGroup _canvasGroup;
-
         [SerializeField]
         private Text _progressText;
 
@@ -36,7 +34,7 @@ namespace Management
             _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine(showProgress));
             _rotateRoutine = StartCoroutine(RotateRoutine());
 
-            SetCanvasGroupParameters(1f, true);
+            Show();
         }
 
         private IEnumerator UpdateProgressRoutine(bool showProgress)
@@ -63,20 +61,14 @@ namespace Management
             }
         }
 
-        public void Hide()
+        public new void Hide()
         {
             StopCoroutine(_updateProgressRoutine);
             StopCoroutine(_rotateRoutine);
 
             _updateProgressRoutine = null;
 
-            SetCanvasGroupParameters(0f, false);
-        }
-
-        private void SetCanvasGroupParameters(float alpha, bool blocksRaycasts)
-        {
-            _canvasGroup.alpha = alpha;
-            _canvasGroup.blocksRaycasts = blocksRaycasts;
+            base.Hide();
         }
     }
 }

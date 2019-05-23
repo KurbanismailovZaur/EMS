@@ -17,6 +17,7 @@ using System.Linq;
 using System;
 using UnityEngine.Networking;
 using TableMaterial = Management.Tables.Material;
+using UI.Dialogs;
 
 namespace Management
 {
@@ -279,7 +280,7 @@ namespace Management
 
             await new WaitForUpdate();
 
-            ProgressManager.Instance.Hide();
+            ProgressDialog.Instance.Hide();
         }
 
         public void RemovePlanes()

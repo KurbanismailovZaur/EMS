@@ -7,12 +7,13 @@ using UI.Main.Contexts;
 using UnityEngine.Events;
 using UI.Exploring.FileSystem;
 using System.IO;
+using UI.Dialogs;
 
 namespace Management.Projects
 {
     public class ProjectManager : MonoSingleton<ProjectManager>
     {
-        private Project? _project;
+        private Project _project;
 
         #region Events
         public UnityEvent Created;
@@ -29,20 +30,67 @@ namespace Management.Projects
             Created.Invoke();
         }
 
-        public void Load(string path)
+        public Coroutine Load()
         {
             New();
 
-            ProjectSerializer.Deserialize(path);
+            return StartCoroutine(LoadRoutine());
         }
 
-        public void Save(string path) => ProjectSerializer.Serialize(path);
-
-        public void Close()
+        private IEnumerator LoadRoutine()
         {
-            if (_project == null) return;
+            yield return FileExplorer.Instance.OpenFile("Открыть Проект", null, "ems");
 
-            CheckChangingAndShowDialog();
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            ProjectSerializer.Deserialize(FileExplorer.Instance.LastResult);
+
+            _project.Path = FileExplorer.Instance.LastResult;
+            _project.WasChanged = false;
+        }
+
+        public Coroutine Save() => StartCoroutine(SaveRoutine());
+
+        private IEnumerator SaveRoutine()
+        {
+            if (string.IsNullOrEmpty(_project.Path))
+            {
+                yield return FileExplorer.Instance.SaveFile("Сохранить Проект", null, "ems");
+
+                if (FileExplorer.Instance.LastResult == null) yield break;
+
+                Serialize(FileExplorer.Instance.LastResult);
+            }
+            else
+                Serialize(_project.Path);
+        }
+
+        private void Serialize(string path)
+        {
+            ProjectSerializer.Serialize(path);
+
+            _project.Path = FileExplorer.Instance.LastResult;
+            _project.WasChanged = false;
+        }
+
+        public void Close() => StartCoroutine(CloseRoutine());
+
+        private IEnumerator CloseRoutine()
+        {
+            if (_project == null) yield break;
+
+            if (_project.WasChanged)
+            {
+                yield return QuestionDialog.Instance.Open("Внимание!", "Если не сохранить, проект изменения будут потеряны.\nСохранить проект?");
+
+                if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Cancel)
+                    yield break;
+
+                if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Yes)
+                {
+                    yield return Save();
+                }
+            }
 
             _project = null;
 
@@ -54,11 +102,56 @@ namespace Management.Projects
             Application.Quit();
         }
 
-        private void CheckChangingAndShowDialog()
+        private void MarkProjectAsChanged()
         {
-            if (_project == null) return;
-
-            //TODO: modal dialog to save current project if it was changed
+            if (_project != null)
+                _project.WasChanged = true;
         }
+
+        #region Event handlers
+        public void ModelManager_ModelImported() => MarkProjectAsChanged();
+
+        public void ModelManager_ModelRemoved() => MarkProjectAsChanged();
+
+        public void ModelManager_PlanesImported() => MarkProjectAsChanged();
+
+        public void ModelManager_PlanesRemoved() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID1Imported() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID1Removed() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID2Imported() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID2Removed() => MarkProjectAsChanged();
+
+        public void WiringManager_Imported() => MarkProjectAsChanged();
+
+        public void WiringManager_Removed() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID4Imported() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID4Removed() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID5Imported() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID5Removed() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID81Imported() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID81Removed() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID82Imported() => MarkProjectAsChanged();
+
+        public void TableDataManager_KVID82Removed() => MarkProjectAsChanged();
+
+        public void ElectricFieldStrenght_Calculated() => MarkProjectAsChanged();
+
+        public void ElectricFieldStrenght_Removed() => MarkProjectAsChanged();
+
+        public void MutualActionOfBCSAndBA_Calculated() => MarkProjectAsChanged();
+
+        public void MutualActionOfBCSAndBA_Removed() => MarkProjectAsChanged();
+        #endregion
     }
 }

@@ -6,12 +6,12 @@ using static UnityEngine.Debug;
 
 namespace Management.Projects
 {
-	public struct Project 
+	public class Project 
 	{
-        private string _path;
+        public string Path { get; set; }
 
-        private string _name;
+        public string Name => System.IO.Path.GetFileNameWithoutExtension(Path);
 
-        private bool _wasChanged;
-	}
+        public bool WasChanged { get; set; } = true;
+    }
 }

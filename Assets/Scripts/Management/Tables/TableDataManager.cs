@@ -10,8 +10,8 @@ using UnityEngine.Events;
 
 namespace Management.Tables
 {
-	public class TableDataManager : MonoSingleton<TableDataManager> 
-	{
+    public class TableDataManager : MonoSingleton<TableDataManager>
+    {
         [SerializeField]
         private string _referencesDataPath;
 
@@ -26,7 +26,7 @@ namespace Management.Tables
         private List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> _kvid5Data =
             new List<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)>();
 
-        private List<(string pointID, float maxVoltage, int fMin, int fMax)> _kvid8Tab0Data = 
+        private List<(string pointID, float maxVoltage, int fMin, int fMax)> _kvid8Tab0Data =
             new List<(string pointID, float maxVoltage, int fMin, int fMax)>();
 
         private List<(string idES, string wireID, float maxVoltage, int fMin, int fMax)> _kvid8Tab1Data =
@@ -70,7 +70,7 @@ namespace Management.Tables
 
         public ReadOnlyCollection<WireMark> WireMarks => new ReadOnlyCollection<WireMark>(_wireMarks);
 
-        public ReadOnlyCollection<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> KVID2Data => 
+        public ReadOnlyCollection<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> KVID2Data =>
             new ReadOnlyCollection<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)>(_kvid2Data);
 
         public ReadOnlyCollection<(string code, Vector3 point, string type, int? iR, int? oV, int? oF, string bBA, string conType)> KVID5Data =>
@@ -107,16 +107,17 @@ namespace Management.Tables
         {
             (_materials, _wireMarks) = (materials, wireMarks);
 
+            if (updateDatabase)
+            {
+                DatabaseManager.Instance.UpdateKVID1(_materials);
+                DatabaseManager.Instance.UpdateKVID4(_wireMarks);
+            }
+
             IsKVID1Imported = _materials?.Count > 0;
-            CallEvent(KVID1Imported, KVID1Removed, IsKVID1Imported);
-
             IsKVID4Imported = _wireMarks?.Count > 0;
+
+            CallEvent(KVID1Imported, KVID1Removed, IsKVID1Imported);
             CallEvent(KVID4Imported, KVID4Removed, IsKVID4Imported);
-
-            if (!updateDatabase) return;
-
-            DatabaseManager.Instance.UpdateKVID1(_materials);
-            DatabaseManager.Instance.UpdateKVID4(_wireMarks);
         }
 
         public void SetKVID2Data(List<(string tabName, string productName, Vector3 center, List<(float? x, float? y)> voltage)> data, bool updateDatabase = true)
@@ -124,11 +125,11 @@ namespace Management.Tables
             _kvid2Data = data;
 
             IsKVID2Imported = _kvid2Data?.Count > 0;
+
+            if (updateDatabase)
+                DatabaseManager.Instance.UpdateKVID2(_kvid2Data);
+
             CallEvent(KVID2Imported, KVID2Removed, IsKVID2Imported);
-
-            if (!updateDatabase) return;
-
-            DatabaseManager.Instance.UpdateKVID2(_kvid2Data);
         }
 
         public void SetKVID3References(List<string> usableKVID5RowIds)
@@ -141,14 +142,11 @@ namespace Management.Tables
             _kvid5Data = data;
             _usableKVID2TabNames = usableKVID2Tabs;
 
-
+            if (updateDatabase)
+                DatabaseManager.Instance.UpdateKVID5(_kvid5Data);
 
             IsKVID5Imported = _kvid5Data?.Count > 0;
             CallEvent(KVID5Imported, KVID5Removed, IsKVID5Imported);
-
-            if (!updateDatabase) return;
-
-            DatabaseManager.Instance.UpdateKVID5(_kvid5Data);
         }
 
         public void SetKVID8Data(List<(string pointID, float maxVoltage, int fMin, int fMax)> tab0Data, List<(string idES, string wireID, float maxVoltage, int fMin, int fMax)> tab1Data, bool updateDatabase = true)
@@ -156,15 +154,14 @@ namespace Management.Tables
             _kvid8Tab0Data = tab0Data;
             _kvid8Tab1Data = tab1Data;
 
+            if (updateDatabase)
+                DatabaseManager.Instance.UpdateKVID8(_kvid8Tab0Data, _kvid8Tab1Data);
+
             IsKVID81Imported = _kvid8Tab0Data?.Count > 0;
-            CallEvent(KVID81Imported, KVID81Removed, IsKVID81Imported);
-
             IsKVID82Imported = _kvid8Tab1Data?.Count > 0;
+
+            CallEvent(KVID81Imported, KVID81Removed, IsKVID81Imported);
             CallEvent(KVID82Imported, KVID82Removed, IsKVID82Imported);
-
-            if (!updateDatabase) return;
-
-            DatabaseManager.Instance.UpdateKVID8(_kvid8Tab0Data, _kvid8Tab1Data);
         }
 
         private void CallEvent(UnityEvent importEvent, UnityEvent removeEvent, bool state)
