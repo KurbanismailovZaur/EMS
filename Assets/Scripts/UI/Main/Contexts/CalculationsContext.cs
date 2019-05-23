@@ -53,12 +53,6 @@ namespace UI.Main.Contexts
         private Toggle _mutualVisibilityToggle;
 
         [SerializeField]
-        private UnityButton _staticTimeButton;
-
-        [SerializeField]
-        private UnityButton _dynamicTimeButton;
-
-        [SerializeField]
         private UnityButton _electricRemoveButton;
 
         [SerializeField]
