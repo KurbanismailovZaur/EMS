@@ -123,9 +123,6 @@ namespace UI.TableViews
 
             if (_explorer.LastResult == null) yield break;
 
-            Clear();
-
-            yield return null;
 
             try
             {
@@ -136,6 +133,9 @@ namespace UI.TableViews
                     ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
                     yield break;
                 }
+
+                Clear();
+
 
                 foreach (var (code, position, type, iR, oV, oF, bBA, conType) in data)
                 {

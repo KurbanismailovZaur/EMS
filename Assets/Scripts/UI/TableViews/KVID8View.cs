@@ -140,14 +140,13 @@ namespace UI.TableViews
 
             if (_explorer.LastResult == null) yield break;
 
-            Clear();
-
-            yield return null;
-
 
             try
             {
                 var kvid8Data = KVID8DataReader.ReadFromFile(_explorer.LastResult);
+
+                Clear();
+
 
                 var table0 = _tabsAssociations[0].table;
                 var table1 = _tabsAssociations[1].table;

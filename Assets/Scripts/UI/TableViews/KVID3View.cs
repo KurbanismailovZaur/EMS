@@ -191,10 +191,6 @@ namespace UI.TableViews
 
             if (_explorer.LastResult == null) yield break;
 
-            Clear();
-
-            yield return null;
-
             try
             {
                 var tabs = KVID3DataReader.ReadFromFile(_explorer.LastResult, out bool hasError);
@@ -204,6 +200,8 @@ namespace UI.TableViews
                     ErrorDialog.Instance.ShowError("Вводимые данные содержат некорректные значения");
                     yield break;
                 }
+
+                Clear();
 
                 Add(tabs);
             }
@@ -237,7 +235,7 @@ namespace UI.TableViews
         private void RemoveTab(Tab tab)
         {
             SelectPreviousOrNextTab(tab);
-            Destroy(tab.gameObject);
+            DestroyImmediate(tab.gameObject);
 
             _tabNextIndex = 0;
         }
@@ -324,12 +322,12 @@ namespace UI.TableViews
 
         private void RemoveTable(Table table)
         {
-            Destroy(table.gameObject);
+            DestroyImmediate(table.gameObject);
         }
 
         private void RemoveHeader(GameObject header)
         {
-            Destroy(header);
+            DestroyImmediate(header);
         }
 
         protected override void SelectTab(Tab tab)

@@ -170,13 +170,12 @@ namespace UI.TableViews
 
             if (_explorer.LastResult == null) yield break;
 
-            Clear();
-
-            yield return null;
 
             try
             {
                 var points = KVID6DataReader.ReadFromFile(_explorer.LastResult);
+
+                Clear();
 
 
                 int lastTableRowsCount = 0;

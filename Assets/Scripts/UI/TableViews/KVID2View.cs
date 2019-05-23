@@ -117,9 +117,9 @@ namespace UI.TableViews
             for (int i = 0; i < _tabsAssociations.Count; ++i)
             {
                 _tabsAssociations[i].table.Clear();
-                Destroy(_tabsAssociations[i].tab.gameObject);
-                Destroy(_tabsAssociations[i].table.gameObject);
-                Destroy(_tabsAssociations[i].header);
+                DestroyImmediate(_tabsAssociations[i].tab.gameObject);
+                DestroyImmediate(_tabsAssociations[i].table.gameObject);
+                DestroyImmediate(_tabsAssociations[i].header);
             }
 
             _tabsAssociations.Clear();
@@ -152,14 +152,13 @@ namespace UI.TableViews
 
             if (_explorer.LastResult == null) yield break;
 
-            Clear();
 
-            yield return null;
 
             try
             {
                 var tabs = KVID2DataReader.ReadFromFile(_explorer.LastResult);
 
+                Clear();
 
 
                 foreach (var (tab, productName, center, voltages) in tabs)
