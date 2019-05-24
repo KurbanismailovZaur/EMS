@@ -174,11 +174,20 @@ namespace UI.TableViews
                 wires.Add(Wire.Factory.Create(data.name, type, i, p, data.points));
             }
 
-            TableDataManager.Instance.SetKVID3References(usableKVID5RowIds);
+            if (wires.Count > 0)
+            {
 
-            var wiring = Wiring.Factory.Create(wires);
+                TableDataManager.Instance.SetKVID3References(usableKVID5RowIds);
 
-            WiringManager.Instance.Import(wiring);
+                var wiring = Wiring.Factory.Create(wires);
+
+                WiringManager.Instance.Import(wiring);
+            }
+            else
+            {
+                TableDataManager.Instance.SetKVID3References(usableKVID5RowIds);
+                WiringManager.Instance.Remove();
+            }
 
             Close();
         }
