@@ -137,6 +137,14 @@ namespace Control
                     SetTransformToCurrent();
                 }
             }
+            else if (IsAnchorModeTurnedOffRightNow())
+            {
+                if (GetAnchoredVectors(out Vector3 positionVector, out Vector3 upVector))
+                {
+                    _targetVector = _currentVector = positionVector;
+                    _targetUpVector = _currentUpVector = upVector;
+                }
+            }
             else
             {
                 SetTransformToCurrent();
@@ -144,6 +152,8 @@ namespace Control
         }
 
         private bool IsAnchorMode() => Input.GetKey(KeyCode.LeftAlt);
+
+        private bool IsAnchorModeTurnedOffRightNow() => Input.GetKeyUp(KeyCode.LeftAlt);
 
         private void SetTransformToCurrent()
         {
