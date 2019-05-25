@@ -85,8 +85,6 @@ namespace Management.Calculations
 
             IsCalculated = true;
             Calculated.Invoke();
-
-            PopupManager.Instance.PopSuccess("Напряженность электрического поля вычислена");
         }
 
         public void SetStrenghts(List<(string name, bool exceeded, double[] values)> strenghts)

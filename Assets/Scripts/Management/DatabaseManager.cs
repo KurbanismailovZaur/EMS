@@ -217,7 +217,7 @@ namespace Management
         {
             public string id { get; set; }
 
-            public float percent { get; set; }
+            public string percent { get; set; }
         }
         #endregion
 
@@ -555,12 +555,14 @@ namespace Management
             return mutuals.Count > 0 ? mutuals : null;
         }
 
-        public void ResetProgress() => _dbManager.Execute($"UPDATE {progress} SET percent = ?", 0f);
+        public void ResetProgress() => _dbManager.Execute($"UPDATE {progress} SET percent = ?", "0%");
 
-        public float GetProgress()
+        public void SetProgress(string progress) => _dbManager.Execute($"UPDATE {DatabaseManager.progress} SET percent = ?", progress);
+
+        public string GetProgress()
         {
             var progressInfos = _dbManager.Query<Progress>($"SELECT * FROM {progress}");
-            return progressInfos.Count > 0 ? progressInfos[0].percent : 0f;
+            return progressInfos.Count > 0 ? progressInfos[0].percent : "0";
         }
 
         public void Disconnect() => _dbManager.Close();

@@ -27,27 +27,23 @@ namespace UI.Dialogs
         [Range(0f, 360)]
         private float _rotateSpeed = 90f;
 
-        public void Show(string text, bool showProgress = true)
+        public void Show(string text)
         {
             if (_isOpen) throw new BusyException("Already open.");
 
-            _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine(showProgress));
+            _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine(text));
             _rotateRoutine = StartCoroutine(RotateRoutine());
 
             Show();
         }
 
-        private IEnumerator UpdateProgressRoutine(bool showProgress)
+        private IEnumerator UpdateProgressRoutine(string text)
         {
-            DatabaseManager.Instance.ResetProgress();
-
-            _progressText.text = $"Загрузка данных{(showProgress == true ? " (0%)" : "")}..";
-
             while (true)
             {
-                yield return new WaitForSeconds(1f);
+                _progressText.text = $"{text} ({DatabaseManager.Instance.GetProgress()})..";
 
-                _progressText.text = $"Загрузка данных{(showProgress == true ? $" ({DatabaseManager.Instance.GetProgress().ToString()}%)" : "")}..";
+                yield return new WaitForSeconds(1f);
             }
         }
 

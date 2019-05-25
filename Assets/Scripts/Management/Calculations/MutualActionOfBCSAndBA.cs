@@ -52,8 +52,6 @@ namespace Management.Calculations
             Calculated.Invoke();
 
             FilterMaxValue = maxValue;
-
-            PopupManager.Instance.PopSuccess("Напряженность взаимного воздействия БКС и БА вычислена");
         }
 
         public override void Remove()

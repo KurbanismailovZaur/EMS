@@ -188,7 +188,8 @@ namespace Facades
 
         private async Task CalculateMutualActionOfBCSAndBAAsync()
         {
-            ProgressDialog.Instance.Show("Вычисление взаимного воздействия БКС и БА..");
+            DatabaseManager.Instance.ResetProgress();
+            ProgressDialog.Instance.Show("Вычисление взаимного воздействия БКС и БА");
 
             await new WaitForBackgroundThread();
 
@@ -208,6 +209,7 @@ namespace Facades
             CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible = true;
 
             ProgressDialog.Instance.Hide();
+            PopupManager.Instance.PopSuccess("Напряженность взаимного воздействия БКС и БА вычислена");
         }
 
         private void SetCurrentCalculations(CalculationBase calculation)
@@ -225,7 +227,8 @@ namespace Facades
 
         private async Task ContinueCalculateElectricFieldStrenghtInPythonAsync()
         {
-            ProgressDialog.Instance.Show("Вычисление напряженности электрического поля..");
+            DatabaseManager.Instance.ResetProgress();
+            ProgressDialog.Instance.Show("Вычисление напряженности электрического поля");
 
             var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => (p.Code, p.transform.localPosition.x, p.transform.localPosition.y, p.transform.localPosition.z)).ToArray();
 
@@ -253,6 +256,7 @@ namespace Facades
             CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
             CalculationsManager.Instance.ElectricFieldStrenght.IsVisible = true;
             ProgressDialog.Instance.Hide();
+            PopupManager.Instance.PopSuccess("Напряженность электрического поля вычислена");
         }
 
         private void FilterCurrentCalculations(float min, float max) => _currentCalculations?.Filter(min, max);
