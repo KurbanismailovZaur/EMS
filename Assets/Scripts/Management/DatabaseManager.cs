@@ -18,6 +18,7 @@ using System;
 using UnityEngine.Networking;
 using TableMaterial = Management.Tables.Material;
 using UI.Dialogs;
+using UI.Popups;
 
 namespace Management
 {
@@ -281,6 +282,7 @@ namespace Management
             await new WaitForUpdate();
 
             ProgressDialog.Instance.Hide();
+            PopupManager.Instance.PopSuccess("Плоскости импортированы");
         }
 
         public void RemovePlanes()

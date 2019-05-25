@@ -21,8 +21,7 @@ namespace UI.Main.Contexts
             Edit5KVID,
             Edit8KVID,
             Visibility,
-            Edit,
-            Remove
+            Edit
         }
         #endregion
 
@@ -83,8 +82,6 @@ namespace UI.Main.Contexts
         public void Visibility() => Selected.Invoke(Action.Visibility);
 
         public void Edit() => Selected.Invoke(Action.Edit);
-
-        public void Remove() => Selected.Invoke(Action.Remove);
 
         #region Event handlers
         public void ProjectManager_Created()

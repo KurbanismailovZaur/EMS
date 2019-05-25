@@ -9,6 +9,7 @@ using UnityEngine.Events;
 using System;
 using UnityRandom = UnityEngine.Random;
 using Management.Interop;
+using UI.Popups;
 
 namespace Management.Calculations
 {
@@ -51,6 +52,8 @@ namespace Management.Calculations
             Calculated.Invoke();
 
             FilterMaxValue = maxValue;
+
+            PopupManager.Instance.PopSuccess("Напряженность взаимного воздействия БКС и БА вычислена");
         }
 
         public override void Remove()

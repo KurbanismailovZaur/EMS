@@ -15,6 +15,9 @@ namespace UI.Sequencing
         [Serializable]
         public class ChangedEvent : UnityEvent<int> { }
 
+        [Serializable]
+        public class VisibilityChangedEvent : UnityEvent<bool> { }
+
         [SerializeField]
         private CanvasGroup _canvasGroup;
 
@@ -41,6 +44,8 @@ namespace UI.Sequencing
 
         public ChangedEvent Changed;
 
+        public VisibilityChangedEvent VisibilityChanged;
+
         private void Start()
         {
             _slider.onValueChanged.AddListener(Slider_OnValueChanged);
@@ -61,6 +66,8 @@ namespace UI.Sequencing
         {
             _canvasGroup.alpha = alpha;
             _canvasGroup.blocksRaycasts = blockRaycast;
+
+            VisibilityChanged.Invoke(alpha == 1f ? true : false);
         }
 
         public void Play()

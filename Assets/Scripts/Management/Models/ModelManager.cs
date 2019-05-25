@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using UI.Panels;
 using UI.Dialogs;
+using UI.Popups;
 
 namespace Management.Models
 {
@@ -112,6 +113,7 @@ namespace Management.Models
             }
 
             ModelImported.Invoke();
+            PopupManager.Instance.PopSuccess("Модель вида импортирована");
         }
 
         private Bounds GetBounds(GameObject go)

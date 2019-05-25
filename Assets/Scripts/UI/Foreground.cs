@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Threading.Tasks;
 using static UnityEngine.Debug;
-using Numba.Tweens;
+using DG.Tweening;
 using System;
 
 namespace UI
@@ -28,7 +28,7 @@ namespace UI
 
             _isBusy = true;
 
-            return _group.DoAlpha(visibility, _duration).OnComplete(() => { _isBusy = false; _group.blocksRaycasts = blockRaycast; }).Play();
+            return _group.DOFade(visibility, _duration).OnComplete(() => { _isBusy = false; _group.blocksRaycasts = blockRaycast; }).Play();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Management.Calculations
                     wire._points = mutual.wire.Points.ToList();
 
                     #region Collider line
-                    var colliderLine = VectorLine.SetLine3D(new Color(0f, 0f, 0f, 0f), mutual.wire.Points.Select(p => p.position).ToArray());
+                    var colliderLine = VectorLine.SetLine3D(new Color(0f, 0f, 0f, 0f), wire._line.points3.ToArray());
                     colliderLine.Draw3DAuto();
 
                     colliderLine.name = "Collider";

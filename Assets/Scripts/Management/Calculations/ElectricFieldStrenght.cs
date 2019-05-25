@@ -8,6 +8,7 @@ using UnityEngine.Events;
 using UnityRandom = UnityEngine.Random;
 using System.Linq;
 using System.Collections.ObjectModel;
+using UI.Popups;
 
 namespace Management.Calculations
 {
@@ -84,6 +85,8 @@ namespace Management.Calculations
 
             IsCalculated = true;
             Calculated.Invoke();
+
+            PopupManager.Instance.PopSuccess("Напряженность электрического поля вычислена");
         }
 
         public void SetStrenghts(List<(string name, bool exceeded, double[] values)> strenghts)

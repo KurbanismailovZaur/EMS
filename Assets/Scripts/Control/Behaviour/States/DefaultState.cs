@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UI;
 using UnityEngine.UI;
+using DG.Tweening;
 
 namespace Control.Behaviour.States
 {
@@ -30,7 +31,7 @@ namespace Control.Behaviour.States
             _scaler.scaleFactor = Screen.dpi / _referenceDPI;
 #endif
 
-            yield return _foreground.Hide();
+            yield return _foreground.Hide().WaitForCompletion();
 
             Destroy(_foreground.gameObject);
         }

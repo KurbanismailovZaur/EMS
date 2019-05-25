@@ -28,6 +28,7 @@ using System;
 using UI.Panels;
 using UI.Dialogs;
 using System.IO;
+using UI.Popups;
 
 namespace Facades
 {
@@ -419,9 +420,6 @@ namespace Facades
                 case WiringContext.Action.Edit:
                     WiringManager.Instance.Edit();
                     break;
-                case WiringContext.Action.Remove:
-                    WiringManager.Instance.Remove();
-                    break;
             }
         }
 
@@ -430,6 +428,7 @@ namespace Facades
             if (_isDeserializationState) return;
 
             DatabaseManager.Instance.UpdateKVID3(WiringManager.Instance.Wiring);
+            PopupManager.Instance.PopSuccess("БКС обновлены");
         }
 
         public void WiringManager_VisibilityChanged()
