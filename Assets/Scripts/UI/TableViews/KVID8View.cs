@@ -85,7 +85,7 @@ namespace UI.TableViews
 
         protected override void LoadData()
         {
-            if (TableDataManager.Instance.KVID8Tab0Data.Count == 0 || TableDataManager.Instance.KVID8Tab1Data.Count == 0) return;
+            //if (TableDataManager.Instance.KVID8Tab0Data.Count == 0 || TableDataManager.Instance.KVID8Tab1Data.Count == 0) return;
 
             var table0 = _tabsAssociations[0].table;
             var table1 = _tabsAssociations[1].table;

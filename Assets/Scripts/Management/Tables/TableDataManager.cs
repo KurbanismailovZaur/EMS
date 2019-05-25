@@ -160,8 +160,25 @@ namespace Management.Tables
             IsKVID81Imported = _kvid8Tab0Data?.Count > 0;
             IsKVID82Imported = _kvid8Tab1Data?.Count > 0;
 
-            CallEvent(KVID81Imported, KVID81Removed, IsKVID81Imported);
-            CallEvent(KVID82Imported, KVID82Removed, IsKVID82Imported);
+            if (IsKVID81Imported ^ IsKVID82Imported)
+            {
+                if(IsKVID82Imported)
+                {
+                    CallEvent(KVID81Imported, KVID81Removed, IsKVID81Imported);
+                    CallEvent(KVID82Imported, KVID82Removed, IsKVID82Imported);
+                }
+
+                if(IsKVID81Imported)
+                {
+                    CallEvent(KVID82Imported, KVID82Removed, IsKVID82Imported);
+                    CallEvent(KVID81Imported, KVID81Removed, IsKVID81Imported);
+                }
+            }
+            else
+            {
+                CallEvent(KVID81Imported, KVID81Removed, IsKVID81Imported);
+                CallEvent(KVID82Imported, KVID82Removed, IsKVID82Imported);
+            }
         }
 
         private void CallEvent(UnityEvent importEvent, UnityEvent removeEvent, bool state)

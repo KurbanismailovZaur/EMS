@@ -145,7 +145,7 @@ namespace UI.Main.Contexts
 
         public void TableDataManager_KVID8Removed()
         {
-            _8KVIDImage.enabled = true;
+            _8KVIDImage.enabled = false;
         }
         #endregion
     }
