@@ -25,7 +25,7 @@ namespace Control.Behaviour.States
 
         private IEnumerator EnterRoutine()
         {
-            Screen.SetResolution((int)DefaultSettings.Screen.Size.x, (int)DefaultSettings.Screen.Size.y, FullScreenMode.Windowed);
+            //Screen.SetResolution((int)DefaultSettings.Screen.Size.x, (int)DefaultSettings.Screen.Size.y, FullScreenMode.Windowed);
 
 #if !UNITY_EDITOR
             _scaler.scaleFactor = Screen.dpi / _referenceDPI;
