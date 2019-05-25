@@ -55,6 +55,10 @@ namespace Control
         private bool _isMouseInViewport;
 
         [SerializeField]
+        [Range(0f, 24f)]
+        private float _anchorAngle = 8f;
+
+        [SerializeField]
         private bool _isActive;
 
         #region Editor
@@ -85,7 +89,7 @@ namespace Control
         {
             CalculateTargetSize();
 
-            SetTransformToTargets();
+            SetTransformToTargetsOrAnchor();
             SetSizeToTarget();
 
             CheckPlanarShifting();
@@ -120,13 +124,77 @@ namespace Control
             Size += -Input.GetAxis("Mouse ScrollWheel") * _mouseScrollMultiplier;
         }
 
-        private void SetTransformToTargets()
+        private void SetTransformToTargetsOrAnchor()
+        {
+            if (IsAnchorMode())
+            {
+                if (GetAnchoredVectors(out Vector3 positionVector, out Vector3 upVector))
+                {
+                    SetTrasnsform(positionVector, upVector);
+                }
+                else
+                {
+                    SetTransformToCurrent();
+                }
+            }
+            else
+            {
+                SetTransformToCurrent();
+            }
+        }
+
+        private bool IsAnchorMode() => Input.GetKey(KeyCode.LeftAlt);
+
+        private void SetTransformToCurrent()
         {
             _currentVector = Quaternion.Lerp(Quaternion.LookRotation(_currentVector, _targetUpVector), Quaternion.LookRotation(_targetVector, _targetUpVector), _transformInterpolation * Time.deltaTime) * Vector3.forward;
             _currentUpVector = Quaternion.Lerp(Quaternion.LookRotation(_currentUpVector, _currentVector), Quaternion.LookRotation(_targetUpVector, _targetVector), _transformInterpolation * Time.deltaTime) * Vector3.forward;
 
-            transform.position = _origin + (_currentVector * _offset);
-            transform.LookAt(_origin, _currentUpVector);
+            SetTrasnsform(_currentVector, _currentUpVector);
+        }
+
+        private void SetTrasnsform(Vector3 positionVector, Vector3 upVector)
+        {
+            transform.position = _origin + (positionVector * _offset);
+            transform.LookAt(_origin, upVector);
+        }
+
+        private bool GetAnchoredVectors(out Vector3 positionVector, out Vector3 upVector)
+        {
+            positionVector = upVector = Vector3.zero;
+
+            if (TryAnchorToAxis(Vector3.right, Vector3.up, ref positionVector, ref upVector))
+                return true;
+
+            if (TryAnchorToAxis(-Vector3.right, Vector3.up, ref positionVector, ref upVector))
+                return true;
+
+            if (TryAnchorToAxis(Vector3.up, Vector3.forward, ref positionVector, ref upVector))
+                return true;
+
+            if (TryAnchorToAxis(-Vector3.up, -Vector3.forward, ref positionVector, ref upVector))
+                return true;
+
+            if (TryAnchorToAxis(Vector3.forward, Vector3.up, ref positionVector, ref upVector))
+                return true;
+
+            if (TryAnchorToAxis(-Vector3.forward, Vector3.up, ref positionVector, ref upVector))
+                return true;
+
+            return false;
+        }
+
+        private bool TryAnchorToAxis(Vector3 axis, Vector3 associatedUpVector, ref Vector3 positionVector, ref Vector3 upVector)
+        {
+            if (Vector3.Angle(_targetVector, axis) <= _anchorAngle)
+            {
+                positionVector = axis;
+                upVector = associatedUpVector;
+
+                return true;
+            }
+
+            return false;
         }
 
         private void SetSizeToTarget()
@@ -167,7 +235,7 @@ namespace Control
 
                 var deltaX = mouseDelta.x / Screen.width * Camera.orthographicSize * Camera.aspect * 2f;
                 var deltaY = mouseDelta.y / Screen.height * Camera.orthographicSize * 2f;
-                
+
                 _origin = originStartPosition - (right * deltaX) - (up * deltaY);
 
                 yield return null;
