@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.UI;
 using System;
+using UI.Exploring.FileSystem;
+using System.IO;
+using UI.Popups;
+using System.Text.RegularExpressions;
 
 namespace UI.Dialogs
 {
@@ -22,7 +26,14 @@ namespace UI.Dialogs
         [SerializeField]
         private Button _closeButton;
 
-        private void Awake() => _closeButton.onClick.AddListener(CloseButton_OnClick);
+        [SerializeField]
+        private Button _saveButton;
+
+        private void Awake()
+        {
+            _closeButton.onClick.AddListener(CloseButton_OnClick);
+            _saveButton.onClick.AddListener(SaveButton_OnClick);
+        }
 
         public void ShowError(string description, Exception ex) => Show(_headerErrorText, $"<color=#FF8080>Описание:</color>\n{description}\n\n<color=#FF8080>Сообщение:</color>\n{ex.Message}\n\n<color=#FF8080>Трассировка пути:</color>\n{ex.StackTrace}");
 
@@ -67,8 +78,33 @@ namespace UI.Dialogs
             base.Hide();
         }
 
+        private void Save() => StartCoroutine(SaveRoutine());
+
+        private IEnumerator SaveRoutine()
+        {
+            yield return FileExplorer.Instance.SaveFile("Сохранить отчет об ошибке", null, "txt", "BugReport");
+
+            if (FileExplorer.Instance.LastResult == null) yield break;
+
+            try
+            {
+                File.WriteAllText(FileExplorer.Instance.LastResult, _infoText.text);
+            }
+            catch
+            {
+                Hide();
+                PopupManager.Instance.PopError("Невозможно создать отчет об ошибке");
+
+                yield break;
+            }
+            Hide();
+            PopupManager.Instance.PopSuccess("Отчет об ошибке успешно сохранен");
+        }
+
         #region Event handlers
         private void CloseButton_OnClick() => Hide();
+
+        private void SaveButton_OnClick() => Save();
         #endregion
     }
 }
