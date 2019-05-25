@@ -358,7 +358,7 @@ class Storage:
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
-        cursor.execute(f"UPDATE Progress SET percent = {percent}")
+        cursor.execute(f"UPDATE Progress SET percent = '{percent}'")
 
         conn.commit()
 
@@ -367,5 +367,4 @@ class Storage:
 
 if __name__ == "__main__":
     storage = Storage('../db/ems.bytes')
-    storage.set_progress(0)
     # print(list(storage.get_BBAs()))

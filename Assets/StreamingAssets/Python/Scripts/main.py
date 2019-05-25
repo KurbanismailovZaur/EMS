@@ -33,10 +33,23 @@ def default(*args):  # функция заглушка для аргументо
 def create_figures(db_path):
     # Загрузка исходных данных
     storage = Storage(db_path)
+
+    storage.set_progress('75%')
+
     planes = storage.get_planes()
 
     m = Math4Figure(np.array(planes), np.array([1, 3, 1]))
+
+    storage.set_progress('85%')
+
+    # Нормирования геометрических параметров модели
+    m.normalization_model()
+
+    storage.set_progress('95%')
+
     figures = m.do()
+
+    storage.set_progress('100%')
 
     # запись полученных кубов в базу данных
     storage.set_figures(figures)
@@ -53,7 +66,7 @@ def script_m3(db_path):
     set_points_limits, ba_limits = storage.get_limits()
     figures = storage.get_figures()
 
-    storage.set_progress(0)
+    storage.set_progress('0%')
     k_percent = 100 / len(set_points)
     v_percent = k_percent
 
@@ -227,7 +240,7 @@ def script_m3(db_path):
         res_report.append([point.id, *E, (E ** 2).sum() ** 0.5, data_wires, data_bbas, data_report])
 
         # Запись прогресса
-        storage.set_progress(round(v_percent))
+        storage.set_progress(f'{round(v_percent)}%')
         v_percent += k_percent
 
     storage.set_result_m3_times(res)
@@ -244,7 +257,7 @@ def script_m2(db_path):
     set_points_limits, ba_limits = storage.get_limits()
     figures = storage.get_figures()
 
-    storage.set_progress(0)
+    storage.set_progress('0%')
     k_percent = 100 / len(wires) / 2
     v_percent = k_percent
 
@@ -291,7 +304,7 @@ def script_m2(db_path):
             dct_sources[wire_b.id][0].append([wire_a.id, wire_a.f, Uc, Uh])
 
         # Запись прогресса
-        storage.set_progress(round(v_percent))
+        storage.set_progress(f'{round(v_percent)}%')
         v_percent += k_percent
 
     # Взаимодействие между БКС и ББА
@@ -320,7 +333,7 @@ def script_m2(db_path):
             dct_sources[wire.id][1].append([bba.id, data_frequencies])
 
         # Запись прогресса
-        storage.set_progress(round(v_percent))
+        storage.set_progress(f'{round(v_percent)}%')
         v_percent += k_percent
 
     res = []

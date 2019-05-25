@@ -562,7 +562,7 @@ namespace Management
         public string GetProgress()
         {
             var progressInfos = _dbManager.Query<Progress>($"SELECT * FROM {progress}");
-            return progressInfos.Count > 0 ? progressInfos[0].percent : "0";
+            return progressInfos.Count > 0 ? progressInfos[0].percent : null;
         }
 
         public void Disconnect() => _dbManager.Close();

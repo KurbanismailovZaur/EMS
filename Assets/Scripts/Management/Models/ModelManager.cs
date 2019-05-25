@@ -174,7 +174,7 @@ namespace Management.Models
 
         public async Task ImportPlanesAsync(string path)
         {
-            DatabaseManager.Instance.SetProgress("1/4");
+            DatabaseManager.Instance.ResetProgress();
             ProgressDialog.Instance.Show("Вычисление плоскостей");
 
             RemovePlanes();
@@ -217,6 +217,15 @@ namespace Management.Models
         {
             Dictionary<string, List<Plane>> materialsPlanes = new Dictionary<string, List<Plane>>();
 
+            int perPercentCount = 0;
+            using (StreamReader sr = new StreamReader(pathToOBJ))
+            {
+                while (sr.ReadLine() != null) perPercentCount += 1;
+            }
+
+            perPercentCount = Mathf.RoundToInt(perPercentCount / 100f);
+
+            int currentRow = 0;
             using (StreamReader sr = new StreamReader(pathToOBJ))
             {
                 List<Vector3> vertices = new List<Vector3>();
@@ -229,6 +238,10 @@ namespace Management.Models
                 while (!sr.EndOfStream)
                 {
                     string line = sr.ReadLine();
+                    currentRow += 1;
+
+                    if (currentRow % perPercentCount == 0)
+                        DatabaseManager.Instance.SetProgress($"{(currentRow / perPercentCount).Remap(0, 100, 0, 75).ToString()}%");
 
                     if (line.StartsWith("v "))
                     {

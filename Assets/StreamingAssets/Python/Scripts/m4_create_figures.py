@@ -140,12 +140,6 @@ class Math4Figure:
         return figures
 
     def do(self):
-
-        # Нормирования геометрических параметров модели
-        if self.normalization_model():
-            pass
-            # print('==> данные нормированны')
-
         # Находим фигуры
         figures = self.find_figures(self.planes)
         # Удаление дубликатов

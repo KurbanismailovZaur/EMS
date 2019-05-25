@@ -41,7 +41,10 @@ namespace UI.Dialogs
         {
             while (true)
             {
-                _progressText.text = $"{text} ({DatabaseManager.Instance.GetProgress()})..";
+                var percent = DatabaseManager.Instance.GetProgress();
+
+                if (percent != null)
+                    _progressText.text = $"{text} ({percent})..";
 
                 yield return new WaitForSeconds(1f);
             }

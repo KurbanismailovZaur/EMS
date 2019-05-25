@@ -35,7 +35,7 @@ namespace UI.Popups
 
             yield return null;
 
-            var showTween = DOTween.To(() => 0f, (w) => _layoutElement.preferredWidth = w, _layoutGroup.preferredWidth, 1f).SetEase(Ease.InOutQuint);
+            var showTween = DOTween.To(() => 0f, (w) => _layoutElement.preferredWidth = w, _layoutGroup.preferredWidth + 8, 1f).SetEase(Ease.InOutQuint);
             var expandeDeviderTween = DOTween.To(() => 0f, (w) => devider.preferredWidth = w, 8f, 1f);
             var showTextTween = _text.DOColor(new Color(color.r, color.g, color.b, 1f), 1f).SetEase(Ease.InOutQuint);
             var hideTextTween = _text.DOColor(new Color(color.r, color.g, color.b, 0f), 1f).SetEase(Ease.InOutQuint);
