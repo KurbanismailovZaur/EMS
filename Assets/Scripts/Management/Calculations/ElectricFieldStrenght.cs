@@ -95,7 +95,7 @@ namespace Management.Calculations
                 _points[i].IsExceeded = strenghts[i].exceeded;
             }
 
-            FilterMaxValue = _points.Max(p => p.Values.Max());
+            FilterMaxValue = _points.Max(p => p.Values.Select(pp => Math.Abs(pp)).Max());
 
             for (int i = 0; i < strenghts.Count; i++)
                 _points[i].Gradients = _points[i].Values.Select(v => _gradient.Evaluate((float)(v / FilterMaxValue))).ToArray();

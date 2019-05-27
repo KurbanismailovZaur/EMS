@@ -304,7 +304,15 @@ namespace Facades
 
             if (FileExplorer.Instance.LastResult == null) yield break;
 
-            File.Copy(DatabaseManager.Instance.DatabasePath, FileExplorer.Instance.LastResult);
+            try
+            {
+                File.Copy(DatabaseManager.Instance.DatabasePath, FileExplorer.Instance.LastResult, true);
+                PopupManager.Instance.PopSuccess("База данных успешно экспортирована");
+            }
+            catch (Exception ex)
+            {
+                ErrorDialog.Instance.ShowError("Ошибка при извлечении базы данных", ex);
+            }
         }
 
         #region Event handlers

@@ -175,7 +175,7 @@ namespace Management.Models
         public async Task ImportPlanesAsync(string path)
         {
             DatabaseManager.Instance.ResetProgress();
-            ProgressDialog.Instance.Show("Вычисление плоскостей");
+            ProgressDialog.Instance.Show("Формирование математической модели");
 
             RemovePlanes();
 
@@ -190,6 +190,7 @@ namespace Management.Models
                 int index = 0;
                 foreach (var pair in info)
                     _materialsPlanesPairs.Add((index++, pair.Value));
+                
             }
             catch (Exception ex)
             {
@@ -202,7 +203,7 @@ namespace Management.Models
             }
 
             await new WaitForUpdate();
-
+            
             PlanesImported.Invoke();
         }
 
@@ -217,7 +218,7 @@ namespace Management.Models
         {
             Dictionary<string, List<Plane>> materialsPlanes = new Dictionary<string, List<Plane>>();
 
-            int perPercentCount = 0;
+            long perPercentCount = 0;
             using (StreamReader sr = new StreamReader(pathToOBJ))
             {
                 while (sr.ReadLine() != null) perPercentCount += 1;
@@ -225,7 +226,7 @@ namespace Management.Models
 
             perPercentCount = Mathf.RoundToInt(perPercentCount / 100f);
 
-            int currentRow = 0;
+            long currentRow = 0;
             using (StreamReader sr = new StreamReader(pathToOBJ))
             {
                 List<Vector3> vertices = new List<Vector3>();
@@ -241,7 +242,7 @@ namespace Management.Models
                     currentRow += 1;
 
                     if (currentRow % perPercentCount == 0)
-                        DatabaseManager.Instance.SetProgress($"{(currentRow / perPercentCount).Remap(0, 100, 0, 75).ToString()}%");
+                        DatabaseManager.Instance.SetProgress($"{((int)(currentRow / perPercentCount)).Remap(0, 100, 0, 60).ToString()}%");
 
                     if (line.StartsWith("v "))
                     {
