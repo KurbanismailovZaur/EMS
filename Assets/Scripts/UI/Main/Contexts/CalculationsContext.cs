@@ -10,6 +10,7 @@ using Management.Calculations;
 using Management.Models;
 using Management.Wires;
 using Management.Tables;
+using UnityEngine.UI;
 
 namespace UI.Main.Contexts
 {
@@ -57,6 +58,12 @@ namespace UI.Main.Contexts
 
         [SerializeField]
         private UnityButton _mutualRemoveButton;
+
+        [SerializeField]
+        private Image _electricDotImage;
+
+        [SerializeField]
+        private Image _mutualDotImage;
 
         public SelectedEvent Selected;
 
@@ -161,11 +168,13 @@ namespace UI.Main.Contexts
         public void ElectricFieldStrenght_Calculated()
         {
             SetElectricButtonsTo(true);
+            _electricDotImage.enabled = true;
         }
 
         public void ElectricFieldStrenght_Removed()
         {
             SetElectricButtonsTo(false);
+            _electricDotImage.enabled = false;
         }
 
         public void ElectricFieldStrenght_VisibilityChanged()
@@ -176,11 +185,13 @@ namespace UI.Main.Contexts
         public void MutualActionOfBCSAndBA_Calculated()
         {
             SetMutualButtonsTo(true);
+            _mutualDotImage.enabled = true;
         }
 
         public void MutualActionOfBCSAndBA_Removed()
         {
             SetMutualButtonsTo(false);
+            _mutualDotImage.enabled = false;
         }
 
         public void MutualActionOfBCSAndBA_VisibilityChanged()
