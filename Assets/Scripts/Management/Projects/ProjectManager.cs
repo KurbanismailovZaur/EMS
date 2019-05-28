@@ -101,6 +101,9 @@ namespace Management.Projects
             catch (Exception ex)
             {
                 ErrorDialog.Instance.ShowError("Не удалось открыть проект.", ex);
+                CloseWithoutQuestions();
+
+                yield break;
             }
 
             _project.Path = pathToProject;
@@ -193,6 +196,15 @@ namespace Management.Projects
                 if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Yes)
                     yield return Save();
             }
+
+            _project = null;
+
+            Closed.Invoke();
+        }
+
+        private void CloseWithoutQuestions()
+        {
+            if (_project == null) return;
 
             _project = null;
 

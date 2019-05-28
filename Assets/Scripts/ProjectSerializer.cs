@@ -26,11 +26,15 @@ public static class ProjectSerializer
             WritePreambleAndVersion(writer, _preamble, 1);
             WriteModelView(writer, ModelManager.Instance.PathToCahchedModelFile, ModelManager.Instance.PathToCahchedMaterialsFile);
 
+            DatabaseManager.Instance.SetProgress("37%");
+
             DatabaseManager.Instance.Disconnect();
             WriteTable(writer, DatabaseManager.Instance.DatabasePath);
             await DatabaseManager.Instance.ConnectAsync();
+            DatabaseManager.Instance.SetProgress("68%");
 
             WritePointRadius(writer, CalculationsManager.Instance.ElectricFieldStrenght.PointRadius);
+            DatabaseManager.Instance.SetProgress("70%");
         }
 
         var rootDirectory = Path.GetDirectoryName(path);
@@ -39,6 +43,7 @@ public static class ProjectSerializer
 
         ZipFile.CreateFromDirectory(archiveDirectory.FullName, path, System.IO.Compression.CompressionLevel.Optimal, false);
         archiveDirectory.Delete(true);
+        DatabaseManager.Instance.SetProgress("100%");
     }
 
     private static void WritePreambleAndVersion(BinaryWriter writer, string preamble, int version)
@@ -79,97 +84,101 @@ public static class ProjectSerializer
     {
         var rootDirectory = Path.GetDirectoryName(path);
         var archiveDirectory = Path.Combine(rootDirectory, Guid.NewGuid().ToString());
-        
+
         ZipFile.ExtractToDirectory(path, archiveDirectory);
         var file = Directory.GetFiles(archiveDirectory)[0];
 
-        using (BinaryReader reader = new BinaryReader(File.OpenRead(file)))
+        var repairDirectory = Path.Combine(Application.temporaryCachePath, Guid.NewGuid().ToString());
+
+        try
         {
-            #region Preamble
-            var preamble = ReadPreamble(reader);
-
-            if (preamble != _preamble) throw new FormatException("Incorrect data format.");
-            #endregion
-
-            int version = ReadVersion(reader);
-
-            var repairDirectory = Path.Combine(Application.temporaryCachePath, "Repair");
-            Directory.CreateDirectory(repairDirectory);
-
-            #region Model
-            // materialsPath is not needed (right here) for importing.
-            var (modelPath, materialsPath) = ReadModelView(reader, repairDirectory);
-
-            if (modelPath != null)
-                ModelManager.Instance.ImportModel(modelPath);
-            #endregion
-
-            #region SQLite
-            DatabaseManager.Instance.Disconnect();
-            File.Delete(Path.Combine(Application.persistentDataPath, "emsdb.bytes"));
-
-            var dbPath = ReadTable(reader, Application.persistentDataPath);
-            DatabaseManager.Instance.Connect();
-            #endregion
-
-            float pointRadius = ReadPointRadius(reader);
-
-            #region Planes
-            var planes = DatabaseManager.Instance.GetPlanes();
-
-            if (planes != null)
-                ModelManager.Instance.ImportPlanes(planes);
-            #endregion
-
-            #region KVIDS
-            // KVID 1 and 4
-            var (materials, wireMarks) = DatabaseManager.Instance.GetReferencesData();
-            TableDataManager.Instance.SetReferenceData(materials, wireMarks, false);
-
-            // KVID 2
-            var kvid2 = DatabaseManager.Instance.GetKVID2();
-            TableDataManager.Instance.SetKVID2Data(kvid2, false);
-
-            // KVID 5
-            var kvid5 = DatabaseManager.Instance.GetKVID5();
-            var usableKVID2Names = kvid5.Select(k => k.bBA).Distinct().ToList();
-            TableDataManager.Instance.SetKVID5Data(kvid5, usableKVID2Names, false);
-
-            // KVID 3
-            var wiring = DatabaseManager.Instance.GetKVID3();
-
-            if (wiring != null)
+            using (BinaryReader reader = new BinaryReader(File.OpenRead(file)))
             {
-                var usableKVID5Names = wiring.Wires.Select(w => w.ESID_I).Concat(wiring.Wires.Select(w => w.ESID_P)).Distinct().ToList();
-                TableDataManager.Instance.SetKVID3References(usableKVID5Names);
-                WiringManager.Instance.Import(wiring);
+                #region Preamble
+                var preamble = ReadPreamble(reader);
+
+                if (preamble != _preamble) throw new FormatException("Incorrect data format.");
+                #endregion
+
+                int version = ReadVersion(reader);
+
+                Directory.CreateDirectory(repairDirectory);
+
+                #region Model
+                // materialsPath is not needed (right here) for importing.
+                var (modelPath, materialsPath) = ReadModelView(reader, repairDirectory);
+
+                if (modelPath != null)
+                    ModelManager.Instance.ImportModel(modelPath);
+                #endregion
+
+                #region SQLite
+                DatabaseManager.Instance.Disconnect();
+                File.Delete(Path.Combine(Application.persistentDataPath, "emsdb.bytes"));
+
+                var dbPath = ReadTable(reader, Application.persistentDataPath);
+                DatabaseManager.Instance.Connect();
+                #endregion
+
+                float pointRadius = ReadPointRadius(reader);
+
+                #region Planes
+                var planes = DatabaseManager.Instance.GetPlanes();
+
+                if (planes != null)
+                    ModelManager.Instance.ImportPlanes(planes);
+                #endregion
+
+                #region KVIDS
+                // KVID 1 and 4
+                var (materials, wireMarks) = DatabaseManager.Instance.GetReferencesData();
+                TableDataManager.Instance.SetReferenceData(materials, wireMarks, false);
+
+                // KVID 2
+                var kvid2 = DatabaseManager.Instance.GetKVID2();
+                TableDataManager.Instance.SetKVID2Data(kvid2, false);
+
+                // KVID 5
+                var kvid5 = DatabaseManager.Instance.GetKVID5();
+                var usableKVID2Names = kvid5.Select(k => k.bBA).Distinct().ToList();
+                TableDataManager.Instance.SetKVID5Data(kvid5, usableKVID2Names, false);
+
+                // KVID 3
+                var wiring = DatabaseManager.Instance.GetKVID3();
+
+                if (wiring != null)
+                {
+                    var usableKVID5Names = wiring.Wires.Select(w => w.ESID_I).Concat(wiring.Wires.Select(w => w.ESID_P)).Distinct().ToList();
+                    TableDataManager.Instance.SetKVID3References(usableKVID5Names);
+                    WiringManager.Instance.Import(wiring);
+                }
+
+                // KVID 8_1 and 8_2
+                var (kvid81, kvid82) = DatabaseManager.Instance.GetKVID8();
+                TableDataManager.Instance.SetKVID8Data(kvid81, kvid82);
+
+                // KVID 6 and electric field
+                var kvid6 = DatabaseManager.Instance.GetKVID6();
+
+                if (kvid6.Count > 0)
+                {
+                    var distance1 = Vector3.Distance(kvid6[0].point, kvid6[1].point);
+                    var distance2 = Vector3.Distance(kvid6[1].point, kvid6[2].point);
+                    var radius = Mathf.Abs(distance1 - distance2) < 0.00001 ? distance1 : 1f;
+                    CalculationsManager.Instance.ElectricFieldStrenght.Calculate(kvid6, pointRadius);
+                    CalculationsManager.Instance.ElectricFieldStrenght.PointRadius = pointRadius;
+                    CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
+                }
+
+                // Mutuals
+                CalculationsManager.Instance.MutualActionOfBCSAndBA.Calculate(WiringManager.Instance.Wiring);
+                #endregion
             }
-
-            // KVID 8_1 and 8_2
-            var (kvid81, kvid82) = DatabaseManager.Instance.GetKVID8();
-            TableDataManager.Instance.SetKVID8Data(kvid81, kvid82);
-
-            // KVID 6 and electric field
-            var kvid6 = DatabaseManager.Instance.GetKVID6();
-
-            if (kvid6.Count > 0)
-            {
-                var distance1 = Vector3.Distance(kvid6[0].point, kvid6[1].point);
-                var distance2 = Vector3.Distance(kvid6[1].point, kvid6[2].point);
-                var radius = Mathf.Abs(distance1 - distance2) < 0.00001 ? distance1 : 1f;
-                CalculationsManager.Instance.ElectricFieldStrenght.Calculate(kvid6, pointRadius);
-                CalculationsManager.Instance.ElectricFieldStrenght.PointRadius = pointRadius;
-                CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
-            }
-
-            // Mutuals
-            CalculationsManager.Instance.MutualActionOfBCSAndBA.Calculate(WiringManager.Instance.Wiring);
-            #endregion
-
+        }
+        finally
+        {
             Directory.Delete(repairDirectory, true);
         }
-
-        Directory.Delete(archiveDirectory, true);
     }
 
     private static string ReadPreamble(BinaryReader reader) => Encoding.ASCII.GetString(reader.ReadBytes(_preamble.Length));
