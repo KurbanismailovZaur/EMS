@@ -14,6 +14,18 @@ namespace Management.Projects
 {
     public class ProjectManager : MonoSingleton<ProjectManager>
     {
+        private class BoolFlag
+        {
+            public bool Flag { get; set; }
+
+            public BoolFlag() { }
+
+            public BoolFlag(bool flag)
+            {
+                Flag = flag;
+            }
+        }
+
         private Project _project;
 
         #region Events
@@ -67,15 +79,11 @@ namespace Management.Projects
                         else
                             path = _project.Path;
 
-                        try
-                        {
-                            Serialize(path);
-                        }
-                        catch (Exception ex)
-                        {
-                            ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
+                        var errorFlag = new BoolFlag();
+                        yield return Serialize(path, errorFlag);
+
+                        if (errorFlag.Flag)
                             yield break;
-                        }
                     }
                 }
 
@@ -107,14 +115,8 @@ namespace Management.Projects
                 yield return StartCoroutine(SaveAsRoutine("Сохранить проект"));
             else
             {
-                try
-                {
-                    Serialize(_project.Path);
-                }
-                catch (Exception ex)
-                {
-                    ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
-                }
+                var errorFlag = new BoolFlag();
+                yield return Serialize(_project.Path, errorFlag);
             }
         }
 
@@ -126,22 +128,53 @@ namespace Management.Projects
 
             if (FileExplorer.Instance.LastResult == null) yield break;
 
-            try
-            {
-                Serialize(FileExplorer.Instance.LastResult);
-            }
-            catch (Exception ex)
-            {
-                ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
-            }
+            var errorFlag = new BoolFlag();
+            yield return Serialize(FileExplorer.Instance.LastResult, errorFlag);
         }
 
-        private void Serialize(string path)
+        private Coroutine Serialize(string path, BoolFlag errorFlag)
         {
-            ProjectSerializer.Serialize(path);
+            DatabaseManager.Instance.ResetProgress();
+            ProgressDialog.Instance.Show("Сохранение проекта");
 
-            _project.Path = FileExplorer.Instance.LastResult;
-            _project.WasChanged = false;
+            var completeFlag = new BoolFlag();
+
+            var task = new Task(async () =>
+            {
+                try
+                {
+                    await ProjectSerializer.Serialize(path);
+                    errorFlag.Flag = false;
+                    completeFlag.Flag = true;
+                }
+                catch (Exception ex)
+                {
+                    errorFlag.Flag = true;
+                    completeFlag.Flag = true;
+
+                    await new WaitForUpdate();
+
+                    ProgressDialog.Instance.Hide();
+                    ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
+                    return;
+                }
+
+                _project.Path = FileExplorer.Instance.LastResult;
+                _project.WasChanged = false;
+
+                await new WaitForUpdate();
+
+                ProgressDialog.Instance.Hide();
+            });
+
+            task.Start();
+
+            return StartCoroutine(SerializeRoutine(completeFlag));
+        }
+
+        private IEnumerator SerializeRoutine(BoolFlag completeFlag)
+        {
+            while (!completeFlag.Flag) yield return null;
         }
 
         public Coroutine Close() => StartCoroutine(CloseRoutine());

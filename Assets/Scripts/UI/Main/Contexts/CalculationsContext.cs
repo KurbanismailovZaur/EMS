@@ -42,6 +42,12 @@ namespace UI.Main.Contexts
         private UnityButton _calculateMutualButton;
 
         [SerializeField]
+        private UnityButton _cyclogramButton;
+
+        [SerializeField]
+        private Toggle _cyclogramVisibilityButton;
+
+        [SerializeField]
         private UnityButton _electricVisibilityButton;
 
         [SerializeField]
@@ -71,6 +77,7 @@ namespace UI.Main.Contexts
         {
             _calculateElectricButton.interactable = state;
             _calculateMutualButton.interactable = state;
+            _cyclogramButton.interactable = state;
         }
 
         public bool ElectricVisibilityInteractible
@@ -198,6 +205,8 @@ namespace UI.Main.Contexts
         {
             MutualVisibilityState = CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible;
         }
+
+        public void CyclogramButton_OnClick() => _cyclogramVisibilityButton.State = !_cyclogramVisibilityButton.State;
         #endregion
     }
 }

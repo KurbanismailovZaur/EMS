@@ -13,12 +13,13 @@ using Management.Tables;
 using System.Linq;
 using Management.Wires;
 using Management.Calculations;
+using System.IO.Compression;
 
 public static class ProjectSerializer
 {
     private static string _preamble = @"Wml_xskV+sq&hRn@XsvIX)\Jel6-v_^Ky%EJswaPeaG=YRYePob=*-ho#t)zn6iH";
 
-    public static void Serialize(string path)
+    public static async Task Serialize(string path)
     {
         using (BinaryWriter writer = new BinaryWriter(File.Create(path)))
         {
@@ -27,10 +28,17 @@ public static class ProjectSerializer
 
             DatabaseManager.Instance.Disconnect();
             WriteTable(writer, DatabaseManager.Instance.DatabasePath);
-            DatabaseManager.Instance.Connect();
+            await DatabaseManager.Instance.ConnectAsync();
 
             WritePointRadius(writer, CalculationsManager.Instance.ElectricFieldStrenght.PointRadius);
         }
+
+        var rootDirectory = Path.GetDirectoryName(path);
+        var archiveDirectory = Directory.CreateDirectory(Path.Combine(rootDirectory, Guid.NewGuid().ToString()));
+        File.Move(path, Path.Combine(archiveDirectory.FullName, Path.GetFileName(path)));
+
+        ZipFile.CreateFromDirectory(archiveDirectory.FullName, path, System.IO.Compression.CompressionLevel.Optimal, false);
+        archiveDirectory.Delete(true);
     }
 
     private static void WritePreambleAndVersion(BinaryWriter writer, string preamble, int version)
@@ -69,7 +77,13 @@ public static class ProjectSerializer
 
     public static void Deserialize(string path)
     {
-        using (BinaryReader reader = new BinaryReader(File.OpenRead(path)))
+        var rootDirectory = Path.GetDirectoryName(path);
+        var archiveDirectory = Path.Combine(rootDirectory, Guid.NewGuid().ToString());
+        
+        ZipFile.ExtractToDirectory(path, archiveDirectory);
+        var file = Directory.GetFiles(archiveDirectory)[0];
+
+        using (BinaryReader reader = new BinaryReader(File.OpenRead(file)))
         {
             #region Preamble
             var preamble = ReadPreamble(reader);
@@ -154,6 +168,8 @@ public static class ProjectSerializer
 
             Directory.Delete(repairDirectory, true);
         }
+
+        Directory.Delete(archiveDirectory, true);
     }
 
     private static string ReadPreamble(BinaryReader reader) => Encoding.ASCII.GetString(reader.ReadBytes(_preamble.Length));

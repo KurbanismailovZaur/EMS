@@ -11,28 +11,17 @@ using System;
 using UI;
 using SimpleSQL;
 using UnityEngine.UI;
+using Assets.SimpleZip;
+using System.IO.Compression;
 
 public class Test : MonoBehaviour
 {
-    [SerializeField]
-    private SimpleSQLManager _dbManager;
-
-    [SerializeField]
-    private Text _text;
-
     private void Start()
     {
-        var figures = _dbManager.Query<ModelFigure>("SELECT * FROM ModelFigure");
-        _text.text = figures.Count.ToString();
-    }
+        var path = @"C:\Users\Zaur Magomedovich\Desktop\photo.jpg";
 
-
-    class ModelFigure
-    {
-        public float x { get; set; }
-        public float y { get; set; }
-        public float z { get; set; }
-        public float r { get; set; }
-        public float material_id { get; set; }
+        var directoryInfo = Directory.CreateDirectory(@"C:\Users\Zaur Magomedovich\Desktop\arhive");
+        File.Copy(path, Path.Combine(directoryInfo.FullName, Path.GetFileName(path)));
+        ZipFile.CreateFromDirectory(directoryInfo.FullName, Path.Combine(Path.GetDirectoryName(path), "archive.zip"));
     }
 }

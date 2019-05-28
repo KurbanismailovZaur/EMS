@@ -58,4 +58,6 @@ public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
         }
     }
     #endregion
+
+    protected virtual void Awake() => _instance = GetComponent<T>();
 }

@@ -593,5 +593,12 @@ namespace Management
         public void Disconnect() => _dbManager.Close();
 
         public void Connect() => _dbManager.Initialize(true);
+
+        public async Task ConnectAsync()
+        {
+            await new WaitForUpdate();
+
+            _dbManager.Initialize(true);
+        }
     }
 }
