@@ -31,9 +31,14 @@ public static class ProjectSerializer
 
             DatabaseManager.Instance.SetProgress("37%");
 
+            await new WaitForUpdate();
+
             DatabaseManager.Instance.Disconnect();
             WriteTable(writer, DatabaseManager.Instance.DatabasePath);
-            await DatabaseManager.Instance.ConnectAsync();
+            DatabaseManager.Instance.Connect();
+
+            await new WaitForBackgroundThread();
+
             DatabaseManager.Instance.SetProgress("68%");
 
             WritePointRadius(writer, CalculationsManager.Instance.ElectricFieldStrenght.PointRadius);
