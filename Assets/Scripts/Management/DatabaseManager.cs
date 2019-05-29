@@ -606,8 +606,8 @@ namespace Management
 
         public void Disconnect()
         {
-            _dbManager.Close();
             IsConnected = false;
+            _dbManager.Close();
         }
 
         public void Connect()
@@ -619,7 +619,6 @@ namespace Management
         public async Task ConnectAsync()
         {
             await new WaitForUpdate();
-
             Connect();
         }
 

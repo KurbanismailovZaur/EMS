@@ -122,8 +122,6 @@ public static class ProjectSerializer
                     ModelManager.Instance.ImportModel(modelPath);
                 }
 
-                await new WaitForBackgroundThread();
-
                 DatabaseManager.Instance.SetProgress("25%");
 
                 #endregion
@@ -133,7 +131,9 @@ public static class ProjectSerializer
                 File.Delete(Path.Combine(persistentPath, "emsdb.bytes"));
 
                 var dbPath = ReadTable(reader, persistentPath);
-                await DatabaseManager.Instance.ConnectAsync();
+                DatabaseManager.Instance.Connect();
+
+                await new WaitForBackgroundThread();
 
                 DatabaseManager.Instance.SetProgress("32%");
                 #endregion
