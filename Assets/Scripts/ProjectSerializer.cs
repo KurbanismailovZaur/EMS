@@ -14,6 +14,7 @@ using System.Linq;
 using Management.Wires;
 using Management.Calculations;
 using System.IO.Compression;
+using System.Threading;
 
 public static class ProjectSerializer
 {
@@ -80,7 +81,7 @@ public static class ProjectSerializer
 
     private static void WritePointRadius(BinaryWriter writer, float distance) => writer.Write(distance);
 
-    public static void Deserialize(string path)
+    public static async Task Deserialize(string path, string persistentPath, string temporaryPath)
     {
         var rootDirectory = Path.GetDirectoryName(path);
         var archiveDirectory = Path.Combine(rootDirectory, Guid.NewGuid().ToString());
@@ -88,7 +89,9 @@ public static class ProjectSerializer
         ZipFile.ExtractToDirectory(path, archiveDirectory);
         var file = Directory.GetFiles(archiveDirectory)[0];
 
-        var repairDirectory = Path.Combine(Application.temporaryCachePath, Guid.NewGuid().ToString());
+        var repairDirectory = Path.Combine(temporaryPath, Guid.NewGuid().ToString());
+
+        DatabaseManager.Instance.SetProgress("18%");
 
         try
         {
@@ -109,15 +112,26 @@ public static class ProjectSerializer
                 var (modelPath, materialsPath) = ReadModelView(reader, repairDirectory);
 
                 if (modelPath != null)
+                {
+                    await new WaitForUpdate();
+
                     ModelManager.Instance.ImportModel(modelPath);
+                }
+
+                await new WaitForBackgroundThread();
+
+                DatabaseManager.Instance.SetProgress("25%");
+
                 #endregion
 
                 #region SQLite
                 DatabaseManager.Instance.Disconnect();
-                File.Delete(Path.Combine(Application.persistentDataPath, "emsdb.bytes"));
+                File.Delete(Path.Combine(persistentPath, "emsdb.bytes"));
 
-                var dbPath = ReadTable(reader, Application.persistentDataPath);
-                DatabaseManager.Instance.Connect();
+                var dbPath = ReadTable(reader, persistentPath);
+                await DatabaseManager.Instance.ConnectAsync();
+
+                DatabaseManager.Instance.SetProgress("32%");
                 #endregion
 
                 float pointRadius = ReadPointRadius(reader);
@@ -126,58 +140,91 @@ public static class ProjectSerializer
                 var planes = DatabaseManager.Instance.GetPlanes();
 
                 if (planes != null)
+                {
+                    await new WaitForUpdate();
+
                     ModelManager.Instance.ImportPlanes(planes);
+                }
+
+                await new WaitForBackgroundThread();
+
+                DatabaseManager.Instance.SetProgress("64%");
                 #endregion
 
                 #region KVIDS
                 // KVID 1 and 4
                 var (materials, wireMarks) = DatabaseManager.Instance.GetReferencesData();
-                TableDataManager.Instance.SetReferenceData(materials, wireMarks, false);
+
+                DatabaseManager.Instance.SetProgress("67%");
 
                 // KVID 2
                 var kvid2 = DatabaseManager.Instance.GetKVID2();
-                TableDataManager.Instance.SetKVID2Data(kvid2, false);
+
+                DatabaseManager.Instance.SetProgress("70%");
 
                 // KVID 5
                 var kvid5 = DatabaseManager.Instance.GetKVID5();
                 var usableKVID2Names = kvid5.Select(k => k.bBA).Distinct().ToList();
-                TableDataManager.Instance.SetKVID5Data(kvid5, usableKVID2Names, false);
+
+                DatabaseManager.Instance.SetProgress("73%");
 
                 // KVID 3
+                await new WaitForUpdate();
+
                 var wiring = DatabaseManager.Instance.GetKVID3();
 
-                if (wiring != null)
-                {
-                    var usableKVID5Names = wiring.Wires.Select(w => w.ESID_I).Concat(wiring.Wires.Select(w => w.ESID_P)).Distinct().ToList();
-                    TableDataManager.Instance.SetKVID3References(usableKVID5Names);
-                    WiringManager.Instance.Import(wiring);
-                }
+                await new WaitForBackgroundThread();
+
+                var usableKVID5Names = wiring?.Wires.Select(w => w.ESID_I).Concat(wiring.Wires.Select(w => w.ESID_P)).Distinct().ToList();
+
+                DatabaseManager.Instance.SetProgress("76%");
 
                 // KVID 8_1 and 8_2
                 var (kvid81, kvid82) = DatabaseManager.Instance.GetKVID8();
-                TableDataManager.Instance.SetKVID8Data(kvid81, kvid82);
+
+                DatabaseManager.Instance.SetProgress("79%");
 
                 // KVID 6 and electric field
                 var kvid6 = DatabaseManager.Instance.GetKVID6();
 
+                DatabaseManager.Instance.SetProgress("82%");
+
+                await new WaitForUpdate();
+
+                TableDataManager.Instance.SetReferenceData(materials, wireMarks, false);
+                TableDataManager.Instance.SetKVID2Data(kvid2, false);
+                TableDataManager.Instance.SetKVID5Data(kvid5, usableKVID2Names, false);
+
+                DatabaseManager.Instance.SetProgress("87%");
+
+                if (wiring != null)
+                {
+                    TableDataManager.Instance.SetKVID3References(usableKVID5Names);
+                    WiringManager.Instance.Import(wiring);
+                }
+
+                TableDataManager.Instance.SetKVID8Data(kvid81, kvid82);
+
                 if (kvid6.Count > 0)
                 {
-                    var distance1 = Vector3.Distance(kvid6[0].point, kvid6[1].point);
-                    var distance2 = Vector3.Distance(kvid6[1].point, kvid6[2].point);
-                    var radius = Mathf.Abs(distance1 - distance2) < 0.00001 ? distance1 : 1f;
                     CalculationsManager.Instance.ElectricFieldStrenght.Calculate(kvid6, pointRadius);
                     CalculationsManager.Instance.ElectricFieldStrenght.PointRadius = pointRadius;
                     CalculationsManager.Instance.ElectricFieldStrenght.SetStrenghts(DatabaseManager.Instance.GetCalculatedElectricFieldStrengts());
                 }
 
+                DatabaseManager.Instance.SetProgress("94%");
+
                 // Mutuals
                 CalculationsManager.Instance.MutualActionOfBCSAndBA.Calculate(WiringManager.Instance.Wiring);
+
+                DatabaseManager.Instance.SetProgress("100%");
                 #endregion
             }
         }
         finally
         {
             Directory.Delete(repairDirectory, true);
+            Directory.Delete(archiveDirectory, true);
         }
     }
 

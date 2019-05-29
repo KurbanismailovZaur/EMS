@@ -113,7 +113,6 @@ namespace Management.Models
             }
 
             ModelImported.Invoke();
-            PopupManager.Instance.PopSuccess("Модель вида импортирована");
         }
 
         private Bounds GetBounds(GameObject go)

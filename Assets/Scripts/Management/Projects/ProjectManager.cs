@@ -9,6 +9,7 @@ using UI.Exploring.FileSystem;
 using System.IO;
 using UI.Dialogs;
 using System;
+using UI.Popups;
 
 namespace Management.Projects
 {
@@ -79,10 +80,10 @@ namespace Management.Projects
                         else
                             path = _project.Path;
 
-                        var errorFlag = new BoolFlag();
-                        yield return Serialize(path, errorFlag);
+                        var serializeErrorFlag = new BoolFlag();
+                        yield return Serialize(path, serializeErrorFlag);
 
-                        if (errorFlag.Flag)
+                        if (serializeErrorFlag.Flag)
                             yield break;
                     }
                 }
@@ -94,20 +95,61 @@ namespace Management.Projects
 
             Created.Invoke();
 
-            try
-            {
-                ProjectSerializer.Deserialize(pathToProject);
-            }
-            catch (Exception ex)
-            {
-                ErrorDialog.Instance.ShowError("Не удалось открыть проект.", ex);
-                CloseWithoutQuestions();
+            var DeserializeErrorFlag = new BoolFlag();
+            yield return Deserialize(pathToProject, DeserializeErrorFlag);
 
+            if (DeserializeErrorFlag.Flag)
+            {
+                CloseWithoutQuestions();
                 yield break;
             }
 
             _project.Path = pathToProject;
             _project.WasChanged = false;
+        }
+
+        private Coroutine Deserialize(string path, BoolFlag errorFlag)
+        {
+            DatabaseManager.Instance.ResetProgress();
+            ProgressDialog.Instance.Show("Восстановление проекта");
+
+            var completeFlag = new BoolFlag();
+
+            var persistentPath = Application.persistentDataPath;
+            var temporaryPath = Application.temporaryCachePath;
+
+            var task = new Task(async () =>
+            {
+                try
+                {
+                    await ProjectSerializer.Deserialize(path, persistentPath, temporaryPath);
+                    errorFlag.Flag = false;
+                    completeFlag.Flag = true;
+                }
+                catch (Exception ex)
+                {
+                    errorFlag.Flag = true;
+                    completeFlag.Flag = true;
+
+                    await new WaitForUpdate();
+
+                    ProgressDialog.Instance.Hide();
+                    ErrorDialog.Instance.ShowError("Не удалось восстановить проект.", ex);
+                    return;
+                }
+
+                _project.Path = FileExplorer.Instance.LastResult;
+                _project.WasChanged = false;
+
+                await new WaitForUpdate();
+
+                ProgressDialog.Instance.Hide();
+                PopupManager.Instance.PopSuccess("Проект успешно восстановлен");
+            });
+
+            task.Start();
+
+            return StartCoroutine(FlagRoutine(completeFlag));
         }
 
         public Coroutine Save() => StartCoroutine(SaveRoutine());
@@ -168,14 +210,15 @@ namespace Management.Projects
                 await new WaitForUpdate();
 
                 ProgressDialog.Instance.Hide();
+                PopupManager.Instance.PopSuccess("Проект успешно сохранен");
             });
 
             task.Start();
 
-            return StartCoroutine(SerializeRoutine(completeFlag));
+            return StartCoroutine(FlagRoutine(completeFlag));
         }
 
-        private IEnumerator SerializeRoutine(BoolFlag completeFlag)
+        private IEnumerator FlagRoutine(BoolFlag completeFlag)
         {
             while (!completeFlag.Flag) yield return null;
         }

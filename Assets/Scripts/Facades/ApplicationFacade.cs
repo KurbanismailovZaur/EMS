@@ -396,6 +396,13 @@ namespace Facades
             }
         }
 
+        public void ModelManager_ModelImported()
+        {
+            if (_isDeserializationState) return;
+
+            PopupManager.Instance.PopSuccess("Модель вида импортирована");
+        }
+
         public void ModelManager_PlanesImported()
         {
             if (_isDeserializationState) return;
