@@ -180,13 +180,28 @@ class Storage:
     def get_planes(self):
         """
         Загрузка плоскостей
-        :return: итерационнай объект Figure(Point, r, material_id)
+        :return: list
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM ModelPoint")
         res = cursor.fetchall()
+
+        conn.close()
+
+        return res
+
+    def get_model_sizes(self):
+        """
+        Загрузка размеров (радиусов) модели
+        :return: list
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM ModelSizes")
+        res = cursor.fetchone()  # читаем только одну строку
 
         conn.close()
 

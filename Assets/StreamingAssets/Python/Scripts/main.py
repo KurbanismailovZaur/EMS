@@ -37,8 +37,9 @@ def create_figures(db_path):
     storage.set_progress('75%')
 
     planes = storage.get_planes()
+    sizes = storage.get_model_sizes()
 
-    m = Math4Figure(np.array(planes), np.array([1, 3, 1]))
+    m = Math4Figure(np.array(planes), np.array(sizes))
 
     storage.set_progress('85%')
 

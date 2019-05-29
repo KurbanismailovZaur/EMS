@@ -219,6 +219,15 @@ namespace Management
 
             public string percent { get; set; }
         }
+
+        private class ModelSize
+        {
+            public float x { get; set; }
+
+            public float y { get; set; }
+
+            public float z { get; set; }
+        }
         #endregion
 
         [SerializeField]
@@ -246,6 +255,7 @@ namespace Management
         private const string resultM3 = "ResultM3";
         private const string resultM2 = "ResultM2";
         private const string progress = "Progress";
+        private const string modelSizes = "ModelSizes";
         #endregion
 
         public string DatabasePath { get; private set; }
@@ -614,5 +624,20 @@ namespace Management
         }
 
         public void Vacuum() => _dbManager.Execute("VACUUM");
+
+        public void SetModelSize(Vector3 size)
+        {
+            _dbManager.BeginTransaction();
+            _dbManager.Execute($"DELETE FROM {modelSizes}");
+            _dbManager.Execute($"INSERT INTO {modelSizes} VALUES (?, ?, ?)", size.x, size.y, size.z);
+            _dbManager.Commit();
+        }
+
+        public Vector3 GetModelSize()
+        {
+            var sizes = _dbManager.Query<ModelSize>($"SELECT * FROM {modelSizes}");
+
+            return sizes.Count == 0 ? Vector3.zero : new Vector3(sizes[0].x, sizes[0].y, sizes[0].z);
+        }
     }
 }

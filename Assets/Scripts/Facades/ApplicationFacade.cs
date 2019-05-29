@@ -141,10 +141,15 @@ namespace Facades
 
         private IEnumerator ImportPlanesRoutine()
         {
+            yield return ModelSizeDialog.Instance.Open();
+
+            if (ModelSizeDialog.Instance.Decision == ModelSizeDialog.DecisionType.Cancel) yield break;
+
             yield return _explorer.OpenFile("Импорт Плоскостей", null, "obj");
 
             if (_explorer.LastResult == null) yield break;
 
+            DatabaseManager.Instance.SetModelSize(ModelSizeDialog.Instance.Size);
             ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).WrapErrors();
         }
 

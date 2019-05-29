@@ -21,6 +21,7 @@ class Math4Figure:
             self.r_xyz = np.abs(r_xyz)
         else:
             raise ValueError('real sizes should not be zero')
+        print(self.r_xyz)
 
     @staticmethod
     @jit(nopython=True)
@@ -153,33 +154,21 @@ if __name__ == "__main__":
     # Memory used: 167.211mb
 
     from settings import DB_PATH
+    from storage import Storage
 
-    import sqlite3
-    # import time_and_memory
-
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+    storage = Storage(DB_PATH)
 
     print('=> чтение данных...')
-    cursor.execute("SELECT * FROM ModelPoint")
+    planes = storage.get_planes()
+    sizes = storage.get_model_sizes()
 
-    m = Math4Figure(np.array(cursor.fetchall()), np.array([1, 3, 1]))
+    m = Math4Figure(np.array(planes), np.array(sizes))
+
+    # Нормирования геометрических параметров модели
     print('=> обработка данных...')
-    res = m.do()
+    m.normalization_model()
+    figures = m.do()
 
     # запись полученных кубов в базу данных
-    cursor.execute("DELETE FROM ModelFigure")  # удаление данных из БД
-    conn.commit()
-
-    count_figures = sum(1 for _ in
-                        map(lambda item:
-                            cursor.execute(f"INSERT into ModelFigure values ({', '.join(str(x) for x in item)})"), res))
-
-    print()
-    print('Всего фигур: %s' % count_figures)  # 219574
-
-    conn.commit()
-
-    conn.close()
-
-    # time_and_memory.endlog()
+    count_figures = storage.set_figures(figures)
+    print('Всего фигур: %s' % count_figures)  # 219574 # 290616
