@@ -238,6 +238,16 @@ public static class ProjectSerializer
 
                 DatabaseManager.Instance.SetProgress("100%");
                 #endregion
+
+                #region Recents
+                var recents = File.ReadAllLines(StartupDialog.Instance.RecentsPath).ToList();
+
+                if (!recents.Contains(path))
+                {
+                    recents.Add(path);
+                    File.WriteAllLines(StartupDialog.Instance.RecentsPath, recents);
+                }
+                #endregion
             }
         }
         finally

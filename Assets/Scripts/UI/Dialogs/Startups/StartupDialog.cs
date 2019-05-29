@@ -12,8 +12,8 @@ using System.Linq;
 
 namespace UI.Dialogs.Startups
 {
-	public class StartupDialog : Dialog<StartupDialog> 
-	{
+    public class StartupDialog : Dialog<StartupDialog>
+    {
         [SerializeField]
         private Button _createButton;
 
@@ -22,6 +22,12 @@ namespace UI.Dialogs.Startups
 
         [SerializeField]
         private Transform _content;
+
+        [SerializeField]
+        private GameObject _recentsScrollView;
+
+        [SerializeField]
+        private GameObject _noRecents;
 
         [Header("Prefabs")]
         [SerializeField]
@@ -60,8 +66,20 @@ namespace UI.Dialogs.Startups
 
             var recents = File.ReadAllLines(RecentsPath);
 
-            foreach (var recent in recents)
-                Recent.Factory.Create(_recentPrefab, _content, recent, RecentButton_Clicked, RecentCloseButton_Clicked);
+            if (recents.Length == 0)
+            {
+                _noRecents.SetActive(true);
+                _recentsScrollView.SetActive(false);
+            }
+            else
+            {
+                _noRecents.SetActive(false);
+                _recentsScrollView.SetActive(true);
+
+                foreach (var recent in recents)
+                    Recent.Factory.Create(_recentPrefab, _content, recent, RecentButton_Clicked, RecentCloseButton_Clicked);
+            }
+
         }
 
         #region Event handlers
@@ -82,6 +100,13 @@ namespace UI.Dialogs.Startups
             if (recents.Remove(recent.Path))
             {
                 Destroy(recent.gameObject);
+
+                if (_content.childCount == 1)
+                {
+                    _noRecents.SetActive(true);
+                    _recentsScrollView.SetActive(false);
+                }
+
                 File.WriteAllLines(RecentsPath, recents);
             }
         }
