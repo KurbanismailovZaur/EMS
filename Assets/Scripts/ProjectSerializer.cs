@@ -85,6 +85,8 @@ public static class ProjectSerializer
 
     public static async Task Deserialize(string path, string persistentPath, string temporaryPath)
     {
+        await new WaitForBackgroundThread();
+
         var rootDirectory = Path.GetDirectoryName(path);
         var archiveDirectory = Path.Combine(rootDirectory, Guid.NewGuid().ToString());
 
