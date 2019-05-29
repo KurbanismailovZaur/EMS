@@ -47,49 +47,52 @@ namespace Management.Projects
             Created.Invoke();
         }
 
-        public Coroutine Load() => StartCoroutine(LoadRoutine());
+        public Coroutine Load(string path) => StartCoroutine(LoadRoutine(path));
 
-        private IEnumerator LoadRoutine()
+        private IEnumerator LoadRoutine(string path)
         {
-            yield return FileExplorer.Instance.OpenFile("Открыть Проект", null, "ems");
-
-            if (FileExplorer.Instance.LastResult == null) yield break;
-
-            string pathToProject = FileExplorer.Instance.LastResult;
-
-            if (_project != null)
+            if (path == null)
             {
-                if (_project.WasChanged)
+                yield return FileExplorer.Instance.OpenFile("Открыть Проект", null, "ems");
+
+                if (FileExplorer.Instance.LastResult == null) yield break;
+
+                path = FileExplorer.Instance.LastResult;
+
+                if (_project != null)
                 {
-                    yield return QuestionDialog.Instance.Open("Внимание!", "Если не сохранить, проект изменения будут потеряны.\nСохранить проект?");
-
-                    if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Cancel)
-                        yield break;
-
-                    if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Yes)
+                    if (_project.WasChanged)
                     {
-                        string path = null;
+                        yield return QuestionDialog.Instance.Open("Внимание!", "Если не сохранить, проект изменения будут потеряны.\nСохранить проект?");
 
-                        if (string.IsNullOrEmpty(_project.Path))
-                        {
-                            yield return FileExplorer.Instance.SaveFile("Сохранить проект", null, "ems");
-
-                            if (FileExplorer.Instance.LastResult == null) yield break;
-
-                            path = FileExplorer.Instance.LastResult;
-                        }
-                        else
-                            path = _project.Path;
-
-                        var serializeErrorFlag = new BoolFlag();
-                        yield return Serialize(path, serializeErrorFlag, false);
-
-                        if (serializeErrorFlag.Flag)
+                        if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Cancel)
                             yield break;
-                    }
-                }
 
-                Closed.Invoke();
+                        if (QuestionDialog.Instance.Answer == QuestionDialog.AnswerType.Yes)
+                        {
+                            string serializePath = null;
+
+                            if (string.IsNullOrEmpty(_project.Path))
+                            {
+                                yield return FileExplorer.Instance.SaveFile("Сохранить проект", null, "ems");
+
+                                if (FileExplorer.Instance.LastResult == null) yield break;
+
+                                serializePath = FileExplorer.Instance.LastResult;
+                            }
+                            else
+                                serializePath = _project.Path;
+
+                            var serializeErrorFlag = new BoolFlag();
+                            yield return Serialize(serializePath, serializeErrorFlag, false);
+
+                            if (serializeErrorFlag.Flag)
+                                yield break;
+                        }
+                    }
+
+                    Closed.Invoke();
+                }
             }
 
             _project = new Project();
@@ -99,7 +102,7 @@ namespace Management.Projects
             ProgressDialog.Instance.Hide();
 
             var DeserializeErrorFlag = new BoolFlag();
-            yield return Deserialize(pathToProject, DeserializeErrorFlag);
+            yield return Deserialize(path, DeserializeErrorFlag);
 
             if (DeserializeErrorFlag.Flag)
             {
@@ -107,7 +110,7 @@ namespace Management.Projects
                 yield break;
             }
 
-            _project.Path = pathToProject;
+            _project.Path = path;
             _project.WasChanged = false;
         }
 

@@ -15,6 +15,7 @@ using Management.Wires;
 using Management.Calculations;
 using System.IO.Compression;
 using System.Threading;
+using UI.Dialogs.Startups;
 
 public static class ProjectSerializer
 {
@@ -51,6 +52,17 @@ public static class ProjectSerializer
 
         ZipFile.CreateFromDirectory(archiveDirectory.FullName, path, System.IO.Compression.CompressionLevel.Optimal, false);
         archiveDirectory.Delete(true);
+
+        #region Recents
+        var recents = File.ReadAllLines(StartupDialog.Instance.RecentsPath).ToList();
+
+        if (!recents.Contains(path))
+        {
+            recents.Add(path);
+            File.WriteAllLines(StartupDialog.Instance.RecentsPath, recents);
+        }
+        #endregion
+
         DatabaseManager.Instance.SetProgress("100%");
     }
 
@@ -120,12 +132,10 @@ public static class ProjectSerializer
                 // materialsPath is not needed (right here) for importing.
                 var (modelPath, materialsPath) = ReadModelView(reader, repairDirectory);
 
-                if (modelPath != null)
-                {
-                    await new WaitForUpdate();
+                await new WaitForUpdate();
 
+                if (modelPath != null)
                     ModelManager.Instance.ImportModel(modelPath);
-                }
 
                 DatabaseManager.Instance.SetProgress("25%");
 

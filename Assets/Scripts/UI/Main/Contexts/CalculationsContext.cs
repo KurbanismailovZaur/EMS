@@ -134,14 +134,13 @@ namespace UI.Main.Contexts
 
         private void CheckAndSetCalcBtnsInteractable()
         {
-            bool planesExist = ModelManager.Instance.MaterialPlanesPairs != null;
             bool kvid1Exist = TableDataManager.Instance.IsKVID1Imported;
             bool kvid2Exist = TableDataManager.Instance.IsKVID2Imported;
             bool wiringExist = WiringManager.Instance.Wiring != null;
             bool kvid4Exist = TableDataManager.Instance.IsKVID4Imported;
             bool kvid5Exist = TableDataManager.Instance.IsKVID5Imported;
 
-            if (planesExist && kvid1Exist && kvid2Exist && wiringExist && kvid4Exist && kvid5Exist)
+            if (kvid1Exist && kvid2Exist && wiringExist && kvid4Exist && kvid5Exist)
                 SetCalcBtnsInteractable(true);
         }
 

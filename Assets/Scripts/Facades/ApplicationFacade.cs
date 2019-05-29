@@ -32,7 +32,7 @@ using UI.Popups;
 
 namespace Facades
 {
-    public class ApplicationFacade : MonoBehaviour
+    public class ApplicationFacade : MonoSingleton<ApplicationFacade>
     {
         [SerializeField]
         private Axes _axes;
@@ -101,7 +101,7 @@ namespace Facades
         }
 
         #region Project
-        private void CreateNewProject() => StartCoroutine(CreateNewProjectRoutine());
+        public void CreateNewProject() => StartCoroutine(CreateNewProjectRoutine());
 
         private IEnumerator CreateNewProjectRoutine()
         {
@@ -113,13 +113,13 @@ namespace Facades
 
         private void SaveProjectAs() => ProjectManager.Instance.SaveAs();
 
-        private void LoadProject() => StartCoroutine(LoadProjectRoutine());
+        public Coroutine LoadProject(string path = null) => StartCoroutine(LoadProjectRoutine(path));
 
-        private IEnumerator LoadProjectRoutine()
+        private IEnumerator LoadProjectRoutine(string path)
         {
             _isDeserializationState = true;
 
-            yield return ProjectManager.Instance.Load();
+            yield return ProjectManager.Instance.Load(path);
 
             _isDeserializationState = false;
         }
