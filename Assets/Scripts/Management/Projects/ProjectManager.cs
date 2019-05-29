@@ -10,6 +10,7 @@ using System.IO;
 using UI.Dialogs;
 using System;
 using UI.Popups;
+using System.Threading;
 
 namespace Management.Projects
 {
@@ -81,7 +82,7 @@ namespace Management.Projects
                             path = _project.Path;
 
                         var serializeErrorFlag = new BoolFlag();
-                        yield return Serialize(path, serializeErrorFlag);
+                        yield return Serialize(path, serializeErrorFlag, false);
 
                         if (serializeErrorFlag.Flag)
                             yield break;
@@ -94,6 +95,8 @@ namespace Management.Projects
             _project = new Project();
 
             Created.Invoke();
+
+            ProgressDialog.Instance.Hide();
 
             var DeserializeErrorFlag = new BoolFlag();
             yield return Deserialize(pathToProject, DeserializeErrorFlag);
@@ -123,25 +126,26 @@ namespace Management.Projects
                 try
                 {
                     await ProjectSerializer.Deserialize(path, persistentPath, temporaryPath);
-                    errorFlag.Flag = false;
-                    completeFlag.Flag = true;
                 }
                 catch (Exception ex)
                 {
+                    await new WaitForUpdate();
+
                     errorFlag.Flag = true;
                     completeFlag.Flag = true;
-
-                    await new WaitForUpdate();
 
                     ProgressDialog.Instance.Hide();
                     ErrorDialog.Instance.ShowError("Не удалось восстановить проект.", ex);
                     return;
                 }
 
+                await new WaitForUpdate();
+
+                errorFlag.Flag = false;
+                completeFlag.Flag = true;
+
                 _project.Path = FileExplorer.Instance.LastResult;
                 _project.WasChanged = false;
-
-                await new WaitForUpdate();
 
                 ProgressDialog.Instance.Hide();
                 PopupManager.Instance.PopSuccess("Проект успешно восстановлен");
@@ -177,7 +181,7 @@ namespace Management.Projects
             yield return Serialize(FileExplorer.Instance.LastResult, errorFlag);
         }
 
-        private Coroutine Serialize(string path, BoolFlag errorFlag)
+        private Coroutine Serialize(string path, BoolFlag errorFlag, bool handleCompletion = true)
         {
             DatabaseManager.Instance.ResetProgress();
             ProgressDialog.Instance.Show("Сохранение проекта");
@@ -189,15 +193,13 @@ namespace Management.Projects
                 try
                 {
                     await ProjectSerializer.Serialize(path);
-                    errorFlag.Flag = false;
-                    completeFlag.Flag = true;
                 }
                 catch (Exception ex)
                 {
+                    await new WaitForUpdate();
+
                     errorFlag.Flag = true;
                     completeFlag.Flag = true;
-
-                    await new WaitForUpdate();
 
                     ProgressDialog.Instance.Hide();
                     ErrorDialog.Instance.ShowError("Не удалось сохранить проект.", ex);
@@ -209,8 +211,14 @@ namespace Management.Projects
 
                 await new WaitForUpdate();
 
-                ProgressDialog.Instance.Hide();
-                PopupManager.Instance.PopSuccess("Проект успешно сохранен");
+                errorFlag.Flag = false;
+                completeFlag.Flag = true;
+
+                if (handleCompletion)
+                {
+                    ProgressDialog.Instance.Hide();
+                    PopupManager.Instance.PopSuccess("Проект успешно сохранен");
+                }
             });
 
             task.Start();

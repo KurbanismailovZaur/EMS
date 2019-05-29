@@ -31,6 +31,8 @@ namespace UI.Dialogs
         {
             if (_isOpen) throw new BusyException("Already open.");
 
+            _isOpen = true;
+
             _updateProgressRoutine = StartCoroutine(UpdateProgressRoutine(text));
             _rotateRoutine = StartCoroutine(RotateRoutine());
 
@@ -62,10 +64,15 @@ namespace UI.Dialogs
 
         public new void Hide()
         {
+            if (!_isOpen) return;
+
+            _isOpen = false;
+
             StopCoroutine(_updateProgressRoutine);
             StopCoroutine(_rotateRoutine);
 
             _updateProgressRoutine = null;
+            _rotateRoutine = null;
 
             base.Hide();
         }

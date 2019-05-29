@@ -250,6 +250,8 @@ namespace Management
 
         public string DatabasePath { get; private set; }
 
+        public bool IsConnected { get; private set; } = true;
+
         private void Start()
         {
             DatabasePath = Path.Combine(Application.persistentDataPath, "emsdb.bytes");
@@ -586,19 +588,31 @@ namespace Management
 
         public string GetProgress()
         {
+            if (!IsConnected) return null;
+
             var progressInfos = _dbManager.Query<Progress>($"SELECT * FROM {progress}");
             return progressInfos.Count > 0 ? progressInfos[0].percent : null;
         }
 
-        public void Disconnect() => _dbManager.Close();
+        public void Disconnect()
+        {
+            _dbManager.Close();
+            IsConnected = false;
+        }
 
-        public void Connect() => _dbManager.Initialize(true);
+        public void Connect()
+        {
+            _dbManager.Initialize(true);
+            IsConnected = true;
+        }
 
         public async Task ConnectAsync()
         {
             await new WaitForUpdate();
 
-            _dbManager.Initialize(true);
+            Connect();
         }
+
+        public void Vacuum() => _dbManager.Execute("VACUUM");
     }
 }

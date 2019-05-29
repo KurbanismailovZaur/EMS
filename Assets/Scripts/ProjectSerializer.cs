@@ -22,6 +22,8 @@ public static class ProjectSerializer
 
     public static async Task Serialize(string path)
     {
+        DatabaseManager.Instance.Vacuum();
+
         using (BinaryWriter writer = new BinaryWriter(File.Create(path)))
         {
             WritePreambleAndVersion(writer, _preamble, 1);
