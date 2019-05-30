@@ -10,6 +10,7 @@ using System;
 using UnityRandom = UnityEngine.Random;
 using Management.Interop;
 using UI.Popups;
+using UI.Panels.Wire;
 
 namespace Management.Calculations
 {
@@ -41,7 +42,7 @@ namespace Management.Calculations
             var influences = new List<(int a, int b, float value)>();
 
             var maxValue = sourceMutuals.Max(m => Math.Abs(m.value));
-            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), wiresInfluences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.blocksInfluences, m.exceeded,  m.value, color: _gradient.Evaluate((float)(m.value / maxValue)))).ToList();
+            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), wiresInfluences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.blocksInfluences, m.exceeded,  m.value, color: _gradient.Evaluate((float)(Math.Abs(m.value) / maxValue)))).ToList();
             
             _wires = Wire.Factory.Create(mutuals, transform);
 
@@ -72,7 +73,10 @@ namespace Management.Calculations
         public override void Filter(float min, float max)
         {
             foreach (var wire in _wires)
-                wire.gameObject.SetActive(Math.Abs(wire.Value) >= min && Math.Abs(wire.Value) <= max);
+            {
+                var filterResult = Math.Abs(wire.Value) >= min && Math.Abs(wire.Value) <= max || (WirePanel.Instance.IsOpen && wire.Name == WirePanel.Instance.SelectedName);
+                wire.gameObject.SetActive(filterResult);
+            }
         }
 
         private void Wire_Clicked(Wire wire) => Clicked.Invoke(wire);

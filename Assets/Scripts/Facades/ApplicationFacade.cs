@@ -266,7 +266,7 @@ namespace Facades
 
         private void FilterCurrentCalculations(float min, float max) => _currentCalculations?.Filter(min, max);
 
-        private void FilterCurrentCalculationsWithCurrentRanges() => FilterCurrentCalculations(_filter.RangeSlider.MinValue, _filter.RangeSlider.MaxValue);
+        public void FilterCurrentCalculationsWithCurrentRanges() => FilterCurrentCalculations(_filter.RangeSlider.MinValue, _filter.RangeSlider.MaxValue);
 
         private void HandleAdditionalCalculationInstuments()
         {

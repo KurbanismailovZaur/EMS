@@ -38,6 +38,8 @@ namespace UI.Panels.Wire
 
         private double _value;
 
+        private bool _enterState;
+
         public string Name
         {
             get => _nameText.text;
@@ -81,6 +83,11 @@ namespace UI.Panels.Wire
 
                     renderer.material.SetColor("_TintColor", baseColor);
                 }
+                else if (wire.name == Name)
+                {
+                    _enterState = wire.gameObject.activeSelf;
+                    wire.gameObject.SetActive(true);
+                }
             }
         }
 
@@ -97,6 +104,10 @@ namespace UI.Panels.Wire
                     baseColor.a = 0.5f;
 
                     renderer.material.SetColor("_TintColor", baseColor);
+                }
+                else if (wire.name == Name)
+                {
+                    wire.gameObject.SetActive(_enterState);
                 }
             }
         }

@@ -13,11 +13,12 @@ using UnityEngine.Events;
 using Management;
 using Management.Interop;
 using UI.Exploring.FileSystem;
+using UI.Dialogs;
 
 namespace UI.Reporting
 {
-	public class Reports : MonoBehaviour 
-	{
+    public class Reports : MonoBehaviour
+    {
         [SerializeField]
         private CanvasGroup _canvasGroup;
 
@@ -99,7 +100,14 @@ namespace UI.Reporting
             DatabaseManager.Instance.RemoveSelectPointAndWire();
             DatabaseManager.Instance.UpdateSelectPointAndWire(points, wires);
 
-            PythonManager.Instance.GenerateReports(FileExplorer.Instance.LastResult);
+            try
+            {
+                PythonManager.Instance.GenerateReports(FileExplorer.Instance.LastResult);
+            }
+            catch (Exception ex)
+            {
+                ErrorDialog.Instance.ShowError("Не удалось сгенерировать отчеты", ex);
+            }
 
             Close();
         }
@@ -128,6 +136,11 @@ namespace UI.Reporting
         public void BKSandBARemoved()
         {
             _kvid3Blocker.SetActive(true);
+        }
+
+        public void SelectionManager_Changed()
+        {
+            _generateButton.interactable = (_kvid6.SelectedElements.Length + _kvid3.SelectedElements.Length > 0 ) ? true : false;
         }
         #endregion
     }

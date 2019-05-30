@@ -8,10 +8,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System;
 using System.Linq;
+using Management.Calculations;
+using Facades;
 
 namespace UI.Panels.Wire
 {
-    public class WirePanel : MonoBehaviour
+    public class WirePanel : MonoSingleton<WirePanel>
     {
         [SerializeField]
         private CanvasScaler _scaler;
@@ -59,6 +61,8 @@ namespace UI.Panels.Wire
         private Vector2 _mouseStartPosition;
 
         public bool IsOpen { get; private set; }
+
+        public string SelectedName => _wireName.text;
 
         private void Start()
         {
@@ -117,6 +121,8 @@ namespace UI.Panels.Wire
             Hide();
 
             IsOpen = false;
+
+            ApplicationFacade.Instance.FilterCurrentCalculationsWithCurrentRanges();
         }
 
         private void Show() => SetCanvasGroupOptions(1f, true);

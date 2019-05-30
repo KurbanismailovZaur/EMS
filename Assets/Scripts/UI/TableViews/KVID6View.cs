@@ -70,7 +70,6 @@ namespace UI.TableViews
             return nextIndex;
         }
 
-
         protected override void Start()
         {
             base.Start();
@@ -106,9 +105,9 @@ namespace UI.TableViews
                 var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
 
                 panel.Code.StringValue = point.Code;
-                panel.X.FloatValue = point.transform.position.x;
-                panel.Y.FloatValue = point.transform.position.y;
-                panel.Z.FloatValue = point.transform.position.z;
+                panel.X.FloatValue = point.transform.localPosition.x;
+                panel.Y.FloatValue = point.transform.localPosition.y;
+                panel.Z.FloatValue = point.transform.localPosition.z;
                 ++lastTableRowsCount;
 
                 if (lastTableRowsCount == _maxRowsOnPage)

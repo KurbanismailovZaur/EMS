@@ -20,6 +20,8 @@ namespace UI.Reporting
         [SerializeField]
         private Transform _selectedContent;
 
+        public UnityEvent Changed;
+
         public Element[] SelectedElements => _selectedContent.GetComponentsInChildren<Element>();
 
         public void Initialize(string[] names)
@@ -38,6 +40,8 @@ namespace UI.Reporting
             element.transform.SetParent(content);
             element.Clicked.RemoveListener(removeHandler);
             element.Clicked.AddListener(addHandler);
+
+            Changed.Invoke();
         }
 
         private void SelectAll()
