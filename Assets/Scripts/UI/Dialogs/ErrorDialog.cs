@@ -29,8 +29,10 @@ namespace UI.Dialogs
         [SerializeField]
         private Button _saveButton;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             _closeButton.onClick.AddListener(CloseButton_OnClick);
             _saveButton.onClick.AddListener(SaveButton_OnClick);
         }

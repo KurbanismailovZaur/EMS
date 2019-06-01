@@ -150,7 +150,7 @@ namespace Facades
             if (_explorer.LastResult == null) yield break;
 
             DatabaseManager.Instance.SetModelSize(ModelSizeDialog.Instance.Size);
-            ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).WrapErrors();
+            ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).CatchErrors();
         }
 
         private async Task PlanesImportedHandler()
@@ -412,7 +412,7 @@ namespace Facades
         {
             if (_isDeserializationState) return;
 
-            PlanesImportedHandler().WrapErrors();
+            PlanesImportedHandler().CatchErrors();
         }
 
         public void ModelManager_PlanesRemoved()
@@ -476,7 +476,7 @@ namespace Facades
                     CalculateElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
-                    CalculateMutualActionOfBCSAndBAAsync().WrapErrors();
+                    CalculateMutualActionOfBCSAndBAAsync().CatchErrors();
                     break;
                 case CalculationsContext.Action.ElectricFieldStrenghtVisibility:
                     CalculationsManager.Instance.ElectricFieldStrenght.ToggleVisibility();
@@ -502,7 +502,7 @@ namespace Facades
         {
             if (_isDeserializationState) return;
 
-            ContinueCalculateElectricFieldStrenghtInPythonAsync().WrapErrors();
+            ContinueCalculateElectricFieldStrenghtInPythonAsync().CatchErrors();
         }
 
         public void ElectricFieldStrenght_VisibilityChanged()
