@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="c8d68705-f743-43be-a4cd-cca231d2eb6a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/CalibrationScaleRGB.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/CalibrationScaleRGB.fbx.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/RoundedCube.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/RoundedCube.fbx.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/Shaderball2.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/Shaderball2.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/headlow.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/headlow.fbx.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/smallmountain.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/smallmountain.fbx.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/smallwater.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Assets/Models/smallwater.fbx.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/EnvironmentGradient/TerrainExample.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/EnvironmentGradient/TerrainExample.fbx.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/SingleChannelMasking/Masked.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/SingleChannelMasking/Masked.fbx.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Fence A.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Fence A.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Fence B.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Fence B.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - FirTree A.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - FirTree A.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - FirTree B.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - FirTree B.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Grass A.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Grass A.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Grass B.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Grass B.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Rock A.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Rock A.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Rock B.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Rock B.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Terrain.FBX.meta" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Community/Skybox Cubemap Extended/Meshes/LowPoly - Terrain.FBX.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/HD SRP Samples.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/LW SRP Samples.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Official/CustomRTRain/Custom RT Samples.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Official/Mosaic Effect PPS/MosaicEffectPPS.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Official/SimpleTerrain/ApplyGrassWindToTerrain.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Official/Substance/LegacySubstanceExample.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Examples/Official/Substance2018/Substance2018.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Plugins/EditorResources/Templates/CustomRTTemplates.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Plugins/EditorResources/Templates/PPStackTemplates.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Plugins/EditorResources/Templates/SRP/HDSRPTemplates (Legacy).unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Plugins/EditorResources/Templates/SRP/HDSRPTemplates.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Plugins/EditorResources/Templates/SRP/LWSRPTemplates (Legacy).unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/AmplifyShaderEditor/Plugins/EditorResources/Templates/SRP/LWSRPTemplates.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Plugins/Vectrosity/Vectrosity5Demos.unitypackage.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../Scenes/Application.unity" beforeDir="false" afterPath="$PROJECT_DIR$/../../../Scenes/Application.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PythonManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PythonManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../ProjectSettings/ProjectVersion.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../ProjectSettings/ProjectVersion.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../../sqlite3.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../../../sqlite3.dll" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/PythonManager.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <folding>
+                <element signature="e#0#238#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../../.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/PythonManager.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="1095" />
+    <option name="y" value="122" />
+    <option name="width" value="1653" />
+    <option name="height" value="1203" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator currentView="FileSystemExplorer" proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="AssemblyExplorer" />
+      <pane id="FileSystemExplorer" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Rider.DefaultBreakpoints.AreToggled" value="true" />
+    <property name="Rider.ProjectViewActivator.IsNotFirstRun" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.editor" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c8d68705-f743-43be-a4cd-cca231d2eb6a" name="Default Changelist" comment="" />
+      <created>1559341649978</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1559341649978</updated>
+      <workItem from="1559341968069" duration="32000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="32000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1095" y="122" width="1653" height="1203" extended-state="0" />
+    <layout>
+      <window_info id="Favorites" side_tool="true" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24953446" />
+      <window_info id="Structure" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="NuGet" />
+      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" />
+      <window_info anchor="bottom" id="Unit Tests" />
+      <window_info anchor="bottom" id="Event Log" side_tool="true" />
+      <window_info anchor="bottom" id="Database Changes" />
+      <window_info anchor="bottom" id="Performance Profiler" />
+      <window_info anchor="bottom" id="Terminal" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Errors In Solution" />
+      <window_info anchor="right" id="Database" />
+      <window_info anchor="right" id="Unit Tests Coverage" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" suspend="NONE" type="DotNet Exception Breakpoints">
+          <properties exception="System.Threading.ThreadAbortException" displayValue="System.Threading.ThreadAbortException" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/PythonManager.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#238#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FadeMaterial
-  m_Shader: {fileID: 4800000, guid: 87dbe9fb145fce747bc3b4c4ca954171, type: 3}
+  m_Shader: {fileID: 4800000, guid: 9ff55fc6808af4d958d842ec4831ee53, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0

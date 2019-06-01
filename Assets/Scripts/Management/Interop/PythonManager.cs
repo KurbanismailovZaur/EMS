@@ -24,7 +24,7 @@ namespace Management.Interop
         [SerializeField]
         private string _pathToMainScript;
 
-        private void Awake()
+        private new void Awake()
         {
             _pythonPath = Path.Combine(Application.streamingAssetsPath, _pythonPath);
             _pathToMainScript = Path.Combine(Application.streamingAssetsPath, _pathToMainScript);
@@ -54,9 +54,9 @@ namespace Management.Interop
 
         private string RunPythonScript(string arguments)
         {
-            ProcessStartInfo start = new ProcessStartInfo
+            var start = new ProcessStartInfo
             {
-                FileName = _pythonPath,
+                FileName = Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer ? "/usr/local/bin/python3" : _pythonPath,
                 Arguments = arguments,
                 UseShellExecute = false,
                 CreateNoWindow = true,
