@@ -53,7 +53,7 @@ namespace Management.Projects
         {
             if (path == null)
             {
-                yield return FileExplorer.Instance.OpenFile("Открыть Проект", null, "ems");
+                yield return FileExplorer.Instance.OpenFile("Открыть Проект", null, "emc");
 
                 if (FileExplorer.Instance.LastResult == null) yield break;
 
@@ -74,7 +74,7 @@ namespace Management.Projects
 
                             if (string.IsNullOrEmpty(_project.Path))
                             {
-                                yield return FileExplorer.Instance.SaveFile("Сохранить проект", null, "ems");
+                                yield return FileExplorer.Instance.SaveFile("Сохранить проект", null, "emc");
 
                                 if (FileExplorer.Instance.LastResult == null) yield break;
 
@@ -167,8 +167,7 @@ namespace Management.Projects
                 yield return StartCoroutine(SaveAsRoutine("Сохранить проект"));
             else
             {
-                var errorFlag = new BoolFlag();
-                yield return Serialize(_project.Path, errorFlag);
+                yield return Serialize(_project.Path, new BoolFlag());
             }
         }
 
@@ -176,7 +175,7 @@ namespace Management.Projects
 
         private IEnumerator SaveAsRoutine(string explorerTitle)
         {
-            yield return FileExplorer.Instance.SaveFile(explorerTitle, null, "ems");
+            yield return FileExplorer.Instance.SaveFile(explorerTitle, null, "emc");
 
             if (FileExplorer.Instance.LastResult == null) yield break;
 

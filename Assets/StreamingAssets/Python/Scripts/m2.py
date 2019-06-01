@@ -96,12 +96,11 @@ class Math2:
                 # расстояние перекрытия между проекциями отрезков
                 d = min(d_a1b1, d_a2b1, d_a1b2, d_a2b2)
 
-                M = ct.NU / 4 * mt.pi \
+                M = ct.NU / (4 * mt.pi) \
                     * ((d_compare + d_current + d)
                        * mt.log(d_compare + d_current + d) + d * mt.log(d)
                        - (d_compare + d) * mt.log(d_compare + d)
-                       - (d_current + d) * mt.log(d_current + d)
-                       * cos_segment)
+                       - (d_current + d) * mt.log(d_current + d)) * cos_segment
             else:
                 # отрезки расположенны относительно друг друга паралельно
                 s = (half_perimeter
@@ -247,11 +246,11 @@ class Math2:
             else:
                 AM = 0
 
-            M = 2 * ct.NU / 4 * mt.pi * cos_segment \
-                * (x2 * mt.tanh(d_current / (d_a2b2 + d_a2b1))
-                   + y2 * mt.tanh(d_compare / (d_a2b2 + d_a1b2))
-                   - x1 * mt.tanh(d_current / (d_a1b1 + d_a1b2))
-                   - y1 * mt.tanh(d_compare / (d_a1b1 + d_a2b1))
+            M = 2 * ct.NU / (4 * mt.pi) * cos_segment \
+                * (x2 * mt.atanh(d_current / (d_a2b2 + d_a2b1))
+                   + y2 * mt.atanh(d_compare / (d_a2b2 + d_a1b2))
+                   - x1 * mt.atanh(d_current / (d_a1b1 + d_a1b2))
+                   - y1 * mt.atanh(d_compare / (d_a1b1 + d_a2b1))
                    + h / mt.sin(fi) * AM)
 
         # Блок вычисления Емкосного воздействия
@@ -283,13 +282,16 @@ class Math2:
             # найдем среднеарифиметическое значение диаметров жил взаимовлияющих проводов
             diam = (self.wire_a.diam + self.wire_b.diam) / 2
             # найдем виличину электрической емкости между отрезками проводов
-            CE = (mt.pi * ct.EPS) / mt.log((2 * he) / diam + ((he / diam) ** 2 - 1) ** 0.5) * de
-            # найдем емкостное сопротивление
-            Zc = abs(1 / (self.wire_a.w * CE))
-            # найдем сумарное сопротивление на портах провода b
-            Zb = self.wire_b.R1 + self.wire_b.R2
-            # найдем напряжение переданное от провода a к проводу b
-            Uc12 = self.wire_a.U * Zb / (Zb + Zc)
+            if he != 0:
+                CE = (mt.pi * ct.EPS) / mt.log((2 * he) / diam + ((he / diam) ** 2 - 1) ** 0.5) * de
+                # найдем емкостное сопротивление
+                Zc = abs(1 / (self.wire_a.w * CE))
+                # найдем сумарное сопротивление на портах провода b
+                Zb = self.wire_b.R1 + self.wire_b.R2
+                # найдем напряжение переданное от провода a к проводу b
+                Uc12 = self.wire_a.U * Zb / (Zb + Zc)
+            else:
+                Uc12 = 0
 
         return Uc12, M
 
