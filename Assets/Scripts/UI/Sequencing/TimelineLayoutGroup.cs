@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.UI;
 
-namespace Namespace
+namespace UI.Sequencing
 {
 	public class TimelineLayoutGroup : MonoBehaviour, ILayoutGroup
 	{
