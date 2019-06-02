@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Threading.Tasks;
+using UnityEngine;
 using static UnityEngine.Debug;
+using System;
 using System.Diagnostics;
 using System.IO;
-using System;
 using System.Text;
 using UnityEngine.UI;
 
@@ -17,16 +17,21 @@ namespace Management.Interop
         {
             public PythonException(string message) : base(message) { }
         }
-
-        [SerializeField]
         private string _pythonPath;
 
         [SerializeField]
         private string _pathToMainScript;
 
-        private new void Awake()
+        private void Start()
         {
-            _pythonPath = Path.Combine(Application.streamingAssetsPath, _pythonPath);
+#if UNITY_EDITOR
+            _pythonPath = Path.Combine(Application.streamingAssetsPath, DefaultSettings.Python.EditorPath);
+#elif UNITY_STANDALONE_WIN
+            _pythonPath = Path.GetFullPath($"{Directory.GetCurrentDirectory()}/{DefaultSettings.Python.WinPath}");
+#else
+            _pythonPath = DefaultSettings.Python._nixPath;
+#endif
+
             _pathToMainScript = Path.Combine(Application.streamingAssetsPath, _pathToMainScript);
         }
 

@@ -1,0 +1,12 @@
+{
+	"Camera": 
+	{
+		"size": 18
+	},
+	"Python" : 
+	{
+		"editor_path": "Python/Scripts/python-embed-amd64/python.exe",
+		"win_path": "./EMC_Data/StreamingAssets/Python/Scripts/python-embed-amd64/python.exe",
+		"_nix_path": "/usr/local/bin/python3"
+	}
+}

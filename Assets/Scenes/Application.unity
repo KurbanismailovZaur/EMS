@@ -1283,7 +1283,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e00ac7725925ab4d8fcf3b2a054f4e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pythonPath: Python/Scripts/python-embed-amd64/python.exe
   _pathToMainScript: Python/Scripts/main.py
 --- !u!224 &864559571 stripped
 RectTransform:
@@ -1966,7 +1965,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1262467189
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5525,7 +5524,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d27fca23817f2ca47a59a45803131d60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _referencesDataPath: References.xls
+  _referencesDataPath: Predefined/References.xls
   KVID1Imported:
     m_PersistentCalls:
       m_Calls:
@@ -7854,12 +7853,12 @@ PrefabInstance:
     - target: {fileID: 5784064233775152200, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00001074756
+      value: 0.000009779318
       objectReference: {fileID: 0}
     - target: {fileID: 8362528287559011351, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00001074756
+      value: 0.000009779318
       objectReference: {fileID: 0}
     - target: {fileID: 1235963582306367238, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
@@ -7914,12 +7913,12 @@ PrefabInstance:
     - target: {fileID: 4868755466886999410, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00000069600986
+      value: 0.000009779318
       objectReference: {fileID: 0}
     - target: {fileID: 5380508979054013774, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00000069600986
+      value: 0.000009779318
       objectReference: {fileID: 0}
     - target: {fileID: 6417296273377904850, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
