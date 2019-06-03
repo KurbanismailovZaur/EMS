@@ -220,7 +220,7 @@ if __name__ == "__main__":
     im = Import()
     im.kvid1('../data_import/1КВИД_ref.xls')
     im.kvid2('../data_import/2КВИД.xls')
-    im.kvid3('../data_import/3КВИДv2.xls')
+    im.kvid3('../data_import/3КВИД.xls')
     im.kvid4('../data_import/4КВИД_ref.xls')
     im.kvid5('../data_import/5КВИД.xls')
     im.kvid6('../data_import/6КВИД.xls')

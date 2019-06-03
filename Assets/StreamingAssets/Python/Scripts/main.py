@@ -326,7 +326,7 @@ def script_m2(db_path):
                     Uf = m2.do(is_bba=True)
                     # ослабление влияние ББА на заданную точку
                     SEf = m4.do()
-                    Uf *= SEf
+                    Uf *= wire.SE * SEf
                     Ebba += Uf
 
                 data_frequencies.append([Ebba, f_start, f_end])
@@ -424,5 +424,5 @@ if __name__ == "__main__":
     results.script_m3(results.db_path)
     results.script_m2(results.db_path)
     results.script_report(results.db_path, results.xlsx_path)
-    # script_m3('./db/ems.bytes')
+    # script_m2(DB_PATH)
     # script_report('./db/ems.bytes', './report.xlsx')

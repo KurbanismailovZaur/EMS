@@ -96,15 +96,17 @@ class Wire:
         self.w = f * 2 * mt.pi
         # Определение метализирован ли кабель
         m_indexes = [[], []]  # индексы точек метализации по экранам
-        hs = [0, 0]  # среднее значение метализации экранов
+        hs = 0  # среднее значение метализации экранов
         for ind, point in enumerate(points):
             if point.metal1:
                 m_indexes[0].append(ind)
-                hs[0] += point.metal1
+                hs += point.metal1
             if point.metal2:
                 m_indexes[1].append(ind)
-                hs[1] += point.metal2
+                hs += point.metal2
         self.is_metallization = any(m_indexes)
+        if self.is_metallization:
+            hs /= len(m_indexes[0]) + len(m_indexes[1])
         # Диаметр жилы кабеля
         self.diam = type_wire[1]
 
@@ -149,27 +151,26 @@ class Wire:
             nu = materials[shield][2]
 
             if len(lst_index) > 1:
+                points_metal = [0] + lst_index + [len(points) - 1]  # добавляем индексы точек x0 и x1
                 ls = 0  # находим среднее расстояние точек изгибов до ближайшей точки метализации
-                start = 0
-                for i, m_i in enumerate(lst_index):
-                    if m_i == 0 or m_i == len(points) - 1:  # если точка метализации в начале или в конце провода
-                        continue
-                    if i == 0 or i == len(lst_index) - 1:  # если первая или последняя точка метализации
-                        ls += (Wire.get_distance(points[start:m_i + 1]) ** 2) / 2
+                # пары x0m1, m1m2, m2x1
+                points_metal_comba = [(points_metal[i], points_metal[i + 1]) for i in range(len(points_metal) - 1)]
+                for i, m_i in enumerate(points_metal_comba):
+                    # если первая или последняя точка метализации
+                    if i == 0 or i == len(points_metal_comba) - 1:
+                        ls += (Wire.get_distance(points[m_i[0]:m_i[1] + 1]) ** 2) / 2
                     else:  # если точка метализации находится в середине
-                        ls += (Wire.get_distance(points[start:m_i + 1]) ** 2) / 4
-
-                    start = m_i  # смешении индекса точки начала измерения длинны
+                        ls += (Wire.get_distance(points[m_i[0]:m_i[1] + 1]) ** 2) / 4
                 ls /= dS
 
-                hs[shield_i] /= len(lst_index)  # довычисление средней суммы значения по колонке метализации
+                # довычисление средней суммы значения по колонке метализации
                 nu /= ct.NU_CU
                 V = 4 * 10 ** -6 * d * (nu * ec * f) ** 0.5
 
                 # Сопротивления экрана на заданной частоте
-                R = 0.318 * ls / r * (mt.sinh(V) + mt.sin(V)) / (mt.cosh(V) - mt.cos(V)) * (nu * f) / ec
+                R = 0.318 * ls / r * (mt.sinh(V) + mt.sin(V)) / (mt.cosh(V) - mt.cos(V)) * ((nu * f) / ec) ** 0.5
 
-                L = 2 * 10 ** -7 * dS * mt.log(2 * hs[shield_i] / r + 1)
+                L = 2 * 10 ** -7 * dS * mt.log(2 * hs / r + 1)
                 # Коэффициент ослобляющий магнитную состовляющую
                 SHm *= R / (R + self.w * L)
 
@@ -191,6 +192,10 @@ class Wire:
 
     @staticmethod
     def get_distance(points):
+        """
+        :param points: часть провода для которого вы должны вычислить расстояние
+        :return: длина части провода
+        """
         res = 0
         for i in range(len(points) - 1):
             res += get_distance(points[i], points[i + 1])

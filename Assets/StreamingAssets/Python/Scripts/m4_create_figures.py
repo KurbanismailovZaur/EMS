@@ -14,14 +14,12 @@ class Math4Figure:
         self.planes = planes
         self.planes_length = self.planes.shape[0]
 
-        # TODO на данный момент ниже описанная длина задается константой относительно отдельной 3D модели
         # Значения по осям X, Y, Z должны лежать в пределах r_xyz (исходя из размеров модели)
         # где r_xyz[i] - ренальные размеры (радиусы) изделия по осям
         if r_xyz.all():  # реальные значения должны быть больше нуля
             self.r_xyz = np.abs(r_xyz)
         else:
             raise ValueError('real sizes should not be zero')
-        print(self.r_xyz)
 
     @staticmethod
     @jit(nopython=True)

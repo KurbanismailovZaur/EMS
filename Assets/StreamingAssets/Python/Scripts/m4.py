@@ -1,7 +1,5 @@
-from classes import Point, Figure
 from functions import get_distance
 
-import numpy as np
 import constants as ct
 import math
 
