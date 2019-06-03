@@ -6,11 +6,13 @@ using static UnityEngine.Debug;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Linq;
+using System;
 
 namespace UI.Reporting
 {
-	public class SelectionManager : MonoBehaviour 
-	{
+    public class SelectionManager : MonoBehaviour
+    {
         [SerializeField]
         private Element _elementPrefab;
 
@@ -20,19 +22,48 @@ namespace UI.Reporting
         [SerializeField]
         private Transform _selectedContent;
 
+        private string[] _names;
+
+        private int _currentPage = 0;
+
+        [SerializeField]
+        [Range(8, 64)]
+        private int _countPerPage = 8;
+
+        [SerializeField]
+        private InputField _pageInputField;
+
         public UnityEvent Changed;
 
         public Element[] SelectedElements => _selectedContent.GetComponentsInChildren<Element>();
 
+        public int PagesCount => (int)Mathf.Ceil(_names.Length / (float)_countPerPage);
+
+        public string[] CurrentPageNames => _names.Skip(_currentPage * _countPerPage).Take(_countPerPage).ToArray();
+
         public void Initialize(string[] names)
         {
-            RemoveAll();
+            _names = names;
+            _currentPage = 0;
 
-            foreach (var name in names)
+            DeselectAll();
+            UpdateSources();
+        }
+
+        private void UpdateSources()
+        {
+            RemoveSources();
+
+            foreach (var name in _names.Skip(_currentPage * _countPerPage).Take(_countPerPage))
             {
+                if (_selectedContent.GetComponentsInChildren<Element>().ToList().Find((el) => el.Name == name))
+                    continue;
+
                 var element = Element.Factory.Create(_elementPrefab, name, _sourceContent);
                 element.Clicked.AddListener(SourceElement_OnClick);
             }
+
+            _pageInputField.text = $"{Mathf.Clamp(_currentPage + 1, 0, PagesCount)} / {PagesCount}";
         }
 
         private void SetElementClickedBehaviour(Element element, Transform content, UnityAction<Element> removeHandler, UnityAction<Element> addHandler)
@@ -40,6 +71,13 @@ namespace UI.Reporting
             element.transform.SetParent(content);
             element.Clicked.RemoveListener(removeHandler);
             element.Clicked.AddListener(addHandler);
+
+            StartCoroutine(WaitOneFrameAndInvokeChanged());
+        }
+
+        private IEnumerator WaitOneFrameAndInvokeChanged()
+        {
+            yield return null;
 
             Changed.Invoke();
         }
@@ -54,18 +92,40 @@ namespace UI.Reporting
 
         private void DeselectAll()
         {
-            while (_selectedContent.childCount != 0)
+            var currentPageNames = CurrentPageNames;
+            var elements = _selectedContent.GetComponentsInChildren<Element>();
+
+            foreach (var el in elements)
             {
-                SetElementClickedBehaviour(_selectedContent.GetChild(0).GetComponent<Element>(), _sourceContent, SelectedElement_OnClick, SourceElement_OnClick);
+                if (currentPageNames.Contains(el.Name))
+                    SetElementClickedBehaviour(el, _sourceContent, SelectedElement_OnClick, SourceElement_OnClick);
+                else
+                    Destroy(el.gameObject);
             }
         }
 
         private void RemoveAll()
         {
             DeselectAll();
+            RemoveSources();
+        }
 
+        private void RemoveSources()
+        {
             foreach (Transform child in _sourceContent)
                 Destroy(child.gameObject);
+        }
+
+        private void ShowPreviousPage()
+        {
+            _currentPage = Mathf.Max(_currentPage - 1, 0);
+            UpdateSources();
+        }
+
+        private void ShowNextPage()
+        {
+            _currentPage = Mathf.Min(_currentPage + 1, PagesCount - 1);
+            UpdateSources();
         }
 
         #region Event handlers
@@ -82,6 +142,10 @@ namespace UI.Reporting
         public void SelectAllButton_OnClick() => SelectAll();
 
         public void DeselectAllButton_OnClick() => DeselectAll();
+
+        public void PreviousButton_OnClick() => ShowPreviousPage();
+
+        public void NextButton_OnClick() => ShowNextPage();
         #endregion
     }
 }
