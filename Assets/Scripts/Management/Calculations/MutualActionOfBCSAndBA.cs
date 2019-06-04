@@ -11,6 +11,7 @@ using UnityRandom = UnityEngine.Random;
 using Management.Interop;
 using UI.Popups;
 using UI.Panels.Wire;
+using System.Collections.ObjectModel;
 
 namespace Management.Calculations
 {
@@ -28,6 +29,8 @@ namespace Management.Calculations
         public override double FilterMaxValue { get; protected set; }
 
         public override string[] ExceededNames => _wires.Where(w => w.IsExceeded).Select(w => w.Name).ToArray();
+
+        public string[] WiresNames => _wires?.Select(w => w.Name).ToArray();
 
         public void Calculate(Wiring wiring)
         {

@@ -1,24 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Threading.Tasks;
+using UnityEngine;
 using static UnityEngine.Debug;
-using Exceptions;
-using UnityEngine.UI;
-using Management.Calculations;
-using System.Linq;
-using Management.Wires;
 using System;
-using UnityEngine.Events;
+using System.Linq;
+using Exceptions;
 using Management;
+using Management.Calculations;
 using Management.Interop;
-using UI.Exploring.FileSystem;
+using Management.Wires;
 using UI.Dialogs;
+using UI.Exploring.FileSystem;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace UI.Reporting
 {
     public class Reports : MonoBehaviour
     {
+        private enum GenerateType
+        {
+            Points,
+            Wires,
+            All,
+            Selected
+        }
+
         [SerializeField]
         private CanvasGroup _canvasGroup;
 
@@ -38,13 +46,43 @@ namespace UI.Reporting
         private Button _generateButton;
 
         [SerializeField]
+        private Button _generateCloseButton;
+
+        [SerializeField]
+        private Button _generatePointsButton;
+
+        [SerializeField]
+        private Button _generateWiresButton;
+
+        [SerializeField]
+        private Button _generateAllButton;
+
+        [SerializeField]
+        private Button _generateSelectedButton;
+
+        [SerializeField]
         private Button _cancelButton;
+
+        [SerializeField]
+        private Button _generatePanelButton;
 
         private bool _isOpen;
 
         private void Start()
         {
             _generateButton.onClick.AddListener(GenerateButton_OnClick);
+
+            _generatePanelButton.onClick.AddListener(GeneratePanelButton_OnClick);
+
+            _generateCloseButton.onClick.AddListener(GenerateCloseButton_OnClick);
+
+            _generatePointsButton.onClick.AddListener(GeneratePointsButton_OnClick);
+
+            _generateWiresButton.onClick.AddListener(GenerateWiresButton_OnClick);
+
+            _generateAllButton.onClick.AddListener(GenerateAllButton_OnClick);
+
+            _generateSelectedButton.onClick.AddListener(GenerateSelectedButton_OnClick);
 
             _cancelButton.onClick.AddListener(CancelButton_OnClick);
         }
@@ -67,6 +105,11 @@ namespace UI.Reporting
 
             _kvid6.Initialize(points);
             _kvid3.Initialize(wires);
+
+            _generatePointsButton.interactable = CalculationsManager.Instance.ElectricFieldStrenght.Points.Count > 0;
+            _generateWiresButton.interactable = CalculationsManager.Instance.MutualActionOfBCSAndBA.WiresNames?.Length > 0;
+
+            _generateAllButton.interactable = _generatePointsButton.interactable && _generateWiresButton.interactable;
         }
 
         private void Close()
@@ -86,16 +129,34 @@ namespace UI.Reporting
             _canvasGroup.blocksRaycasts = blockRaycast;
         }
 
-        private void Generate() => StartCoroutine(GenerateRoutine());
-
-        private IEnumerator GenerateRoutine()
+        private IEnumerator GenerateRoutine(GenerateType generateType)
         {
+            _generatePanelButton.gameObject.SetActive(false);
+
             yield return FileExplorer.Instance.SaveFile("Сгенерировать Отчеты", null, "xlsx", "reports.xlsx");
 
             if (FileExplorer.Instance.LastResult == null) yield break;
 
-            var points = _kvid6.SelectedElements.Select(el => el.Name).ToArray();
-            var wires = _kvid3.SelectedElements.Select(el => el.Name).ToArray();
+            string[] points = { };
+            string[] wires = { };
+
+            switch (generateType)
+            {
+                case GenerateType.Points:
+                    points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => p.Code).ToArray();
+                    break;
+                case GenerateType.Wires:
+                    wires = WiringManager.Instance.Wiring.Wires.Select(w => w.Name).ToArray();
+                    break;
+                case GenerateType.All:
+                    points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => p.Code).ToArray();
+                    wires = WiringManager.Instance.Wiring.Wires.Select(w => w.Name).ToArray();
+                    break;
+                case GenerateType.Selected:
+                    points = _kvid6.SelectedElements.Select(el => el.Name).ToArray();
+                    wires = _kvid3.SelectedElements.Select(el => el.Name).ToArray();
+                    break;
+            }
 
             DatabaseManager.Instance.RemoveSelectPointAndWire();
             DatabaseManager.Instance.UpdateSelectPointAndWire(points, wires);
@@ -113,10 +174,21 @@ namespace UI.Reporting
         }
 
         #region Event handlers
-        private void GenerateButton_OnClick() => Generate();
+        private void GenerateButton_OnClick() => _generatePanelButton.gameObject.SetActive(true);
+
+        private void GeneratePanelButton_OnClick() => _generatePanelButton.gameObject.SetActive(false);
+
+        private void GenerateCloseButton_OnClick() => _generatePanelButton.gameObject.SetActive(false);
+
+        private void GeneratePointsButton_OnClick() => StartCoroutine(GenerateRoutine(GenerateType.Points));
+
+        private void GenerateWiresButton_OnClick() => StartCoroutine(GenerateRoutine(GenerateType.Wires));
+
+        private void GenerateAllButton_OnClick() => StartCoroutine(GenerateRoutine(GenerateType.All));
+
+        private void GenerateSelectedButton_OnClick() => StartCoroutine(GenerateRoutine(GenerateType.Selected));
 
         private void CancelButton_OnClick() => Close();
-
 
         public void ElectricFieldCalculated()
         {
@@ -140,7 +212,7 @@ namespace UI.Reporting
 
         public void SelectionManager_Changed()
         {
-            _generateButton.interactable = (_kvid6.SelectedElements.Length + _kvid3.SelectedElements.Length > 0 ) ? true : false;
+            _generateSelectedButton.interactable = (_kvid6.SelectedElements.Length + _kvid3.SelectedElements.Length > 0) ? true : false;
         }
         #endregion
     }
