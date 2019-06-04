@@ -11,6 +11,8 @@ class Math4Figure:
         :param planes: плоскости из которых состоит модель - np.array(<три точки>, материал)
         :param r_xyz: ренальные размеры, где  X, Z - радиусы, а Y - высота изделия
         """
+        print(planes)
+        print(planes[0, 0])
         self.planes = planes
         self.planes_length = self.planes.shape[0]
 
@@ -147,20 +149,16 @@ class Math4Figure:
         return figures
 
 
-if __name__ == "__main__":
-    # Elapsed time: 0:01:01.784
-    # Memory used: 167.211mb
-
+def main():
     from settings import DB_PATH
     from storage import Storage
 
     storage = Storage(DB_PATH)
 
     print('=> чтение данных...')
-    planes = storage.get_planes()
-    sizes = storage.get_model_sizes()
-
-    m = Math4Figure(np.array(planes), np.array(sizes))
+    m = Math4Figure(
+        storage.get_planes(),
+        np.array(storage.get_model_sizes()))
 
     # Нормирования геометрических параметров модели
     print('=> обработка данных...')
@@ -170,3 +168,11 @@ if __name__ == "__main__":
     # запись полученных кубов в базу данных
     count_figures = storage.set_figures(figures)
     print('Всего фигур: %s' % count_figures)  # 219574 # 290616
+
+
+if __name__ == "__main__":
+    # Elapsed time: 0:01:01.784
+    # Memory used: 167.211mb
+    main()
+
+

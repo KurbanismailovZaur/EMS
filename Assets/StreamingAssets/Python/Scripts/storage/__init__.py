@@ -180,17 +180,25 @@ class Storage:
     def get_planes(self):
         """
         Загрузка плоскостей
-        :return: list
+        :return: numpy.ndarray
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
         cursor.execute("SELECT * FROM ModelPoint")
-        res = cursor.fetchall()
+
+        # формируем 1d массив из кортежей
+        res = np.fromiter(cursor, dtype=[
+            ('x1', 'd'), ('y1', 'd'), ('z1', 'd'),
+            ('x2', 'd'), ('y2', 'd'), ('z2', 'd'),
+            ('x3', 'd'), ('y3', 'd'), ('z3', 'd'),
+            ('material_id', 'd')])
+
+        res_view = res.view((res.dtype[0], len(res.dtype.names)))  # преобразуем в простой 2d массив
 
         conn.close()
 
-        return res
+        return res_view
 
     def get_model_sizes(self):
         """
@@ -381,5 +389,7 @@ class Storage:
 
 
 if __name__ == "__main__":
-    storage = Storage('../db/ems.bytes')
-    # print(list(storage.get_BBAs()))
+    from settings import DB_PATH
+
+    storage = Storage(DB_PATH)
+    print(storage.get_planes())
