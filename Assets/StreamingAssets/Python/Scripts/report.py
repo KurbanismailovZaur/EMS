@@ -1,5 +1,7 @@
 import xlsxwriter
 
+LIMITER_ROWS = 65500
+
 
 class Report:
     def __init__(self, results_m3, results_m2, points, wires, path='reports.xlsx'):
@@ -11,10 +13,10 @@ class Report:
 
     def do(self):
         is_points = len(self.select_points) > 0 and len(self.results_m3) > 0  # если заданные точки выбраны
-        is_wires = len(self.select_wires) > 0 and len(self.results_m2) > 0 # если кабеля выбраны
+        is_wires = len(self.select_wires) > 0 and len(self.results_m2) > 0  # если кабеля выбраны
 
         if is_points or is_wires:
-            workbook = xlsxwriter.Workbook(self.path)
+            workbook = xlsxwriter.Workbook(self.path, {'constant_memory': True})
 
             props_base = {
                 'font_name': 'Times New Roman',
@@ -96,7 +98,7 @@ class Report:
                 row = 4
                 col = 0
                 for point_id in self.select_points:
-                    if row >= 1000000:
+                    if row >= LIMITER_ROWS:
                         break
                     item = self.results_m3[point_id]
                     for wire in item[4]:
@@ -168,7 +170,7 @@ class Report:
                 row = 4
                 col = 0
                 for point_id in self.select_points:
-                    if row >= 1000000:
+                    if row >= LIMITER_ROWS:
                         break
                     item = self.results_m3[point_id]
                     worksheet.write(row, col, point_id, format_base)
@@ -218,7 +220,7 @@ class Report:
                 row = 3
                 col = 0
                 for point_id in self.select_points:
-                    if row + count_f >= 1000000:
+                    if row + count_f >= LIMITER_ROWS:
                         break
                     item = self.results_m3[point_id]
                     row_point = row
@@ -305,7 +307,7 @@ class Report:
                 row = 4
                 col = 0
                 for wire_id in self.select_wires:
-                    if row >= 1000000:
+                    if row >= LIMITER_ROWS:
                         break
                     item = self.results_m2[wire_id]
                     for wire in item[0]:
@@ -368,7 +370,7 @@ class Report:
                 row = 3
                 col = 0
                 for wire_id in self.select_wires:
-                    if row + count_f >= 1000000:
+                    if row + count_f >= LIMITER_ROWS:
                         break
                     item = self.results_m2[wire_id]
                     row_point = row

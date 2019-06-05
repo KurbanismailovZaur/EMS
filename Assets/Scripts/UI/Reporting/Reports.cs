@@ -14,6 +14,7 @@ using UI.Dialogs;
 using UI.Exploring.FileSystem;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UI.Popups;
 
 namespace UI.Reporting
 {
@@ -158,6 +159,18 @@ namespace UI.Reporting
                     break;
             }
 
+            DatabaseManager.Instance.SetProgress("ожидание");
+            ProgressDialog.Instance.Show("Генерация отчета");
+
+            Meth(points, wires).WrapErrors();
+
+            Close();
+        }
+
+        private async Task Meth(string[] points, string[] wires)
+        {
+            await new WaitForBackgroundThread();
+
             DatabaseManager.Instance.RemoveSelectPointAndWire();
             DatabaseManager.Instance.UpdateSelectPointAndWire(points, wires);
 
@@ -167,10 +180,18 @@ namespace UI.Reporting
             }
             catch (Exception ex)
             {
+                await new WaitForUpdate();
+                
+                ProgressDialog.Instance.Hide();
                 ErrorDialog.Instance.ShowError("Не удалось сгенерировать отчеты", ex);
+
+                return;
             }
 
-            Close();
+            await new WaitForUpdate();
+
+            ProgressDialog.Instance.Hide();
+            PopupManager.Instance.PopSuccess("Отчет сгенерирован");
         }
 
         #region Event handlers
