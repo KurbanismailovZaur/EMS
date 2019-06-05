@@ -46,5 +46,11 @@ namespace Management.Calculations
             _currentTimeIndex = index;
             _renderer.sharedMaterial.color = Gradients[_currentTimeIndex];
         }
+
+        private void OnDestroy()
+        {
+            Destroy(GetComponent<MeshFilter>().sharedMesh);
+            Destroy(GetComponent<MeshRenderer>().sharedMaterial);
+        }
     }
 }

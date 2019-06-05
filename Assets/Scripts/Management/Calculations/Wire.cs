@@ -105,6 +105,8 @@ namespace Management.Calculations
 
         public event Action<Wire> Clicked;
 
+        protected override void OnDestroy() => base.OnDestroy();
+
         #region Events handler
         private void LineCollider_ClickHandler() => Clicked?.Invoke(this);
         #endregion

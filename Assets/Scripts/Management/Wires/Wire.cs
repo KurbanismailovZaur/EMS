@@ -60,5 +60,11 @@ namespace Management.Wires
         protected List<Point> _points;
 
         public ReadOnlyCollection<Point> Points => new ReadOnlyCollection<Point>(_points);
+
+        protected virtual void OnDestroy()
+        {
+            Destroy(GetComponent<MeshFilter>().sharedMesh);
+            Destroy(GetComponent<MeshRenderer>().sharedMaterial);
+        }
     }
 }

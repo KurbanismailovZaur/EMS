@@ -150,7 +150,7 @@ namespace Facades
             if (_explorer.LastResult == null) yield break;
 
             DatabaseManager.Instance.SetModelSize(ModelSizeDialog.Instance.Size);
-            ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).CatchErrors();
+            ModelManager.Instance.ImportPlanesAsync(_explorer.LastResult).WrapErrors();
         }
 
         private async Task PlanesImportedHandler()
@@ -372,6 +372,9 @@ namespace Facades
             TableDataManager.Instance.RemoveAll();
 
             DatabaseManager.Instance.DisconectAndDeleteDatabase();
+
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
         }
         #endregion
 
@@ -412,7 +415,7 @@ namespace Facades
         {
             if (_isDeserializationState) return;
 
-            PlanesImportedHandler().CatchErrors();
+            PlanesImportedHandler().WrapErrors();
         }
 
         public void ModelManager_PlanesRemoved()
@@ -476,7 +479,7 @@ namespace Facades
                     CalculateElectricFieldStrenght();
                     break;
                 case CalculationsContext.Action.CalculateMutualActionOfBCSAndBA:
-                    CalculateMutualActionOfBCSAndBAAsync().CatchErrors();
+                    CalculateMutualActionOfBCSAndBAAsync().WrapErrors();
                     break;
                 case CalculationsContext.Action.ElectricFieldStrenghtVisibility:
                     CalculationsManager.Instance.ElectricFieldStrenght.ToggleVisibility();
@@ -502,7 +505,7 @@ namespace Facades
         {
             if (_isDeserializationState) return;
 
-            ContinueCalculateElectricFieldStrenghtInPythonAsync().CatchErrors();
+            ContinueCalculateElectricFieldStrenghtInPythonAsync().WrapErrors();
         }
 
         public void ElectricFieldStrenght_VisibilityChanged()
