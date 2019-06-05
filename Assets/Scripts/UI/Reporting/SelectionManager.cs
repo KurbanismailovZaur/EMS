@@ -136,7 +136,10 @@ namespace UI.Reporting
 
         private void SelectedElement_OnClick(Element element)
         {
-            SetElementClickedBehaviour(element, _sourceContent, SelectedElement_OnClick, SourceElement_OnClick);
+            if (CurrentPageNames.Contains(element.Name))
+                SetElementClickedBehaviour(element, _sourceContent, SelectedElement_OnClick, SourceElement_OnClick);
+            else
+                Destroy(element.gameObject);
         }
 
         public void SelectAllButton_OnClick() => SelectAll();
