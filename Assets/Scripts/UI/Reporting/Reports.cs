@@ -101,7 +101,7 @@ namespace UI.Reporting
         private void Initialize()
         {
             var points = CalculationsManager.Instance.ElectricFieldStrenght.Points.Select(p => p.Code).ToArray();
-            var wires = WiringManager.Instance.Wiring?.Wires.Select(w => w.Name).ToArray() ?? new string[0];
+            var wires = CalculationsManager.Instance.MutualActionOfBCSAndBA.WiresNames;
 
             _kvid6.Initialize(points);
             _kvid3.Initialize(wires);

@@ -49,7 +49,6 @@ namespace Management.Calculations
 
         private void OnDestroy()
         {
-            Destroy(GetComponent<MeshFilter>().sharedMesh);
             Destroy(GetComponent<MeshRenderer>().sharedMaterial);
         }
     }
