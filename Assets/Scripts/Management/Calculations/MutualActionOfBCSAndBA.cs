@@ -30,7 +30,7 @@ namespace Management.Calculations
 
         public override string[] ExceededNames => _wires.Where(w => w.IsExceeded).Select(w => w.Name).ToArray();
 
-        public string[] WiresNames => _wires?.Select(w => w.Name).ToArray();
+        public string[] WiresNames => _wires?.Select(w => w.Name).ToArray() ?? new string[] { };
 
         public void Calculate(Wiring wiring)
         {

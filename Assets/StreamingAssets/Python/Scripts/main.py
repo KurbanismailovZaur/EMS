@@ -57,6 +57,8 @@ def create_figures(db_path):
 
     # запись полученных кубов в базу данных
     storage.set_figures(figures)
+
+    storage.delete_all_planes()
     print('ok')
 
 

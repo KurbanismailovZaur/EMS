@@ -462,6 +462,17 @@ namespace Management
             _dbManager.Execute($"DELETE FROM {kvid81}");
             _dbManager.Execute($"DELETE FROM {kvid82}");
         }
+
+        public void RemoveResultAllM3()
+        {
+            _dbManager.Execute($"DELETE FROM {resultM3}");
+            _dbManager.Execute($"DELETE FROM {resultM3Times}");
+        }
+
+        public void RemoveResultM2()
+        {
+            _dbManager.Execute($"DELETE FROM {resultM2}");
+        }
         #endregion
 
         public void UpdateSelectPointAndWire(string[] points, string[] wires)

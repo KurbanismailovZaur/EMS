@@ -218,7 +218,7 @@ class Storage:
     def get_result_m3(self):
         """
         Загрузка результатов по M3
-        :return: итерационнай объект list
+        :return: dict
         """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -373,6 +373,28 @@ class Storage:
 
         return count
 
+    def set_select_point(self, data):
+        """
+        Установка заданных точек
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM SelectPoint")  # удаление данных из БД
+        conn.commit()
+
+        count = sum(1 for _ in
+                    map(lambda item:
+                        cursor.execute(f"INSERT into SelectPoint values (?)",
+                                       [item]),
+                        data))
+
+        conn.commit()
+
+        conn.close()
+
+        return count
+
     def set_progress(self, percent):
         """
         Запись прогресса завершения определенной задачи в процентах
@@ -387,9 +409,25 @@ class Storage:
 
         conn.close()
 
+    def delete_all_planes(self):
+        """
+        Удаление всех плоскостей
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM ModelPoint")  # удаление данных из БД
+
+        conn.commit()
+
+        conn.close()
+
 
 if __name__ == "__main__":
     from settings import DB_PATH
 
     storage = Storage(DB_PATH)
-    print(storage.get_planes())
+    storage.delete_all_planes()
+
+    # result_m3 = storage.get_result_m3()
+    # print(storage.set_select_point(list(result_m3.keys())))

@@ -525,6 +525,7 @@ namespace Facades
             Timeline.Instance.Pause();
             Timeline.Instance.Hide();
             DatabaseManager.Instance.RemoveKVID6();
+            DatabaseManager.Instance.RemoveResultAllM3();
         }
         #endregion
 
@@ -559,6 +560,11 @@ namespace Facades
                 _wirePanel.Open(wire);
             else
                 _wirePanel.Open(wire, Input.mousePosition);
+        }
+
+        public void MutualActionOfBCSAndBA_Removed()
+        {
+            DatabaseManager.Instance.RemoveResultM2();
         }
         #endregion
         #endregion
