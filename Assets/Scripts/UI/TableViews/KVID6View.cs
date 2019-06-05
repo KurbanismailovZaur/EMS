@@ -31,44 +31,10 @@ namespace UI.TableViews
         [SerializeField]
         private FileExplorer _explorer;
 
-
-        private List<KVID6Table> _pages = new List<KVID6Table>();
+        private List<(string code, Vector3 position)> _points = new List<(string code, Vector3 position)>();
         private int _activePageIndex = 0;
 
-        public int CountPanelsInAllPages
-        {
-            get
-            {
-                if (_pages.Count == 0) return 0;
-
-                return _pages[_pages.Count - 1].GetPoints().Count + _maxRowsOnPage * (_pages.Count - 1);
-            }
-        }
-
-        public int GetNextRowIndex()
-        {
-            int nextIndex = 0;
-
-            bool needContinue = true;
-            while (needContinue)
-            {
-                bool finded = false;
-                foreach (var page in _pages)
-                {
-                    if (page.Panels.Find(p => p.Code.StringValue == $"Т{nextIndex}") != null)
-                    {
-                        ++nextIndex;
-                        finded = true;
-                        break;
-                    }
-                }
-
-                if (!finded)
-                    needContinue = false;
-            }
-
-            return nextIndex;
-        }
+        private int _currentRowIndex = -1;
 
         protected override void Start()
         {
@@ -81,7 +47,6 @@ namespace UI.TableViews
 
             SelectFirstTab();
 
-            _pages.Add(_tabsAssociations[0].table as KVID6Table);
             ActivatePage(0);
         }
 
@@ -90,73 +55,43 @@ namespace UI.TableViews
             base.Open();
         }
 
+        public void DeepClear()
+        {
+            _points.Clear();
+            _currentRowIndex = 0;
+            KVID6Table currentTable = (KVID6Table)GetCurrentTable();
+            currentTable.ClearNextCode();
+        }
+
         protected override void LoadData()
         {
             if (!CalculationsManager.Instance.ElectricFieldStrenght.IsCalculated) return;
 
-
-
-            int lastTableRowsCount = 0;
-            KVID6Table currentTable;
-            currentTable = (KVID6Table)GetCurrentTable();
-
+            DeepClear();
             foreach (var point in CalculationsManager.Instance.ElectricFieldStrenght.Points)
             {
-                var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
+                _points.Add((point.Code, point.transform.localPosition));
 
-                panel.Code.StringValue = point.Code;
-                panel.X.FloatValue = point.transform.localPosition.x;
-                panel.Y.FloatValue = point.transform.localPosition.y;
-                panel.Z.FloatValue = point.transform.localPosition.z;
-                ++lastTableRowsCount;
-
-                if (lastTableRowsCount == _maxRowsOnPage)
+                int i;
+                if(int.TryParse(point.Code.Substring(1), out i))
                 {
-                    currentTable.gameObject.SetActive(false);
-                    currentTable = AddTable("KVID6Table");
-                    _pages.Add(currentTable);
-
-                    lastTableRowsCount = 0;
+                    if (i > _currentRowIndex) _currentRowIndex = i;
                 }
             }
 
-
-            currentTable.gameObject.SetActive(false);
             ActivatePage(0);
         }
 
         protected override void Clear()
         {
-            PagesClear();
-        }
-
-        private void PagesClear()
-        {
-            for (int i = 0; i < _pages.Count; ++i)
-            {
-                if (i == 0) continue;
-
-                Destroy(_pages[i].gameObject);
-            }
-
-            _pages[0].Clear();
-            _pages.Clear();
-
-            _activePageIndex = 0;
-            _pages.Add(_tabsAssociations[0].table as KVID6Table);
-            ActivatePage(0);
+            _tabsAssociations[0].table.Clear();
         }
 
         public override void Save()
         {
-            List<(string code, Vector3 position)> points = new List<(string code, Vector3 position)>();
+            SaveCurrentPageChanges();
 
-            foreach (var table in _pages)
-            {
-                points.AddRange(table.GetPoints());
-            }
-
-            CalculationsManager.Instance.CalculateElectricFieldStrenght(points, 1f);
+            CalculationsManager.Instance.CalculateElectricFieldStrenght(_points, 1f);
 
             Close();
         }
@@ -165,7 +100,7 @@ namespace UI.TableViews
 
         private IEnumerator ImportRoutine()
         {
-            yield return _explorer.OpenFile("Импорт 3КВИД", null, "xls");
+            yield return _explorer.OpenFile("Импорт 6КВИД", null, "xls");
 
             if (_explorer.LastResult == null) yield break;
 
@@ -173,39 +108,19 @@ namespace UI.TableViews
             try
             {
                 var points = KVID6DataReader.ReadFromFile(_explorer.LastResult);
+                DeepClear();
 
-                Clear();
+                _points = points;
 
-
-                int lastTableRowsCount = 0;
-                KVID6Table currentTable;
-                currentTable = (KVID6Table)GetCurrentTable();
-
-
-                foreach (var (code, position) in points)
+                foreach(var point in _points)
                 {
-                    var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
-
-                    panel.Code.StringValue = code;
-                    panel.X.FloatValue = position.x;
-                    panel.Y.FloatValue = position.y;
-                    panel.Z.FloatValue = position.z;
-
-                    ++lastTableRowsCount;
-
-                    if (lastTableRowsCount == _maxRowsOnPage)
+                    int i;
+                    if (int.TryParse(point.code.Substring(1), out i))
                     {
-                        currentTable.gameObject.SetActive(false);
-
-                        currentTable = AddTable("KVID6Table");
-                        _pages.Add(currentTable);
-
-                        lastTableRowsCount = 0;
+                        if (i > _currentRowIndex) _currentRowIndex = i;
                     }
                 }
 
-
-                currentTable.gameObject.SetActive(false);
                 ActivatePage(0);
             }
             catch (Exception e)
@@ -225,23 +140,37 @@ namespace UI.TableViews
 
         public void ActivatePage(int number)
         {
-            if (number < 0 || number >= _pages.Count) return;
+            if (_points.Count == 0) return;
+            if (number < 0 || number > Mathf.CeilToInt(_points.Count / _maxRowsOnPage)) return;
 
-            _pages[_activePageIndex].gameObject.SetActive(false);
-            _pages[number].gameObject.SetActive(true);
+            Clear();
+
+            KVID6Table currentTable = (KVID6Table)GetCurrentTable();
+
+            var pagePoints = _points.Skip(_maxRowsOnPage * number).Take(_maxRowsOnPage);
+
+            foreach (var point in pagePoints)
+            {
+                var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
+                panel.Code.StringValue = point.code;
+                panel.X.FloatValue = point.position.x;
+                panel.Y.FloatValue = point.position.y;
+                panel.Z.FloatValue = point.position.z;
+            }
 
             _activePageIndex = number;
-
             _currentPageNumberText.text = _activePageIndex.ToString();
         }
 
         public void PreviousPage()
         {
+            SaveCurrentPageChanges();
             ActivatePage(_activePageIndex - 1);
         }
 
         public void NextPage()
         {
+            SaveCurrentPageChanges();
             ActivatePage(_activePageIndex + 1);
         }
 
@@ -251,25 +180,43 @@ namespace UI.TableViews
             _content.GetComponentInParent<UnityEngine.UI.ScrollRect>().verticalNormalizedPosition = 0f;
         }
 
+
+        private void SaveCurrentPageChanges()
+        {
+            KVID6Table currentTable = (KVID6Table)GetCurrentTable();
+
+            for (int i = 0; i < currentTable.PanelCount; ++i)
+            {
+                int index = _activePageIndex * _maxRowsOnPage + i;
+                var panel = currentTable.Panels[i];
+                _points[index] = (panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue));
+            }
+        }
+
+
+
         #region Event handlers
         private void Import_OnClick() => Import();
         protected override void AddButton_OnClick()
         {
-            if (CountPanelsInAllPages == 103823) return;
+            if (_points.Count == 103823) return;
 
 
-            int lastPageRowsCount = _pages[_pages.Count - 1].PanelCount;
+            int lastPageRowsCount = _points.Count % _maxRowsOnPage;
             if (lastPageRowsCount == _maxRowsOnPage)
             {
-                var currentTable = AddTable("KVID6Table");
-                _pages.Add(currentTable);
+                SaveCurrentPageChanges();
             }
+            _points.Add(($"Т{++_currentRowIndex}", Vector3.zero));
 
-            ActivatePage(_pages.Count - 1);
-
-            _pages[_pages.Count - 1].AddEmpty(Cell_Clicked);
+            ActivatePage((_points.Count % _maxRowsOnPage == 0) ? Mathf.CeilToInt(_points.Count / _maxRowsOnPage) - 1 : Mathf.CeilToInt(_points.Count / _maxRowsOnPage));
 
             StartCoroutine(UpdateScrollrectVerticalRoutine());
+        }
+
+        public void OnPanelDeleted((string code, Vector3 position) panelData)
+        {
+            _points.Remove(panelData);
         }
         #endregion
     }

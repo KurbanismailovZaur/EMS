@@ -108,7 +108,9 @@ namespace UI.Tables.Concrete.KVIDS
 
         public List<KVID6Panel> Panels { get { return _kvid6Panels; } }
 
-        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add(GetNextCode(), 0f, 0f, 0f, cellClickHandler);
+        public string NextCode { get { return GetNextCode(); } }
+
+        public override Panel AddEmpty(Action<Cell> cellClickHandler) => Add("qwerty", 0f, 0f, 0f, cellClickHandler);
 
         private KVID6Panel Add(string code, float x, float y, float z, Action<Cell> cellClickHandler)
         {
@@ -131,7 +133,14 @@ namespace UI.Tables.Concrete.KVIDS
 
         private string GetNextCode()
         {
-            return $"Т{GetComponentInParent<KVID6View>().GetNextRowIndex()}";
+            while (_kvid6Panels.Find(p => p.Code.StringValue == $"Т{_nextCodeIndex}") != null) _nextCodeIndex += 1;
+
+            return $"Т{_nextCodeIndex}";
+        }
+
+        public void ClearNextCode()
+        {
+            _nextCodeIndex = 0;
         }
 
         public override void Clear()
@@ -199,12 +208,12 @@ namespace UI.Tables.Concrete.KVIDS
 
         protected override void AddPanelToColumns(Panel panel)
         {
-            var kvid3Panel = (KVID6Panel)panel;
+            var kvid6Panel = (KVID6Panel)panel;
 
-            _codes.AddCell(kvid3Panel.Code);
-            _xs.AddCell(kvid3Panel.X);
-            _ys.AddCell(kvid3Panel.Y);
-            _zs.AddCell(kvid3Panel.Z);
+            _codes.AddCell(kvid6Panel.Code);
+            _xs.AddCell(kvid6Panel.X);
+            _ys.AddCell(kvid6Panel.Y);
+            _zs.AddCell(kvid6Panel.Z);
         }
 
         protected override void RemovePanelFromColumns(Panel panel)
@@ -230,8 +239,12 @@ namespace UI.Tables.Concrete.KVIDS
         #region Event handlers
         private void RemoveButton_Clicked(RemoveButton removeButton, Panel panel)
         {
+            var kvid6Panel = (KVID6Panel)panel;
+
+            GetComponentInParent<KVID6View>().OnPanelDeleted((kvid6Panel.Code.StringValue, new Vector3(kvid6Panel.X.FloatValue, kvid6Panel.Y.FloatValue, kvid6Panel.Z.FloatValue)));
             Remove(panel);
             Destroy(removeButton.gameObject);
+
         }
         #endregion
     }
