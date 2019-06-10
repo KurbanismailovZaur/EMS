@@ -27,6 +27,7 @@ namespace Management.Wires
             _wiring.transform.SetParent(transform);
 
             Imported.Invoke();
+            Log("Imported");
         }
 
         public void SetVisibility(bool state)

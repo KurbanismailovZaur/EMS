@@ -30,8 +30,17 @@ namespace UI
 
         private bool _eatEvents;
 
-        [SerializeField]
         private string _valueSuffix;
+
+        public string ValueSuffix
+        {
+            get => _valueSuffix;
+            set
+            {
+                _valueSuffix = value;
+                UpdateTexts();
+            }
+        }
 
         [Header("Events")]
         public ChangedEvent Changed;
@@ -128,8 +137,8 @@ namespace UI
 
         private void UpdateTexts()
         {
-            _minTextComponent.text = $"{MinValue} {_valueSuffix}";
-            _maxTextComponent.text = $"{MaxValue} {_valueSuffix}";
+            _minTextComponent.text = $"{MinValue} {ValueSuffix}";
+            _maxTextComponent.text = $"{MaxValue} {ValueSuffix}";
         }
 
         private void CallEvent()

@@ -17,7 +17,11 @@ namespace UI
 
         public RangeSlider RangeSlider => _slider;
 
-        public void Show() => SetCanvasGroupOptions(1f, true);
+        public void Show(string suffix)
+        {
+            _slider.ValueSuffix = suffix;
+            SetCanvasGroupOptions(1f, true);
+        }
 
         public void Hide() => SetCanvasGroupOptions(0f, false);
 

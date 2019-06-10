@@ -272,7 +272,7 @@ namespace Facades
         {
             _filter.SetRanges((float)_currentCalculations.FilterMinValue, (float)_currentCalculations.FilterMaxValue);
             _filter.ResetValues();
-            _filter.Show();
+            _filter.Show(_currentCalculations is ElectricFieldStrenght ? "(В/м)" : "(В)");
 
             if (_currentCalculations is ElectricFieldStrenght)
             {
