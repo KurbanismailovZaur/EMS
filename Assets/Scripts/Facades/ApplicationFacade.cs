@@ -193,6 +193,8 @@ namespace Facades
 
         private async Task CalculateMutualActionOfBCSAndBAAsync()
         {
+            CalculationsManager.Instance.RemoveMutualActionOfBCSAndBA();
+
             DatabaseManager.Instance.ResetProgress();
             ProgressDialog.Instance.Show("Вычисление взаимного воздействия БКС и БА");
 

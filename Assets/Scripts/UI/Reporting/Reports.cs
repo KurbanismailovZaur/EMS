@@ -219,7 +219,6 @@ namespace UI.Reporting
         public void ElectricFieldRemoved()
         {
             _kvid6Blocker.SetActive(true);
-            Log("Called");
         }
 
         public void BKSandBACalculated()

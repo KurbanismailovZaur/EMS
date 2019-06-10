@@ -200,6 +200,9 @@ namespace Management.Projects
                 {
                     await new WaitForUpdate();
 
+                    if (!DatabaseManager.Instance.IsConnected)
+                        DatabaseManager.Instance.Connect();
+
                     errorFlag.Flag = true;
                     completeFlag.Flag = true;
 
