@@ -12,6 +12,7 @@ using Management.Interop;
 using UI.Popups;
 using UI.Panels.Wire;
 using System.Collections.ObjectModel;
+using UI.Panels.Exceeding;
 
 namespace Management.Calculations
 {
@@ -45,8 +46,8 @@ namespace Management.Calculations
             var influences = new List<(int a, int b, float value)>();
 
             var maxValue = sourceMutuals.Max(m => Math.Abs(m.value));
-            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), wiresInfluences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.blocksInfluences, m.exceeded,  m.value, color: _gradient.Evaluate((float)(Math.Abs(m.value) / maxValue)))).ToList();
-            
+            var mutuals = sourceMutuals.Select(m => (wire: wires.First(w => w.Name == m.name), wiresInfluences: m.influences.Select(i => (wires.First(w => w.Name == i.name), i.frequency, i.value)).ToList(), m.blocksInfluences, m.exceeded, m.value, color: _gradient.Evaluate((float)(Math.Abs(m.value) / maxValue)))).ToList();
+
             _wires = Wire.Factory.Create(mutuals, transform);
 
             foreach (var wire in _wires)
@@ -75,10 +76,28 @@ namespace Management.Calculations
 
         public override void Filter(float min, float max)
         {
-            foreach (var wire in _wires)
+            if (ExceedingPanel.Instance.Exceeses.Any(e => e.IsChecked))
             {
-                var filterResult = Math.Abs(wire.Value) >= min && Math.Abs(wire.Value) <= max || (WirePanel.Instance.IsOpen && wire.Name == WirePanel.Instance.SelectedName);
-                wire.gameObject.SetActive(filterResult);
+                var selectedNames = ExceedingPanel.Instance.Exceeses.Where(e => e.IsChecked).Select(e => e.Name);
+
+                foreach (var wire in _wires)
+                {
+                    if (selectedNames.Contains(wire.Name))
+                    {
+                        var filterResult = Math.Abs(wire.Value) >= min && Math.Abs(wire.Value) <= max || (WirePanel.Instance.IsOpen && wire.Name == WirePanel.Instance.SelectedName);
+                        wire.gameObject.SetActive(filterResult);
+                    }
+                    else
+                        wire.gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                foreach (var wire in _wires)
+                {
+                    var filterResult = Math.Abs(wire.Value) >= min && Math.Abs(wire.Value) <= max || (WirePanel.Instance.IsOpen && wire.Name == WirePanel.Instance.SelectedName);
+                    wire.gameObject.SetActive(filterResult);
+                }
             }
         }
 

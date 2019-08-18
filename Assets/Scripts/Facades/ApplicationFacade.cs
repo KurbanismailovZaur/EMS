@@ -669,6 +669,8 @@ namespace Facades
             CalculationsManager.Instance.ElectricFieldStrenght.SetCurrentIndexToPoints(index);
             FilterCurrentCalculationsWithCurrentRanges();
         }
+
+        public void ExceedingPanel_Changed() => FilterCurrentCalculationsWithCurrentRanges();
         #endregion
     }
 }

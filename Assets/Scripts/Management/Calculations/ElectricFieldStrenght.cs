@@ -9,6 +9,7 @@ using UnityRandom = UnityEngine.Random;
 using System.Linq;
 using System.Collections.ObjectModel;
 using UI.Popups;
+using UI.Panels.Exceeding;
 
 namespace Management.Calculations
 {
@@ -118,8 +119,21 @@ namespace Management.Calculations
 
         public override void Filter(float min, float max)
         {
-            foreach (var point in _points)
-                point.gameObject.SetActive(Math.Abs(point.CurrentValue) >= min && Math.Abs(point.CurrentValue) <= max);
+            if (ExceedingPanel.Instance.Exceeses.Any(e => e.IsChecked))
+            {
+                var selectedNames = ExceedingPanel.Instance.Exceeses.Where(e => e.IsChecked).Select(e => e.Name);
+
+                foreach (var point in _points)
+                    if (selectedNames.Contains(point.Code))
+                        point.gameObject.SetActive(Math.Abs(point.CurrentValue) >= min && Math.Abs(point.CurrentValue) <= max);
+                    else
+                        point.gameObject.SetActive(false);
+            }
+            else
+            {
+                foreach (var point in _points)
+                    point.gameObject.SetActive(Math.Abs(point.CurrentValue) >= min && Math.Abs(point.CurrentValue) <= max);
+            }
         }
 
         public void SetCurrentIndexToPoints(int index)

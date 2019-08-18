@@ -5,11 +5,19 @@ using System.Threading.Tasks;
 using static UnityEngine.Debug;
 using UnityEngine.UI;
 using System;
+using System.Linq;
+using UnityEngine.Events;
+using System.Collections.ObjectModel;
 
 namespace UI.Panels.Exceeding
 {
-    public class ExceedingPanel : MonoBehaviour
+    public class ExceedingPanel : MonoSingleton<ExceedingPanel>
     {
+        #region Classes
+        [Serializable]
+        public class ChangedEvent : UnityEvent { }
+        #endregion
+
         [SerializeField]
         private CanvasGroup _canvasGroup;
 
@@ -43,13 +51,35 @@ namespace UI.Panels.Exceeding
 
         private bool _isFolded = true;
 
+        private List<Excees> _exceeses = new List<Excees>();
+
+        [SerializeField]
+        private Image _allExcessVisibilityImage;
+
+        [SerializeField]
+        private Button _allExceesButton;
+
+        [Header("Colors")]
+        [SerializeField]
+        private Color _uncheckedColor;
+
+        [SerializeField]
+        private Color _checkedColor;
+
+        public ChangedEvent Changed;
+
+        public ReadOnlyCollection<Excees> Exceeses => _exceeses.AsReadOnly();
+
         private void Awake()
         {
             _hasExceeding.onClick.AddListener(FoldButton_OnClick);
+            _allExceesButton.onClick.AddListener(AllExceesButton_OnClick);
         }
 
         public void Open(string[] names)
         {
+            _allExcessVisibilityImage.color = _uncheckedColor;
+
             if (names.Length == 0)
                 _noExceeding.SetActive(true);
             else
@@ -57,7 +87,14 @@ namespace UI.Panels.Exceeding
                 _hasExceeding.gameObject.SetActive(true);
 
                 foreach (var name in names)
-                    Instantiate(_exceesPrefab, _content).Name = name;
+                {
+                    var excees = Instantiate(_exceesPrefab, _content);
+                    excees.Name = name;
+
+                    excees.Changed += Excees_Changed;
+
+                    _exceeses.Add(excees);
+                }
 
                 _scrollViewElement.preferredHeight = 32f * Mathf.Clamp(names.Length, 1, 4);
                 _viewportElement.preferredHeight = 32f * Mathf.Clamp(names.Length, 1, 4);
@@ -70,6 +107,8 @@ namespace UI.Panels.Exceeding
         {
             foreach (Transform child in _content)
                 Destroy(child.gameObject);
+
+            _exceeses.Clear();
 
             _namesContainer.SetActive(false);
             _hasExceeding.gameObject.SetActive(false);
@@ -105,6 +144,25 @@ namespace UI.Panels.Exceeding
 
         #region Event handlers
         private void FoldButton_OnClick() => ToggleFoldState();
+
+        private void Excees_Changed(bool visibility)
+        {
+            _allExcessVisibilityImage.color = _exceeses.All(e => e.IsChecked) ? _checkedColor : _uncheckedColor;
+
+            Changed.Invoke();
+        }
+
+        private void AllExceesButton_OnClick()
+        {
+            var state = !_exceeses.All(e => e.IsChecked);
+
+            foreach (var excees in _exceeses)
+                excees.SetVisibility(state, false);
+
+            _allExcessVisibilityImage.color = _exceeses.All(e => e.IsChecked) ? _checkedColor : _uncheckedColor;
+
+            Changed.Invoke();
+        }
         #endregion
     }
 }
