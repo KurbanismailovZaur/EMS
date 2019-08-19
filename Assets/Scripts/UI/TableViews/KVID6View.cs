@@ -137,7 +137,6 @@ namespace UI.TableViews
             return table;
         }
 
-
         public void ActivatePage(int number)
         {
             if (_points.Count == 0) return;
@@ -180,20 +179,19 @@ namespace UI.TableViews
             _content.GetComponentInParent<UnityEngine.UI.ScrollRect>().verticalNormalizedPosition = 0f;
         }
 
-
         private void SaveCurrentPageChanges()
         {
+            _points.Clear();
+
             KVID6Table currentTable = (KVID6Table)GetCurrentTable();
 
             for (int i = 0; i < currentTable.PanelCount; ++i)
-            {
+            {  
                 int index = _activePageIndex * _maxRowsOnPage + i;
                 var panel = currentTable.Panels[i];
-                _points[index] = (panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue));
+                _points.Add((panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue)));
             }
         }
-
-
 
         #region Event handlers
         private void Import_OnClick() => Import();

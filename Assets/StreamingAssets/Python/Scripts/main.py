@@ -116,7 +116,7 @@ def script_m3(db_path):
                         SEf = m4.do()
                         ec = ec * SEf
 
-                    Ew += ec
+                    Ew += ec * mt.sin(2 * mt.pi * wire.f * time_bbas[t])
                 E += Ew
 
             for bba in BBAs:  # цикл по ББА
@@ -203,6 +203,11 @@ def script_m3(db_path):
                 data_frequencies.append([er, f_start, f_end, is_excessive])
 
             data_bbas.append([bba.id, data_frequencies])
+            
+            # Сложение напряженности по БКС с напряженностью по ББА
+            Ebba /= 3 ** 0.5
+            for i in range(3):
+                E[i] = mt.copysign(abs(E[i]) + Ebba, E[i])
 
         dct_wires = {}
         for item in data_wires:
