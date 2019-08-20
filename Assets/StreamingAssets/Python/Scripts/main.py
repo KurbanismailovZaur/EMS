@@ -76,15 +76,15 @@ def script_m3(db_path):
     k_percent = 100 / len(set_points)
     v_percent = k_percent
 
-    # Найдем минимальную частоту для вычислении 36 шагов времени
+    # Найдем минимальную частоту для вычислении 18 шагов времени
     # Для кабелей
     f_min = min(*[w.f for w in wires], *[bba.get_min_frequency() for bba in BBAs])
-    t_step = (1 / f_min) / 36  # шаг времени
-    time_wires = list(itertools.accumulate([t_step] * 36))
+    t_step = (1 / f_min) / 18  # шаг времени
+    time_wires = list(itertools.accumulate([t_step] * 18))
     # Для ББА
     f_max = max([(f_start + f_end) / 2 for bba in BBAs for f_start, f_end, value in bba.get_frequency_range()])
-    t_step = (1 / f_max) / 36
-    time_bbas = list(itertools.accumulate([t_step] * 36))
+    t_step = (1 / f_max) / 18
+    time_bbas = list(itertools.accumulate([t_step] * 18))
 
     m3 = Math3()
     m4 = Math4(figures, materials)
@@ -94,7 +94,7 @@ def script_m3(db_path):
     for point in set_points:
         # Блок кода получения значений для шкалы времени
         time_values = []
-        for t in range(36):  # шкала времени
+        for t in range(18):  # шкала времени
             m3.set_t(time_wires[t])
 
             E = np.zeros(3)  #  напряженность электрического поля в заданной точке
@@ -146,7 +146,7 @@ def script_m3(db_path):
         for wire in wires:  # цикл по кабелям
             m3.set_wire(wire)
             m3.set_c(point)
-            m3.set_t((1 / wire.f) / 36 * 9)
+            m3.set_t((1 / wire.f) / 18 * 9)
 
             m4.set_f(wire.f)
             m4.set_c(point)

@@ -36,7 +36,7 @@ namespace UI.Sequencing
         [SerializeField]
         private GameObject _pauseImage;
 
-        private const float _timeDelta = 1f / 36f;
+        private const float _timeDelta = 1f / 18f;
 
         private static NumberFormatInfo _nfi = new NumberFormatInfo { NumberDecimalSeparator = "." };
 
@@ -82,7 +82,7 @@ namespace UI.Sequencing
 
             while (true)
             {
-                var time = Mathf.Round(((Time.time - startTime) % 1f).Remap(0f, 1f, 0f, 36f));
+                var time = Mathf.Round(((Time.time - startTime) % 1f).Remap(0f, 1f, 0f, 18f));
 
                 _slider.value = time;
 
@@ -111,7 +111,7 @@ namespace UI.Sequencing
         #region Event handlers
         private void Slider_OnValueChanged(float value)
         {
-            _timeText.text = $"{value}/36";
+            _timeText.text = $"{value}/18";
 
             Changed.Invoke((int)value);
         }
