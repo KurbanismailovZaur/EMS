@@ -59,6 +59,25 @@ namespace Management.Interop
 
         private string RunPythonScript(string arguments)
         {
+            //var start = new ProcessStartInfo
+            //{
+            //    FileName = @"C:\Users\Zaur\Desktop\App.exe",
+            //    UseShellExecute = false,
+            //    CreateNoWindow = true,
+            //    RedirectStandardOutput = true,
+            //    RedirectStandardError = true
+            //};
+
+            //using (Process process = Process.Start(start))
+            //{
+            //    using (StreamReader reader = process.StandardOutput)
+            //    {
+            //        var data = reader.ReadToEnd();
+            //        Log(data);
+            //    }
+            //}
+
+            //return null;
             var start = new ProcessStartInfo
             {
                 FileName = Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer ? "/usr/local/bin/python3" : _pythonPath,
@@ -76,11 +95,27 @@ namespace Management.Interop
                     var error = process.StandardError.ReadToEnd();
 
                     if (!string.IsNullOrWhiteSpace(error))
-                        throw new PythonException(error);
+                        throw new PythonException(DeescapeErrorMessage(error));
 
                     return reader.ReadToEnd();
                 }
             }
+        }
+
+        private string DeescapeErrorMessage(string message)
+        {
+            for (int i = 0; i < message.Length; i++)
+            {
+                if (message[i] == '\\' && message.Substring(i + 1, 4) == "suka")
+                {
+                    char symbol = (char)int.Parse(message.Substring(i + 5, 4));
+
+                    message = message.Remove(i, 9);
+                    message = message.Insert(i, $"{symbol}");
+                }
+            }
+
+            return message;
         }
     }
 }

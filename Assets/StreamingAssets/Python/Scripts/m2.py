@@ -32,7 +32,7 @@ class Math2:
     def set_range_params(self, f, e_id):
         self.BBA_f = f
         self.BBA_E = e_id
-        
+
     def set_fragments(self, a1, a2, b1, b2):
         """
         :param a1: начала фрагмента a
@@ -67,13 +67,13 @@ class Math2:
         p_a1a2 = self.a2 - self.a1
         p_b1b2 = self.b2 - self.b1
         # вычисление длин отрезков провода (AB, BC, CD, etc.)
-        d_compare = get_distance(self.a1, self.a2)
-        d_current = get_distance(self.b1, self.b2)
+        d_compare = round(get_distance(self.a1, self.a2), 3)
+        d_current = round(get_distance(self.b1, self.b2), 3)
         # вычисление длин отрезков между проводами (a1b1, a1b2, a1C2, etc.)
-        d_a1b1 = get_distance(self.a1, self.b1)
-        d_a2b1 = get_distance(self.a2, self.b1)
-        d_a1b2 = get_distance(self.a1, self.b2)
-        d_a2b2 = get_distance(self.a2, self.b2)
+        d_a1b1 = round(get_distance(self.a1, self.b1), 3)
+        d_a2b1 = round(get_distance(self.a2, self.b1), 3)
+        d_a1b2 = round(get_distance(self.a1, self.b2), 3)
+        d_a2b2 = round(get_distance(self.a2, self.b2), 3)
         # вычисляем косинус угла между отрезками
         cos_segment = get_cos(p_a1a2, p_b1b2, d_compare, d_current)
 
@@ -81,6 +81,21 @@ class Math2:
         p2x, p2y, p2z = p_b1b2
 
         CE = 0  # величина электрической емкости между проводами
+
+        a_uid = ''
+        for ch in self.wire_a.id:
+            a_uid += f"\\suka{str(ord(ch)).rjust(4, '0')}"
+
+        b_uid = ''
+        for ch in self.wire_b.id:
+            b_uid += f"\\suka{str(ord(ch)).rjust(4, '0')}"
+
+        # Проверяем на пересечение узлами отрезков
+        if d_a1b1 + d_a2b1 == d_compare \
+                or d_a1b2 + d_a2b2 == d_compare \
+                or d_a1b1 + d_a1b2 == d_current \
+                or d_a2b1 + d_a2b2 == d_current:
+            raise Exception(f"Cable crossing: {a_uid} with {b_uid}")
 
         """
         Определения положения двух отрезков относительно друг друга:
@@ -141,6 +156,44 @@ class Math2:
                        - mt.hypot(af, h) + mt.hypot(bt, h)
                        + mt.hypot(gm, h) - mt.hypot(dt, h)) * cos_segment
         else:  # общий случай
+            # Проверяем на пересечения кабелей
+            complan = (self.a1.x - self.b1.x) * (p2z * p1y - p2y * p1z) \
+                      - (self.a1.y - self.b1.y) * (p2z * p1x - p2x * p1z) \
+                      + (self.a1.z - self.b1.z) * (p2y * p1x - p2x * p1y)
+            if complan == 0:
+                zero_xyz = np.array([0, 0, 0])
+
+                ab1_x = (self.b1.z - self.a1.z) * p1y - (self.b1.y - self.a1.y) * p1z
+                ab1_y = -((self.b1.z - self.a1.z) * p1x - (self.b1.x - self.a1.x) * p1z)
+                ab1_z = (self.b1.y - self.a1.y) * p1x - (self.b1.x - self.a1.x) * p1y
+                ab2_x = (self.b2.z - self.a1.z) * p1y - (self.b2.y - self.a1.y) * p1z
+                ab2_y = -((self.b2.z - self.a1.z) * p1x - (self.b2.x - self.a1.x) * p1z)
+                ab2_z = (self.b2.y - self.a1.y) * p1x - (self.b2.x - self.a1.x) * p1y
+                ab1 = np.array([ab1_x, ab1_y, ab1_z])
+                ab2 = np.array([ab2_x, ab2_y, ab2_z])
+                p_ab1 = ab1 - zero_xyz
+                p_ab2 = ab2 - zero_xyz
+                d_ab1 = get_distance(zero_xyz, ab1)
+                d_ab2 = get_distance(zero_xyz, ab2)
+                cosab = get_cos(p_ab1, p_ab2, d_ab1, d_ab2)
+
+                ba1_x = (self.a1.z - self.b1.z) * p2y - (self.a1.y - self.b1.y) * p2z
+                ba1_y = -((self.a1.z - self.b1.z) * p2x - (self.a1.x - self.b1.x) * p2z)
+                ba1_z = (self.a1.y - self.b1.y) * p2x - (self.a1.x - self.b1.x) * p2y
+                ba2_x = (self.a2.z - self.b1.z) * p2y - (self.a2.y - self.b1.y) * p2z
+                ba2_y = -((self.a2.z - self.b1.z) * p2x - (self.a2.x - self.b1.x) * p2z)
+                ba2_z = (self.a2.y - self.b1.y) * p2x - (self.a2.x - self.b1.x) * p2y
+                ba1 = np.array([ba1_x, ba1_y, ba1_z])
+                ba2 = np.array([ba2_x, ba2_y, ba2_z])
+                p_ba1 = ba1 - zero_xyz
+                p_ba2 = ba2 - zero_xyz
+                d_ba1 = get_distance(zero_xyz, ba1)
+                d_ba2 = get_distance(zero_xyz, ba2)
+                cosba = get_cos(p_ba1, p_ba2, d_ba1, d_ba2)
+
+                if cosab == -1 and cosba == -1:
+                    raise Exception(f"Cable crossing: {a_uid} with {b_uid}")
+
             # вычисление вектора нормали
             nx = p1y * p2z - p1z * p2y
             ny = -(p1x * p2z - p1z * p2x)
@@ -156,7 +209,7 @@ class Math2:
             # параметр прямой заданной парамметрически которая является
             t1 = (-dpl_current - apl_current * self.a1.x - bpl_current * self.a1.y
                   - cpl_current * self.a1.z) / (apl_current ** 2 + bpl_current ** 2
-                                                     + cpl_current ** 2)
+                                                + cpl_current ** 2)
             # координаты точни a1нов
             a1bx = self.a1.x + t1 * apl_current
             a1by = self.a1.y + t1 * bpl_current
@@ -240,9 +293,9 @@ class Math2:
 
             if h != 0:
                 AM = mt.atan((x1 + y1 + d_a1b1) / h * mt.tan(fi / 2)) \
-                    + mt.atan((x2 + y2 + d_a2b2) / h * mt.tan(fi / 2)) \
-                    - mt.atan((x1 + y2 + d_a1b2) / h * mt.tan(fi / 2)) \
-                    - mt.atan((x2 + y1 + d_a2b1) / h * mt.tan(fi / 2))
+                     + mt.atan((x2 + y2 + d_a2b2) / h * mt.tan(fi / 2)) \
+                     - mt.atan((x1 + y2 + d_a1b2) / h * mt.tan(fi / 2)) \
+                     - mt.atan((x2 + y1 + d_a2b1) / h * mt.tan(fi / 2))
             else:
                 AM = 0
 
