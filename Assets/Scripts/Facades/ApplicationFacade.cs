@@ -206,8 +206,12 @@ namespace Facades
             }
             catch (Exception ex)
             {
+                await new WaitForUpdate();
+
                 ProgressDialog.Instance.Hide();
                 ErrorDialog.Instance.ShowError("Ошибка при вычислении взаимного воздействия БКС и БА.", ex);
+
+                return;
             }
 
             await new WaitForUpdate();

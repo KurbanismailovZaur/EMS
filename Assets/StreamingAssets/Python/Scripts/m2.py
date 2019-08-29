@@ -67,13 +67,13 @@ class Math2:
         p_a1a2 = self.a2 - self.a1
         p_b1b2 = self.b2 - self.b1
         # вычисление длин отрезков провода (AB, BC, CD, etc.)
-        d_compare = round(get_distance(self.a1, self.a2), 3)
-        d_current = round(get_distance(self.b1, self.b2), 3)
+        d_compare = get_distance(self.a1, self.a2)
+        d_current = get_distance(self.b1, self.b2)
         # вычисление длин отрезков между проводами (a1b1, a1b2, a1C2, etc.)
-        d_a1b1 = round(get_distance(self.a1, self.b1), 3)
-        d_a2b1 = round(get_distance(self.a2, self.b1), 3)
-        d_a1b2 = round(get_distance(self.a1, self.b2), 3)
-        d_a2b2 = round(get_distance(self.a2, self.b2), 3)
+        d_a1b1 = get_distance(self.a1, self.b1)
+        d_a2b1 = get_distance(self.a2, self.b1)
+        d_a1b2 = get_distance(self.a1, self.b2)
+        d_a2b2 = get_distance(self.a2, self.b2)
         # вычисляем косинус угла между отрезками
         cos_segment = get_cos(p_a1a2, p_b1b2, d_compare, d_current)
 
