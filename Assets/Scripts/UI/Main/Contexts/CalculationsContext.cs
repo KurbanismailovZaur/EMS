@@ -149,10 +149,6 @@ namespace UI.Main.Contexts
 
         public void WiringManager_Removed() => SetCalcBtnsInteractable(false);
 
-        public void ModelManager_PlanesImported() => CheckAndSetCalcBtnsInteractable();
-
-        public void ModelManager_PlanesRemoved() => SetCalcBtnsInteractable(false);
-
         #region TableDataManager
         public void TableDataManager_KVID1Imported() => CheckAndSetCalcBtnsInteractable();
 
