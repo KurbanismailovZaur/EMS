@@ -462,6 +462,8 @@ namespace Facades
 
             DatabaseManager.Instance.UpdateKVID3(WiringManager.Instance.Wiring);
             PopupManager.Instance.PopSuccess("БКС обновлены");
+
+            CalculationsManager.Instance.MutualActionOfBCSAndBA.IsVisible = false;
         }
 
         public void WiringManager_VisibilityChanged()
