@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using UnityEngine.UI;
+using UI.Dialogs;
 
 namespace Management.Interop
 {
@@ -17,10 +18,14 @@ namespace Management.Interop
         {
             public PythonException(string message) : base(message) { }
         }
+
         private string _pythonPath;
 
         [SerializeField]
         private string _pathToMainScript;
+
+        [SerializeField]
+        private ErrorDialog _errorDialog;
 
         private void Start()
         {
@@ -95,7 +100,12 @@ namespace Management.Interop
                     var error = process.StandardError.ReadToEnd();
 
                     if (!string.IsNullOrWhiteSpace(error))
-                        throw new PythonException(DeescapeErrorMessage(error));
+                    {
+                        if (error.Contains("Traceback"))
+                            throw new PythonException(DeescapeErrorMessage(error));
+                        else
+                            _errorDialog.ShowWarningInMainThread("Предупреждение", DeescapeErrorMessage(error)).WrapErrors();
+                    }
 
                     return reader.ReadToEnd();
                 }

@@ -18,10 +18,10 @@ class Math4Figure:
 
         # Значения по осям X, Y, Z должны лежать в пределах r_xyz (исходя из размеров модели)
         # где r_xyz[i] - ренальные размеры (радиусы) изделия по осям
-        if r_xyz.all():  # реальные значения должны быть больше нуля
-            self.r_xyz = np.abs(r_xyz)
-        else:
-            raise ValueError('real sizes should not be zero')
+        # if r_xyz.all():  # реальные значения должны быть больше нуля
+        #     self.r_xyz = np.abs(r_xyz)
+        # else:
+        #     raise ValueError('real sizes should not be zero')
 
     @staticmethod
     @jit(nopython=True)
@@ -162,7 +162,7 @@ def main():
 
     # Нормирования геометрических параметров модели
     print('=> обработка данных...')
-    m.normalization_model()
+    # m.normalization_model()
     figures = m.do()
 
     # запись полученных кубов в базу данных

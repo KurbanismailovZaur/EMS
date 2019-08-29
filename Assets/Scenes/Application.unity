@@ -561,7 +561,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d5d9727083dc5f4e842e166f160988c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _allowedMaxSize: 4
+  _allowedMaxSize: 100
   ModelImported:
     m_PersistentCalls:
       m_Calls:
@@ -1284,6 +1284,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pathToMainScript: Python/Scripts/main.py
+  _errorDialog: {fileID: 1484634271}
 --- !u!224 &864559571 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7662794882561303662, guid: 3e25973e7a1f9b04389d9c908c062b7b,
@@ -2112,6 +2113,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 981a81d4593258e42b031be3cdf89eab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1484634271 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7662794882561303659, guid: 3e25973e7a1f9b04389d9c908c062b7b,
+    type: 3}
+  m_PrefabInstance: {fileID: 7662794881763853757}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1610305737850854b9338f8583db68f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1502489318
@@ -7812,12 +7825,12 @@ PrefabInstance:
     - target: {fileID: 5784064233775152200, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000016350647
+      value: 0.14239396
       objectReference: {fileID: 0}
     - target: {fileID: 8362528287559011351, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0000029228422
+      value: 0.08346827
       objectReference: {fileID: 0}
     - target: {fileID: 1235963582306367238, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
@@ -7872,12 +7885,12 @@ PrefabInstance:
     - target: {fileID: 4868755466886999410, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000008948957
+      value: 0.14238991
       objectReference: {fileID: 0}
     - target: {fileID: 5380508979054013774, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000009692859
+      value: 0.08346915
       objectReference: {fileID: 0}
     - target: {fileID: 6417296273377904850, guid: d986faaa017cd884398982c4b96fafeb,
         type: 3}

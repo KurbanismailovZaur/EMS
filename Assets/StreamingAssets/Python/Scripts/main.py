@@ -1,4 +1,5 @@
 import os
+
 if os.name == 'nt':  # для Windows
     import sys
 
@@ -8,7 +9,6 @@ if os.name == 'nt':  # для Windows
 
     sys.path.append(vendor_dir)
     sys.path.append(parent_dir)
-
 
 from storage import Storage
 from m2 import Math2
@@ -20,6 +20,7 @@ from report import Report
 import numpy as np
 import math as mt
 import itertools
+
 
 # TODO привести в порядок каталог проекта
 # TODO проверить зависимост ИД в скрипах
@@ -44,10 +45,10 @@ def create_figures(db_path):
 
     m = Math4Figure(np.array(planes), np.array(sizes))
 
-    storage.set_progress('85%')
+    # storage.set_progress('85%')
 
     # Нормирования геометрических параметров модели
-    m.normalization_model()
+    # m.normalization_model()
 
     storage.set_progress('95%')
 
@@ -203,7 +204,7 @@ def script_m3(db_path):
                 data_frequencies.append([er, f_start, f_end, is_excessive])
 
             data_bbas.append([bba.id, data_frequencies])
-            
+
             # Сложение напряженности по БКС с напряженностью по ББА
             Ebba /= 3 ** 0.5
             for i in range(3):
