@@ -183,7 +183,7 @@ namespace UI.TableViews
 
         private void SaveCurrentPageChanges()
         {
-            _points.Clear();
+            //_points.Clear();
 
             KVID6Table currentTable = (KVID6Table)GetCurrentTable();
 
@@ -191,7 +191,7 @@ namespace UI.TableViews
             {  
                 int index = _activePageIndex * _maxRowsOnPage + i;
                 var panel = currentTable.Panels[i];
-                _points.Add((panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue)));
+                _points[index] = (panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue));
             }
         }
 
