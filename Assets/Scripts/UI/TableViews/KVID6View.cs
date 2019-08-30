@@ -31,7 +31,9 @@ namespace UI.TableViews
         [SerializeField]
         private FileExplorer _explorer;
 
-        private List<(string code, Vector3 position)> _points = new List<(string code, Vector3 position)>();
+        //private List<(string code, Vector3 position)> _points = new List<(string code, Vector3 position)>();
+        private Dictionary<string, Vector3> _points = new Dictionary<string, Vector3>();
+
         private int _activePageIndex = 0;
 
         private int _currentRowIndex = -1;
@@ -72,7 +74,8 @@ namespace UI.TableViews
             DeepClear();
             foreach (var point in CalculationsManager.Instance.ElectricFieldStrenght.Points)
             {
-                _points.Add((point.Code, point.transform.localPosition));
+                //_points.Add((point.Code, point.transform.localPosition));
+                _points.Add(point.Code, point.transform.localPosition);
 
                 int i;
                 if(int.TryParse(point.Code.Substring(1), out i))
@@ -93,7 +96,14 @@ namespace UI.TableViews
         {
             SaveCurrentPageChanges();
 
-            CalculationsManager.Instance.CalculateElectricFieldStrenght(_points, 1f);
+            //CalculationsManager.Instance.CalculateElectricFieldStrenght(_points, 1f);
+
+            var exportPoints = new List<(string code, Vector3 position)>();
+            foreach (var point in _points)
+            {
+                exportPoints.Add((point.Key, point.Value));
+            }
+            CalculationsManager.Instance.CalculateElectricFieldStrenght(exportPoints, 1f);
 
             Close();
         }
@@ -112,10 +122,23 @@ namespace UI.TableViews
                 var points = KVID6DataReader.ReadFromFile(_explorer.LastResult);
                 DeepClear();
 
-                _points = points;
+                //_points = points;
 
-                foreach(var point in _points)
+                //foreach(var point in _points)
+                //{
+                //    int i;
+                //    if (int.TryParse(point.code.Substring(1), out i))
+                //    {
+                //        if (i > _currentRowIndex) _currentRowIndex = i;
+                //    }
+                //}
+
+
+
+                foreach (var point in points)
                 {
+                    _points.Add(point.code, point.position);
+
                     int i;
                     if (int.TryParse(point.code.Substring(1), out i))
                     {
@@ -123,6 +146,7 @@ namespace UI.TableViews
                     }
                 }
 
+                _saveButton.interactable = _points.Count != 0;
                 ActivatePage(0);
             }
             catch (Exception e)
@@ -153,10 +177,10 @@ namespace UI.TableViews
             foreach (var point in pagePoints)
             {
                 var panel = (KVID6Table.KVID6Panel)currentTable.AddEmpty(Cell_Clicked);
-                panel.Code.StringValue = point.code;
-                panel.X.FloatValue = point.position.x;
-                panel.Y.FloatValue = point.position.y;
-                panel.Z.FloatValue = point.position.z;
+                panel.Code.StringValue = point.Key;
+                panel.X.FloatValue = point.Value.x;
+                panel.Y.FloatValue = point.Value.y;
+                panel.Z.FloatValue = point.Value.z;
             }
 
             _activePageIndex = number;
@@ -183,15 +207,14 @@ namespace UI.TableViews
 
         private void SaveCurrentPageChanges()
         {
-            //_points.Clear();
-
             KVID6Table currentTable = (KVID6Table)GetCurrentTable();
 
             for (int i = 0; i < currentTable.PanelCount; ++i)
             {  
                 int index = _activePageIndex * _maxRowsOnPage + i;
                 var panel = currentTable.Panels[i];
-                _points[index] = (panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue));
+                //_points[index] = (panel.Code.StringValue, new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue));
+                _points[panel.Code.StringValue] = new Vector3(panel.X.FloatValue, panel.Y.FloatValue, panel.Z.FloatValue);
             }
         }
 
@@ -207,7 +230,8 @@ namespace UI.TableViews
             {
                 SaveCurrentPageChanges();
             }
-            _points.Add(($"Т{++_currentRowIndex}", Vector3.zero));
+            //_points.Add(($"Т{++_currentRowIndex}", Vector3.zero));
+            _points.Add($"Т{++_currentRowIndex}", Vector3.zero);
 
             ActivatePage((_points.Count % _maxRowsOnPage == 0) ? Mathf.CeilToInt(_points.Count / _maxRowsOnPage) - 1 : Mathf.CeilToInt(_points.Count / _maxRowsOnPage));
 
@@ -218,7 +242,8 @@ namespace UI.TableViews
 
         public void OnPanelDeleted((string code, Vector3 position) panelData)
         {
-            _points.Remove(panelData);
+            //_points.Remove(panelData);
+            _points.Remove(panelData.code);
             _saveButton.interactable = _points.Count != 0;
         }
         #endregion
