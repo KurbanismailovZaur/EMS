@@ -256,6 +256,7 @@ namespace Management
         private const string resultM2 = "ResultM2";
         private const string progress = "Progress";
         private const string modelSizes = "ModelSizes";
+        private const string modelFigure = "ModelFigure";
         #endregion
 
         public string DatabasePath { get; private set; }
@@ -319,7 +320,10 @@ namespace Management
 
         public void RemovePlanes()
         {
+            _dbManager.BeginTransaction();
             _dbManager.Execute($"DELETE FROM {modelPoint}");
+            _dbManager.Execute($"DELETE FROM {modelFigure}");
+            _dbManager.Commit();
         }
 
         #region KVIDs

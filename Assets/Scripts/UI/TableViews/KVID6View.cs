@@ -65,6 +65,8 @@ namespace UI.TableViews
 
         protected override void LoadData()
         {
+            _saveButton.interactable = _points.Count != 0;
+
             if (!CalculationsManager.Instance.ElectricFieldStrenght.IsCalculated) return;
 
             DeepClear();
@@ -210,11 +212,14 @@ namespace UI.TableViews
             ActivatePage((_points.Count % _maxRowsOnPage == 0) ? Mathf.CeilToInt(_points.Count / _maxRowsOnPage) - 1 : Mathf.CeilToInt(_points.Count / _maxRowsOnPage));
 
             StartCoroutine(UpdateScrollrectVerticalRoutine());
+
+            _saveButton.interactable = _points.Count != 0;
         }
 
         public void OnPanelDeleted((string code, Vector3 position) panelData)
         {
             _points.Remove(panelData);
+            _saveButton.interactable = _points.Count != 0;
         }
         #endregion
     }
