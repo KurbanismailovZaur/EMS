@@ -360,7 +360,11 @@ namespace UI.TableViews
         private void RemoveTabButton_OnClick()
         {
             var currentAssociation = _tabsAssociations.Find(a => a.tab == _currentTab);
-            if (TableDataManager.Instance.IsUsableKVID2Name(currentAssociation.tab.Name)) return;
+            if (TableDataManager.Instance.IsUsableKVID2Name(currentAssociation.tab.Name))
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Невозможно удалить вкладку так как на нее имеется ссылка из таблицы КВИД 5.", "").WrapErrors();
+                return;
+            }
 
             RemoveAssociation(currentAssociation);
         }

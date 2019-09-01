@@ -61,12 +61,6 @@ namespace UI.Dialogs
 
             Show(_headerWarningText, $"<color=#FFFF60>Описание:</color>\n{description}\n\n{warning}");
         }
-        public async Task ShowWarningFromBackgroundThread(string description, string warning)
-        {
-            await new WaitForUpdate();
-
-            ShowWarningInMainThread(description, warning);
-        }
 
         private void Show(Text header, string text)
         {

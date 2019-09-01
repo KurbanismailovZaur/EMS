@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using Management.Wires;
 using Management.Tables;
 using System.Linq;
+using UI.Dialogs;
 
 namespace UI.Tables.Concrete.KVIDS
 {
@@ -296,7 +297,11 @@ namespace UI.Tables.Concrete.KVIDS
         #region Event handlers
         private void RemoveButton_Clicked(RemoveButton removeButton, Panel panel)
         {
-            if (TableDataManager.Instance.IsUsableKVID5Row(((KVID5Panel)panel).Code.StringValue)) return;
+            if (TableDataManager.Instance.IsUsableKVID5Row(((KVID5Panel)panel).Code.StringValue))
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Невозможно удалить строку так как на нее имеется ссылка из таблицы КВИД 3.", "").WrapErrors();
+                return;
+            }
 
             Remove(panel);
             Destroy(removeButton.gameObject);
