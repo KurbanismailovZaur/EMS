@@ -13,6 +13,7 @@ using UI.Tables;
 using UI.Panels;
 using UI.Dialogs;
 using System;
+using System.Linq;
 
 namespace UI.TableViews
 {
@@ -110,7 +111,17 @@ namespace UI.TableViews
         public override void Save()
         {
             var usableKvid2Tabs = new List<string>();
-            TableDataManager.Instance.SetKVID5Data(((KVID5Table)_tabsAssociations[0].table).GetPanelsData(usableKvid2Tabs), usableKvid2Tabs);
+            var datas = ((KVID5Table)_tabsAssociations[0].table).GetPanelsData(usableKvid2Tabs);
+
+            var duplicatedCount = datas.GroupBy(d => d.code).Where(g => g.Count() > 1).Select(x => x.Key).Count();
+
+            if (duplicatedCount > 0)
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Два одинаковых ключа в поле \"Код\" не разрешены", "").WrapErrors();
+                return;
+            }
+
+            TableDataManager.Instance.SetKVID5Data(datas, usableKvid2Tabs);
 
             Close();
         }

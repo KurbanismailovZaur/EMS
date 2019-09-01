@@ -155,6 +155,14 @@ namespace UI.TableViews
 
         public override void Save()
         {
+            var duplicatedCount = _tabsAssociations.GroupBy(a => a.name).Where(g => g.Count() > 1).Select(g => g.Key).Count();
+
+            if (duplicatedCount > 0)
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Два одинаковых названия вкладок не разрешены", "").WrapErrors();
+                return;
+            }
+
             var wires = new List<Wire>();
             List<string> usableKVID5RowIds = new List<string>();
 

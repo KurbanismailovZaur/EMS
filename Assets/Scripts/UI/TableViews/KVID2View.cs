@@ -140,6 +140,14 @@ namespace UI.TableViews
                 result.Add((name, productName, center, voltages));
             }
 
+            var duplicatedCount = result.GroupBy(x => x.tabName).Where(g => g.Count() > 1).Select(x => x.Key).Count();
+
+            if (duplicatedCount > 0)
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Два одинаковых названия вкладок не разрешены", "").WrapErrors();
+                return;
+            }
+
             TableDataManager.Instance.SetKVID2Data(result);
             Close();
         }

@@ -12,6 +12,7 @@ using Management.Tables;
 using UI.Tables;
 using System;
 using UI.Dialogs;
+using System.Linq;
 
 namespace UI.TableViews
 {
@@ -127,6 +128,34 @@ namespace UI.TableViews
 
         public override void Save()
         {
+            var data0 = ((KVID8Tab0Table)_tabsAssociations[0].table).GetPanelsData();
+
+            var duplicatedCount = data0.GroupBy(p => p.pointID).Where(g => g.Count() > 1).Select(g => g.Key).Count();
+
+            if (duplicatedCount > 0)
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Два одинаковых названия в поле \"Код точки\" во вкладке \"В точках мониторинга\" не разрешены", "").WrapErrors();
+                return;
+            }
+
+            var data1 = ((KVID8Tab1Table)_tabsAssociations[1].table).GetPanelsData();
+
+            duplicatedCount = data1.GroupBy(p => p.pointID).Where(g => g.Count() > 1).Select(g => g.Key).Count();
+
+            if (duplicatedCount > 0)
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Два одинаковых названия в поле \"Код ЭС\" во вкладке \"В точках мониторинга\" не разрешены", "").WrapErrors();
+                return;
+            }
+
+            duplicatedCount = data1.GroupBy(p => p.wireID).Where(g => g.Count() > 1).Select(g => g.Key).Count();
+
+            if (duplicatedCount > 0)
+            {
+                ErrorDialog.Instance.ShowWarningInMainThread("Два одинаковых названия в поле \"Код кабеля\" во вкладке \"В точках мониторинга\" не разрешены", "").WrapErrors();
+                return;
+            }
+
             TableDataManager.Instance.SetKVID8Data(((KVID8Tab0Table)_tabsAssociations[0].table).GetPanelsData(), ((KVID8Tab1Table)_tabsAssociations[1].table).GetPanelsData());
 
             Close();
