@@ -156,13 +156,13 @@ public static class ProjectSerializer
                 float pointRadius = ReadPointRadius(reader);
 
                 #region Planes
-                var planes = DatabaseManager.Instance.GetPlanes();
+                var isPlanesCalculated = DatabaseManager.Instance.IsPlanesCalculated();
 
-                if (planes != null)
+                if (isPlanesCalculated)
                 {
                     await new WaitForUpdate();
 
-                    ModelManager.Instance.ImportPlanes(planes);
+                    ModelManager.Instance.ImmitateImportCalculatedPlanes();
                 }
 
                 await new WaitForBackgroundThread();

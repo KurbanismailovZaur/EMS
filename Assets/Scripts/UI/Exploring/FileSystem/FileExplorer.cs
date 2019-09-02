@@ -125,7 +125,8 @@ namespace UI.Exploring.FileSystem
             {
                 _explorer.SelectElementByName(name);
 
-                _explorer._submitButton.interactable = name != string.Empty;
+                if (!string.IsNullOrEmpty(_explorer.CurrentPath))
+                    _explorer._submitButton.interactable = name != string.Empty;
             }
             #endregion
         }

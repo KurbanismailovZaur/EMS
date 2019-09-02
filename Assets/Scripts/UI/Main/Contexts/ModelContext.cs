@@ -128,6 +128,8 @@ namespace UI.Main.Contexts
             _planesModelImported.enabled = true;
         }
 
+        public void ModelManager_ImmitationalPlanesImported() => ModelManager_PlanesImported();
+
         public void ModelManager_PlanesRemoved()
         {
             _removePlanesButton.interactable = false;

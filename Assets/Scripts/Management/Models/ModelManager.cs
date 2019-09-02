@@ -50,6 +50,8 @@ namespace Management.Models
 
         public UnityEvent PlanesRemoved;
 
+        public UnityEvent ImmitationalPlanesImported;
+
         public Model Model { get; private set; }
 
         public ReadOnlyCollection<(int materialID, List<Plane> planes)> MaterialPlanesPairs => _materialsPlanesPairs == null ? null : new ReadOnlyCollection<(int materialID, List<Plane>)>(_materialsPlanesPairs);
@@ -206,12 +208,11 @@ namespace Management.Models
             PlanesImported.Invoke();
         }
 
-        public void ImportPlanes(List<(int materialID, List<Plane>)> planes)
+        public void ImmitateImportCalculatedPlanes()
         {
-            _materialsPlanesPairs = planes;
-
-            PlanesImported.Invoke();
+            ImmitationalPlanesImported.Invoke();
         }
+
 
         public Dictionary<string, List<Plane>> GetVerticesInfoFromOBJ(string pathToOBJ)
         {

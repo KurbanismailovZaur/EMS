@@ -25,6 +25,19 @@ namespace Management
     public class DatabaseManager : MonoSingleton<DatabaseManager>
     {
         #region Classes
+        private class ModelFigure
+        {
+            public float x { get; set; }
+
+            public float y { get; set; }
+
+            public float z { get; set; }
+
+            public float r { get; set; }
+
+            public int material_id { get; set; }
+        }
+
         private class ModelPointInfo
         {
             public float x1 { get; set; }
@@ -500,13 +513,10 @@ namespace Management
             _dbManager.Commit();
         }
 
-        public List<(int materialID, List<ModelManager.Plane> planes)> GetPlanes()
+        public bool IsPlanesCalculated()
         {
-            var modelPoints = _dbManager.Query<ModelPointInfo>($"SELECT * FROM {modelPoint}");
-            var planes = modelPoints.GroupBy(p => p.material_id).Select(g => (g.Key, g.Select(gp => new ModelManager.Plane(new Vector3(gp.x1, gp.y1, gp.z1), new Vector3(gp.x2, gp.y2, gp.z2), new Vector3(gp.x3, gp.y3, gp.z3))).ToList())).ToList();
-
-            return planes.Count == 0 ? null : planes;
-
+            var modelFigures = _dbManager.Query<ModelFigure>($"SELECT * FROM {modelFigure}");
+            return modelFigure.Count() > 0 ? true : false;
         }
 
         public (List<TableMaterial> materials, List<WireMark> wireMarks) GetReferencesData()
