@@ -17,7 +17,7 @@ namespace UI.Tables
 
         public RectTransformChangedEvent RectTransformChanged;
 
-        private List<object> _cells = new List<object>();
+        public List<object> _cells = new List<object>();
 
         public void AddCell(Cell cell) => _cells.Add(cell);
 

@@ -24,7 +24,7 @@ namespace UI.Tables
         private Cell _targetCell;
 
         private Action<string> _setFunction;
-        
+
         private ScrollRect _scrollRect;
 
         [SerializeField]
@@ -143,6 +143,8 @@ namespace UI.Tables
 
         private void SetUniqueString(string text)
         {
+            _targetCell.Column._cells.RemoveAll(x => (Cell)x == null);
+
             if (!string.IsNullOrWhiteSpace(text) && !_targetCell.Column.Cells.Any(c => c.StringValue == text))
                 _targetCell.StringValue = text;
         }
